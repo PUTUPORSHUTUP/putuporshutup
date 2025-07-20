@@ -21,9 +21,6 @@ const Index = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-6xl md:text-8xl font-gaming font-bold mb-6">
-            BRAG. WAGER. WIN.
-          </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
             The ultimate gaming wagering platform. Put your skills where your mouth is.
           </p>
