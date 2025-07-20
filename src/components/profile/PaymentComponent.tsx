@@ -124,10 +124,10 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
     if (!user || !withdrawAmount) return;
     
     const amount = parseFloat(withdrawAmount);
-    if (amount < 10) {
+    if (amount < 1) {
       toast({
         title: "Invalid Amount",
-        description: "Minimum withdrawal is $10.00",
+        description: "Minimum withdrawal is $1.00",
         variant: "destructive",
       });
       return;
@@ -144,7 +144,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
 
     setProcessingWithdraw(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-withdrawal', {
+      const { data, error } = await supabase.functions.invoke('instant-withdrawal', {
         body: { amount }
       });
 
@@ -158,8 +158,8 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
       }
 
       toast({
-        title: "Withdrawal Requested",
-        description: `$${amount} withdrawal request submitted. Processing may take 1-3 business days.`,
+        title: "Instant Withdrawal Complete!",
+        description: `$${amount} has been withdrawn instantly to your account.`,
       });
 
       setWithdrawAmount('');
@@ -261,7 +261,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
               <Input
                 type="number"
                 step="0.01"
-                min="10"
+                min="1"
                 max={balance}
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
@@ -270,7 +270,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
               />
               <Button 
                 onClick={handleWithdraw}
-                disabled={processingWithdraw || !withdrawAmount || balance < 10}
+                disabled={processingWithdraw || !withdrawAmount || balance < 1}
                 variant="outline"
                 className="border-red-600 text-red-600 hover:bg-red-50"
               >
@@ -285,7 +285,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Processing takes 1-3 business days. Minimum $10.00
+              ⚡ Instant withdrawal to your bank account. Minimum $1.00
             </p>
           </div>
         </CardContent>

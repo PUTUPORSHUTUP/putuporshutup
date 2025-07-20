@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2 } from 'lucide-react';
+import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut } from 'lucide-react';
 
 interface Game {
   id: string;
@@ -29,18 +29,22 @@ interface Wager {
   creator_id: string;
   game: Game;
   participant_count: number;
+  user_participated?: boolean; // Added to track if user is in this wager
 }
 
 interface WagerCardProps {
   wager: Wager;
   onJoin: (wagerId: string, stakeAmount: number) => void;
+  onLeave: (wagerId: string) => void;
   currentUserId?: string;
   isJoining?: boolean;
+  isLeaving?: boolean;
 }
 
-export const WagerCard = ({ wager, onJoin, currentUserId, isJoining }: WagerCardProps) => {
+export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
+  const isParticipant = wager.user_participated && !isCreator;
   const creatorName = 'Player'; // We'll fetch this later if needed
 
   const getStatusColor = () => {
@@ -140,6 +144,25 @@ export const WagerCard = ({ wager, onJoin, currentUserId, isJoining }: WagerCard
             <Button disabled className="w-full" variant="outline">
               <Clock className="w-4 h-4 mr-2" />
               Your Wager
+            </Button>
+          ) : isParticipant ? (
+            <Button 
+              onClick={() => onLeave(wager.id)}
+              className="w-full bg-red-600 hover:bg-red-700"
+              disabled={isLeaving}
+              variant="destructive"
+            >
+              {isLeaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Leaving...
+                </>
+              ) : (
+                <>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Leave Wager (${wager.stake_amount} refund)
+                </>
+              )}
             </Button>
           ) : isFull ? (
             <Button disabled className="w-full" variant="outline">

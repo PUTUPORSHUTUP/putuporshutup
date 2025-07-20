@@ -36,6 +36,7 @@ interface Wager {
   created_at: string;
   game: Game;
   participant_count: number;
+  user_participated?: boolean;
 }
 
 const Games = () => {
@@ -43,6 +44,7 @@ const Games = () => {
   const [wagers, setWagers] = useState<Wager[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState<string | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [activeTab, setActiveTab] = useState('browse');
@@ -115,7 +117,8 @@ const Games = () => {
 
   const loadWagers = async () => {
     try {
-      const { data, error } = await supabase
+      // First get all open wagers
+      const { data: allWagers, error: wagersError } = await supabase
         .from('wagers')
         .select(`
           *,
@@ -125,14 +128,26 @@ const Games = () => {
         .eq('status', 'open')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error loading wagers:', error);
+      if (wagersError) {
+        console.error('Error loading wagers:', wagersError);
         return;
       }
 
-      const wagersWithCount = (data as any)?.map((wager: any) => ({
+      // Then check which wagers the current user participates in
+      let userParticipations: string[] = [];
+      if (user) {
+        const { data: participations } = await supabase
+          .from('wager_participants')
+          .select('wager_id')
+          .eq('user_id', user.id);
+        
+        userParticipations = participations?.map(p => p.wager_id) || [];
+      }
+
+      const wagersWithCount = (allWagers as any)?.map((wager: any) => ({
         ...wager,
         participant_count: wager.participant_count?.[0]?.count || 0,
+        user_participated: userParticipations.includes(wager.id),
         status: wager.status as 'open' | 'in_progress' | 'completed' | 'cancelled'
       })) || [];
 
@@ -246,6 +261,46 @@ const Games = () => {
       });
     } finally {
       setJoining(null);
+    }
+  };
+
+  const handleLeaveWager = async (wagerId: string) => {
+    if (!user) return;
+
+    try {
+      setLeaving(wagerId);
+      
+      const { data, error } = await supabase.functions.invoke('leave-wager', {
+        body: { wager_id: wagerId }
+      });
+
+      if (error) {
+        toast({
+          title: "Error leaving wager",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Left Wager!",
+        description: data.message,
+      });
+
+      // Refresh data
+      loadWagers();
+      loadUserBalance();
+      
+    } catch (error) {
+      console.error('Error leaving wager:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setLeaving(null);
     }
   };
 
@@ -398,8 +453,10 @@ const Games = () => {
                     key={wager.id} 
                     wager={wager} 
                     onJoin={handleJoinWager}
+                    onLeave={handleLeaveWager}
                     currentUserId={user?.id}
                     isJoining={joining === wager.id}
+                    isLeaving={leaving === wager.id}
                   />
                 ))}
               </div>
