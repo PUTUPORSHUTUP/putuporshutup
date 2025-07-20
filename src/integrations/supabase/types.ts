@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      games: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_name: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          platform: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          platform?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          platform?: string[] | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -67,6 +100,106 @@ export type Database = {
           wallet_balance?: number | null
         }
         Relationships: []
+      }
+      wager_participants: {
+        Row: {
+          id: string
+          joined_at: string | null
+          stake_paid: number
+          status: string | null
+          user_id: string
+          wager_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          stake_paid: number
+          status?: string | null
+          user_id: string
+          wager_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          stake_paid?: number
+          status?: string | null
+          user_id?: string
+          wager_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_participants_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wagers: {
+        Row: {
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          end_time: string | null
+          game_id: string
+          game_mode: string | null
+          id: string
+          max_participants: number | null
+          platform: string
+          stake_amount: number
+          start_time: string | null
+          status: string | null
+          title: string
+          total_pot: number | null
+          updated_at: string | null
+          winner_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          end_time?: string | null
+          game_id: string
+          game_mode?: string | null
+          id?: string
+          max_participants?: number | null
+          platform: string
+          stake_amount: number
+          start_time?: string | null
+          status?: string | null
+          title: string
+          total_pot?: number | null
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          end_time?: string | null
+          game_id?: string
+          game_mode?: string | null
+          id?: string
+          max_participants?: number | null
+          platform?: string
+          stake_amount?: number
+          start_time?: string | null
+          status?: string | null
+          title?: string
+          total_pot?: number | null
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wagers_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

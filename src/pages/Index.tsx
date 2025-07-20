@@ -21,6 +21,14 @@ const Index = () => {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
+                onClick={() => navigate('/games')}
+                className="text-foreground hover:text-primary"
+              >
+                <Gamepad2 className="w-4 h-4 mr-2" />
+                GAMES
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => navigate('/profile')}
                 className="text-foreground hover:text-primary"
               >
