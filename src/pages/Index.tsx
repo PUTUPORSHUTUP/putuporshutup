@@ -1,12 +1,60 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Users, DollarSign, Gamepad2, ArrowRight } from 'lucide-react';
+import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Header Navigation */}
+      <header className="absolute top-0 left-0 right-0 z-20 bg-black/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <Link to="/" className="text-white font-gaming text-xl font-bold">
+            GAMING PLATFORM
+          </Link>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link to="/games">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Games
+                  </Button>
+                </Link>
+                <Link to="/profile">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Profile
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-black"
+                  onClick={signOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -25,17 +73,28 @@ const Index = () => {
             The ultimate gaming wagering platform. Put your skills where your mouth is.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/games">
-              <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
-                START WAGERING
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-black">
-                JOIN NOW
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/games">
+                <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
+                  START WAGERING
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
+                    START WAGERING
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-black">
+                    JOIN NOW
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -136,16 +195,26 @@ const Index = () => {
             Join the most competitive gaming community. Show your skills, earn respect, and win big.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth">
-              <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-                CREATE ACCOUNT
-              </Button>
-            </Link>
-            <Link to="/games">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-primary">
-                BROWSE WAGERS
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/games">
+                <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                  BROWSE WAGERS
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                    CREATE ACCOUNT
+                  </Button>
+                </Link>
+                <Link to="/games">
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-primary">
+                    BROWSE WAGERS
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
