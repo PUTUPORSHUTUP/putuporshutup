@@ -44,7 +44,7 @@ interface WagerCardProps {
 export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
-  const isParticipant = wager.user_participated;
+  const isParticipant = wager.user_participated || isCreator; // Creator can always cancel
   const creatorName = 'Player'; // We'll fetch this later if needed
 
   const getStatusColor = () => {
