@@ -7,9 +7,10 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
-const App = () => (
+const App = () => {
+  const queryClient = new QueryClient();
+  
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <div className="min-h-screen bg-background font-gaming">
@@ -26,6 +27,7 @@ const App = () => (
       </div>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
