@@ -38,14 +38,18 @@ serve(async (req) => {
     console.log("Processing payment for user:", user.email);
 
     // Get request body
-    const { amount } = await req.json();
+    const { amount, totalCharge, platformFee, isPremium } = await req.json();
     
     if (!amount || amount < 1) {
       throw new Error("Invalid amount");
     }
 
-    // Convert to cents for Stripe
-    const amountInCents = Math.round(amount * 100);
+    if (!totalCharge || totalCharge < amount) {
+      throw new Error("Invalid total charge");
+    }
+
+    // Convert to cents for Stripe (use totalCharge which includes platform fee)
+    const amountInCents = Math.round(totalCharge * 100);
 
     // Check if customer exists, create if not
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -72,7 +76,7 @@ serve(async (req) => {
             currency: "usd",
             product_data: {
               name: "Gaming Wallet Deposit",
-              description: `Add $${amount} to your gaming wallet`
+              description: `Add $${amount} to wallet (includes $${platformFee?.toFixed(2) || '0.00'} platform fee)`
             },
             unit_amount: amountInCents,
           },
@@ -80,12 +84,15 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/profile?payment=success&amount=${amount}`,
+      success_url: `${req.headers.get("origin")}/profile?payment=success&amount=${amount}&totalCharge=${totalCharge}`,
       cancel_url: `${req.headers.get("origin")}/profile?payment=cancelled`,
       metadata: {
         user_id: user.id,
         amount: amount.toString(),
-        type: "wallet_deposit"
+        total_charge: totalCharge.toString(),
+        platform_fee: (platformFee || 0).toString(),
+        type: "wallet_deposit",
+        is_premium: isPremium ? "true" : "false"
       }
     });
 

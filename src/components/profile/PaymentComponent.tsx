@@ -15,8 +15,11 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Loader2 
+  Loader2,
+  Crown,
+  Info
 } from 'lucide-react';
+import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
 
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51RjSrZQ29zUP69L93G4LjSsPrbpuREzy2zfy4vwBB7a7ycqCBkPRcPb4lBL4fpLO1DH7JNGoDfmLiznqMlqExpo600extcImi0";
 
@@ -32,9 +35,10 @@ interface Transaction {
 interface PaymentComponentProps {
   balance: number;
   onBalanceUpdate: () => void;
+  isPremiumUser?: boolean;
 }
 
-export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentProps) => {
+export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = false }: PaymentComponentProps) => {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [processingDeposit, setProcessingDeposit] = useState(false);
@@ -88,10 +92,17 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
       return;
     }
 
+    const feeCalculation = calculateDepositFee(amount, isPremiumUser);
+
     setProcessingDeposit(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment-session', {
-        body: { amount }
+        body: { 
+          amount: feeCalculation.amountToWallet,
+          totalCharge: feeCalculation.totalCharge,
+          platformFee: feeCalculation.platformFee,
+          isPremium: isPremiumUser
+        }
       });
 
       if (error) {
@@ -209,6 +220,10 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
     }
   };
 
+  // Calculate fee preview for current deposit amount
+  const feePreview = depositAmount ? calculateDepositFee(parseFloat(depositAmount) || 0, isPremiumUser) : null;
+  const feeStructure = getFeeStructure();
+
   return (
     <div className="space-y-6">
       {/* Wallet Overview */}
@@ -251,7 +266,15 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
               PAYMENT CENTER
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+        <CardContent className="space-y-6">
+          {/* Premium Status */}
+          {isPremiumUser && (
+            <div className="text-center p-4 bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-lg">
+              <Crown className="w-6 h-6 mx-auto text-yellow-600 mb-2" />
+              <p className="text-sm font-medium text-yellow-600">Premium Member</p>
+              <p className="text-xs text-muted-foreground">50% off all deposit fees!</p>
+            </div>
+          )}
           
           {/* Deposit Section */}
           <div className="space-y-3">
@@ -281,6 +304,58 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
                 )}
               </Button>
             </div>
+
+            {/* Fee Preview */}
+            {feePreview && (
+              <div className="p-3 bg-muted rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Deposit Amount:</span>
+                  <span>${feePreview.depositAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Platform Fee ({feePreview.platformFeePercentage}%):</span>
+                  <span>${feePreview.platformFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold border-t pt-2">
+                  <span>Total Charge:</span>
+                  <span>${feePreview.totalCharge.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Added to Wallet:</span>
+                  <span>${feePreview.amountToWallet.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Fee Structure Info */}
+            <details className="text-xs">
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground flex items-center gap-1">
+                <Info className="w-3 h-3" />
+                View Fee Structure
+              </summary>
+              <div className="mt-2 p-3 bg-muted rounded space-y-2">
+                <div className="grid grid-cols-3 gap-2 text-xs font-medium">
+                  <span>Deposit Range</span>
+                  <span>Standard Fee</span>
+                  <span>Premium Fee</span>
+                </div>
+                {feeStructure.map((tier, i) => (
+                  <div key={i} className="grid grid-cols-3 gap-2 text-xs">
+                    <span>{tier.range}</span>
+                    <span>{tier.fee}</span>
+                    <span className="text-yellow-600">{tier.premiumFee}</span>
+                  </div>
+                ))}
+                {!isPremiumUser && (
+                  <div className="mt-2 pt-2 border-t text-center">
+                    <p className="text-xs text-muted-foreground">
+                      Upgrade to Premium for 50% off all fees + exclusive tournaments!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </details>
+
             <p className="text-xs text-muted-foreground">
               Secure payments powered by Stripe. Minimum $1.00
             </p>
