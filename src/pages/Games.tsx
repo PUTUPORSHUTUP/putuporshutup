@@ -269,6 +269,14 @@ const Games = () => {
                   <p className="text-sm text-muted-foreground">Wallet Balance</p>
                   <p className="text-lg font-bold">${userBalance.toFixed(2)}</p>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.href = '/profile'}
+                  className="ml-auto"
+                >
+                  Add Funds
+                </Button>
               </CardContent>
             </Card>
             
