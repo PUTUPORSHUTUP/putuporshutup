@@ -40,6 +40,8 @@ export function ProfileDashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [addingFunds, setAddingFunds] = useState(false);
+  const [fundAmount, setFundAmount] = useState('');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editForm, setEditForm] = useState<Partial<UserProfile>>({});
   
@@ -121,6 +123,55 @@ export function ProfileDashboard() {
   const handleCancel = () => {
     setEditForm(profile || {});
     setIsEditing(false);
+  };
+
+  const handleAddFunds = async () => {
+    if (!user || !profile || !fundAmount) return;
+    
+    const amount = parseFloat(fundAmount);
+    if (amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAddingFunds(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          wallet_balance: profile.wallet_balance + amount
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast({
+          title: "Error adding funds",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setProfile(prev => prev ? { ...prev, wallet_balance: prev.wallet_balance + amount } : null);
+      setFundAmount('');
+      toast({
+        title: "Funds added!",
+        description: `$${amount} has been added to your wallet.`,
+      });
+    } catch (error) {
+      console.error('Error adding funds:', error);
+      toast({
+        title: "Error adding funds",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingFunds(false);
+    }
   };
 
   if (loading) {
@@ -349,20 +400,67 @@ export function ProfileDashboard() {
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              RECENT ACTIVITY
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              No recent activity. Start your first wager to see your activity here!
-            </div>
-          </CardContent>
-        </Card>
+        {/* Wallet Management */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5" />
+                WALLET MANAGEMENT
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center p-6 border rounded-lg">
+                <p className="text-3xl font-gaming text-green-600">${profile.wallet_balance.toFixed(2)}</p>
+                <p className="text-muted-foreground">Current Balance</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Add Funds (For Testing)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    value={fundAmount}
+                    onChange={(e) => setFundAmount(e.target.value)}
+                    placeholder="25.00"
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={handleAddFunds}
+                    disabled={addingFunds || !fundAmount}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {addingFunds ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Add"
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  In production, this would integrate with payment processors
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                RECENT ACTIVITY
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                No recent activity. Start your first wager to see your activity here!
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

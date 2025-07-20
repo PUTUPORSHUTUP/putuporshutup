@@ -42,11 +42,13 @@ const Games = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [wagers, setWagers] = useState<Wager[]>([]);
   const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState<string | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [activeTab, setActiveTab] = useState('browse');
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [addGameModalOpen, setAddGameModalOpen] = useState(false);
+  const [userBalance, setUserBalance] = useState(0);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -54,7 +56,43 @@ const Games = () => {
   useEffect(() => {
     loadGames();
     loadWagers();
+    loadUserBalance();
+    
+    // Set up real-time subscriptions
+    const wagerChannel = supabase
+      .channel('wagers_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'wagers'
+      }, () => {
+        loadWagers();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'wager_participants'
+      }, () => {
+        loadWagers();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(wagerChannel);
+    };
   }, []);
+
+  const loadUserBalance = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('profiles')
+      .select('wallet_balance')
+      .eq('user_id', user.id)
+      .single();
+      
+    setUserBalance(data?.wallet_balance || 0);
+  };
 
   const loadGames = async () => {
     try {
@@ -125,6 +163,8 @@ const Games = () => {
     if (!user) return;
 
     try {
+      setJoining(wagerId);
+      
       // Check user's wallet balance first
       const { data: profile } = await supabase
         .from('profiles')
@@ -135,7 +175,24 @@ const Games = () => {
       if (!profile || profile.wallet_balance < stakeAmount) {
         toast({
           title: "Insufficient Funds",
-          description: "You don't have enough funds in your wallet to join this wager.",
+          description: `You need $${stakeAmount} to join this wager. Your balance: $${profile?.wallet_balance || 0}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if already joined
+      const { data: existing } = await supabase
+        .from('wager_participants')
+        .select('id')
+        .eq('wager_id', wagerId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existing) {
+        toast({
+          title: "Already Joined",
+          description: "You've already joined this wager.",
           variant: "destructive",
         });
         return;
@@ -176,7 +233,10 @@ const Games = () => {
         description: "You've successfully joined the challenge. Good luck!",
       });
 
+      // Refresh data
       loadWagers();
+      loadUserBalance();
+      
     } catch (error) {
       console.error('Error joining wager:', error);
       toast({
@@ -184,6 +244,8 @@ const Games = () => {
         description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setJoining(null);
     }
   };
 
@@ -196,7 +258,21 @@ const Games = () => {
             <h1 className="text-4xl font-gaming text-primary">GAMES & WAGERS</h1>
             <p className="text-muted-foreground mt-2">Challenge players and win big</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-4">
+            {/* Wallet Balance */}
+            <Card>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="p-2 bg-green-500/10 rounded-full">
+                  <DollarSign className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Wallet Balance</p>
+                  <p className="text-lg font-bold">${userBalance.toFixed(2)}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="flex gap-3">
             <Button 
               onClick={() => setSuggestModalOpen(true)}
               variant="outline"
@@ -221,6 +297,7 @@ const Games = () => {
               <Plus className="w-5 h-5 mr-2" />
               CREATE WAGER
             </Button>
+            </div>
           </div>
         </div>
 
@@ -314,6 +391,7 @@ const Games = () => {
                     wager={wager} 
                     onJoin={handleJoinWager}
                     currentUserId={user?.id}
+                    isJoining={joining === wager.id}
                   />
                 ))}
               </div>

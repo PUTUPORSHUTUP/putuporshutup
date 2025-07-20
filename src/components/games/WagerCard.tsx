@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { Trophy, Users, Clock, DollarSign, Gamepad2 } from 'lucide-react';
+import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2 } from 'lucide-react';
 
 interface Game {
   id: string;
@@ -35,9 +35,10 @@ interface WagerCardProps {
   wager: Wager;
   onJoin: (wagerId: string, stakeAmount: number) => void;
   currentUserId?: string;
+  isJoining?: boolean;
 }
 
-export const WagerCard = ({ wager, onJoin, currentUserId }: WagerCardProps) => {
+export const WagerCard = ({ wager, onJoin, currentUserId, isJoining }: WagerCardProps) => {
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
   const creatorName = 'Player'; // We'll fetch this later if needed
@@ -149,9 +150,19 @@ export const WagerCard = ({ wager, onJoin, currentUserId }: WagerCardProps) => {
             <Button 
               onClick={() => onJoin(wager.id, wager.stake_amount)}
               className="w-full bg-primary hover:bg-primary/90"
+              disabled={isJoining}
             >
-              <Trophy className="w-4 h-4 mr-2" />
-              Join for ${wager.stake_amount}
+              {isJoining ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                <>
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Join for ${wager.stake_amount}
+                </>
+              )}
             </Button>
           )}
         </div>
