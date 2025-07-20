@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,11 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
 
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Load transactions on component mount
+  useEffect(() => {
+    loadTransactions();
+  }, [user]);
 
   const loadTransactions = async () => {
     if (!user) return;
@@ -205,21 +210,48 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Payment Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            PAYMENT CENTER
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Current Balance */}
-          <div className="text-center p-6 border rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-            <p className="text-3xl font-gaming text-green-600">${balance.toFixed(2)}</p>
-            <p className="text-muted-foreground">Available Balance</p>
-          </div>
+    <div className="space-y-6">
+      {/* Wallet Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <CardContent className="p-6 text-center">
+            <DollarSign className="w-8 h-8 mx-auto mb-2 text-primary" />
+            <p className="text-3xl font-bold text-primary">${balance.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">Available Balance</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-green-500/5 to-green-600/10 border-green-500/20">
+          <CardContent className="p-6 text-center">
+            <ArrowDownLeft className="w-8 h-8 mx-auto mb-2 text-green-600" />
+            <p className="text-xl font-bold text-green-600">
+              {transactions.filter(t => t.type === 'deposit' && t.status === 'completed').length}
+            </p>
+            <p className="text-sm text-muted-foreground">Successful Deposits</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-600/10 border-blue-500/20">
+          <CardContent className="p-6 text-center">
+            <ArrowUpRight className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+            <p className="text-xl font-bold text-blue-600">
+              {transactions.filter(t => t.type === 'withdrawal' && t.status === 'completed').length}
+            </p>
+            <p className="text-sm text-muted-foreground">Successful Withdrawals</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Payment Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              PAYMENT CENTER
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
           
           {/* Deposit Section */}
           <div className="space-y-3">
@@ -361,6 +393,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate }: PaymentComponentP
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
