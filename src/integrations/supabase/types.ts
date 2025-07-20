@@ -382,6 +382,38 @@ export type Database = {
           },
         ]
       }
+      wager_result_reports: {
+        Row: {
+          created_at: string
+          id: string
+          reported_by: string
+          wager_id: string
+          winner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reported_by: string
+          wager_id: string
+          winner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reported_by?: string
+          wager_id?: string
+          winner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_result_reports_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wagers: {
         Row: {
           created_at: string | null

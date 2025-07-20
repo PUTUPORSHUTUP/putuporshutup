@@ -3,7 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut } from 'lucide-react';
+import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play } from 'lucide-react';
+import { ReportResultModal } from './ReportResultModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 interface Game {
   id: string;
@@ -13,6 +17,12 @@ interface Game {
   platform: string[];
   image_url?: string;
   is_active: boolean;
+}
+
+interface WagerParticipant {
+  user_id: string;
+  stake_paid: number;
+  joined_at: string;
 }
 
 interface Wager {
@@ -27,25 +37,58 @@ interface Wager {
   total_pot: number;
   created_at: string;
   creator_id: string;
+  winner_id?: string | null;
   game: Game;
   participant_count: number;
-  user_participated?: boolean; // Added to track if user is in this wager
+  user_participated?: boolean;
+  wager_participants?: WagerParticipant[];
 }
 
 interface WagerCardProps {
   wager: Wager;
   onJoin: (wagerId: string, stakeAmount: number) => void;
   onLeave: (wagerId: string) => void;
+  onResultReported: () => void;
   currentUserId?: string;
   isJoining?: boolean;
   isLeaving?: boolean;
 }
 
-export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
+export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
+  const [isStarting, setIsStarting] = useState(false);
+  const { toast } = useToast();
+  
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
   const isParticipant = wager.user_participated || isCreator; // Creator can always cancel
   const creatorName = 'Player'; // We'll fetch this later if needed
+
+  const handleStartWager = async () => {
+    setIsStarting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('start-wager', {
+        body: { wager_id: wager.id }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Match Started!",
+        description: data.message,
+      });
+
+      onResultReported(); // Refresh the wagers list
+    } catch (error: any) {
+      console.error('Error starting wager:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start wager",
+        variant: "destructive"
+      });
+    } finally {
+      setIsStarting(false);
+    }
+  };
 
   const getStatusColor = () => {
     switch (wager.status) {
@@ -140,49 +183,92 @@ export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, is
 
         {/* Action Button */}
         <div className="pt-2">
-          {isParticipant ? (
-            <Button 
-              onClick={() => onLeave(wager.id)}
-              className="w-full bg-red-600 hover:bg-red-700"
-              disabled={isLeaving}
-              variant="destructive"
-            >
-              {isLeaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Leaving...
-                </>
-              ) : (
-                <>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {isCreator ? `Cancel Wager (${wager.stake_amount} refund)` : `Leave Wager (${wager.stake_amount} refund)`}
-                </>
+          {wager.status === 'completed' ? (
+            <div className="space-y-2">
+              <Button disabled className="w-full" variant="outline">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Match Completed
+              </Button>
+              {wager.winner_id && (
+                <p className="text-sm text-center text-muted-foreground">
+                  Winner: {wager.winner_id === currentUserId ? 'You!' : 'Opponent'}
+                </p>
               )}
-            </Button>
-          ) : isFull ? (
+            </div>
+          ) : wager.status === 'cancelled' ? (
             <Button disabled className="w-full" variant="outline">
-              <Users className="w-4 h-4 mr-2" />
-              Wager Full
+              <LogOut className="w-4 h-4 mr-2" />
+              Wager Cancelled
             </Button>
-          ) : (
-            <Button 
-              onClick={() => onJoin(wager.id, wager.stake_amount)}
-              className="w-full bg-primary hover:bg-primary/90"
-              disabled={isJoining}
-            >
-              {isJoining ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Joining...
-                </>
-              ) : (
-                <>
-                  <Trophy className="w-4 h-4 mr-2" />
-                  Join for ${wager.stake_amount}
-                </>
-              )}
-            </Button>
-          )}
+          ) : wager.status === 'in_progress' && isParticipant ? (
+            <ReportResultModal
+              wager={wager}
+              currentUserId={currentUserId!}
+              onResultReported={onResultReported}
+            />
+          ) : wager.status === 'open' ? (
+            isFull && isCreator ? (
+              <Button 
+                onClick={handleStartWager}
+                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={isStarting}
+              >
+                {isStarting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Starting Match...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Match
+                  </>
+                )}
+              </Button>
+            ) : isParticipant ? (
+              <Button 
+                onClick={() => onLeave(wager.id)}
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={isLeaving}
+                variant="destructive"
+              >
+                {isLeaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Leaving...
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {isCreator ? `Cancel Wager ($${wager.stake_amount} refund)` : `Leave Wager ($${wager.stake_amount} refund)`}
+                  </>
+                )}
+              </Button>
+            ) : isFull ? (
+              <Button disabled className="w-full" variant="outline">
+                <Users className="w-4 h-4 mr-2" />
+                Wager Full
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => onJoin(wager.id, wager.stake_amount)}
+                className="w-full bg-primary hover:bg-primary/90"
+                disabled={isJoining}
+              >
+                {isJoining ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Joining...
+                  </>
+                ) : (
+                  <>
+                    <Trophy className="w-4 h-4 mr-2" />
+                    Join for ${wager.stake_amount}
+                  </>
+                )}
+              </Button>
+            )
+          ) : null}
         </div>
       </CardContent>
     </Card>

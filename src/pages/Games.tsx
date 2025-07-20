@@ -22,6 +22,12 @@ interface Game {
   is_active: boolean;
 }
 
+interface WagerParticipant {
+  user_id: string;
+  stake_paid: number;
+  joined_at: string;
+}
+
 interface Wager {
   id: string;
   creator_id: string;
@@ -33,10 +39,12 @@ interface Wager {
   game_mode: string | null;
   status: 'open' | 'in_progress' | 'completed' | 'cancelled';
   total_pot: number;
+  winner_id?: string | null;
   created_at: string;
   game: Game;
   participant_count: number;
   user_participated?: boolean;
+  wager_participants: WagerParticipant[];
 }
 
 const Games = () => {
@@ -117,15 +125,16 @@ const Games = () => {
 
   const loadWagers = async () => {
     try {
-      // First get all open wagers
+      // Get all wagers with participant data
       const { data: allWagers, error: wagersError } = await supabase
         .from('wagers')
         .select(`
           *,
           game:games(*),
-          participant_count:wager_participants(count)
+          participant_count:wager_participants(count),
+          wager_participants(user_id, stake_paid, joined_at)
         `)
-        .eq('status', 'open')
+        .in('status', ['open', 'in_progress', 'completed'])
         .order('created_at', { ascending: false });
 
       if (wagersError) {
@@ -148,7 +157,8 @@ const Games = () => {
         ...wager,
         participant_count: wager.participant_count?.[0]?.count || 0,
         user_participated: userParticipations.includes(wager.id),
-        status: wager.status as 'open' | 'in_progress' | 'completed' | 'cancelled'
+        status: wager.status as 'open' | 'in_progress' | 'completed' | 'cancelled',
+        wager_participants: wager.wager_participants || []
       })) || [];
 
       console.log('User participations:', userParticipations);
@@ -457,6 +467,7 @@ const Games = () => {
                     wager={wager} 
                     onJoin={handleJoinWager}
                     onLeave={handleLeaveWager}
+                    onResultReported={loadWagers}
                     currentUserId={user?.id}
                     isJoining={joining === wager.id}
                     isLeaving={leaving === wager.id}
