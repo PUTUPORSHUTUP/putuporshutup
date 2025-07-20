@@ -3,6 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PaymentComponent } from '@/components/profile/PaymentComponent';
+import { PremiumSubscription } from '@/components/profile/PremiumSubscription';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save } from 'lucide-react';
+import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save, Crown } from 'lucide-react';
 
 interface Profile {
   id: string;
@@ -26,6 +28,8 @@ interface Profile {
   total_wins: number;
   total_losses: number;
   total_wagered: number;
+  is_premium: boolean;
+  premium_expires_at: string;
 }
 
 interface WagerHistory {
@@ -45,16 +49,38 @@ const Profile = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [wagerHistory, setWagerHistory] = useState<WagerHistory[]>([]);
+  const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadProfile();
       loadWagerHistory();
+      checkSubscriptionStatus();
     }
   }, [user]);
+
+  const checkSubscriptionStatus = async () => {
+    if (!user) return;
+
+    setLoadingSubscription(true);
+    try {
+      const { data } = await supabase.functions.invoke('check-premium-subscription');
+      setSubscription(data);
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    } finally {
+      setLoadingSubscription(false);
+    }
+  };
+
+  const handleSubscriptionUpdate = () => {
+    loadProfile();
+    checkSubscriptionStatus();
+  };
 
   const loadProfile = async () => {
     try {
@@ -255,7 +281,15 @@ const Profile = () => {
             </div>
             
             <div className="flex-1">
-              <h1 className="text-3xl font-bold">{profile.display_name || profile.username}</h1>
+              <div className="flex items-center gap-2 mb-2">
+                <h1 className="text-3xl font-bold">{profile.display_name || profile.username}</h1>
+                {profile.is_premium && (
+                  <div className="flex items-center gap-1">
+                    <Crown className="w-5 h-5 text-yellow-600" />
+                    <Badge className="bg-yellow-600 text-white text-xs">PREMIUM</Badge>
+                  </div>
+                )}
+              </div>
               <p className="text-muted-foreground mb-4">{profile.bio || 'No bio yet'}</p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -283,10 +317,11 @@ const Profile = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="edit" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="edit">Edit Profile</TabsTrigger>
-          <TabsTrigger value="stats">Stats Dashboard</TabsTrigger>
-          <TabsTrigger value="history">Match History</TabsTrigger>
+          <TabsTrigger value="premium">Premium</TabsTrigger>
+          <TabsTrigger value="wallet">Wallet</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         {/* Edit Profile Tab */}
@@ -370,6 +405,23 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Premium Membership Tab */}
+        <TabsContent value="premium" className="space-y-6">
+          <PremiumSubscription 
+            onSubscriptionUpdate={handleSubscriptionUpdate}
+            currentSubscription={subscription}
+          />
+        </TabsContent>
+
+        {/* Wallet Management Tab */}
+        <TabsContent value="wallet" className="space-y-6">
+          <PaymentComponent 
+            balance={profile.wallet_balance} 
+            onBalanceUpdate={loadProfile}
+            isPremiumUser={profile.is_premium}
+          />
         </TabsContent>
 
         {/* Stats Dashboard Tab */}
