@@ -1,18 +1,16 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AuthModal } from "@/components/auth/AuthModal";
-import { Gamepad2, Users, Trophy, DollarSign, Zap, Target, User, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Gamepad2, Users, Trophy, DollarSign, Zap, Target, User, LogOut } from "lucide-react";
 
 const Index = () => {
-  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-gaming">
-      {/* Auth Modal */}
-      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
-      
       {/* Header */}
       <header className="relative z-50 border-b border-border/20 backdrop-blur-sm">
         <div className="container mx-auto px-4">
@@ -23,18 +21,18 @@ const Index = () => {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                onClick={() => setAuthModalOpen(true)}
+                onClick={() => navigate('/profile')}
                 className="text-foreground hover:text-primary"
               >
-                <LogIn className="w-4 h-4 mr-2" />
-                LOG IN
+                <User className="w-4 h-4 mr-2" />
+                PROFILE
               </Button>
               <Button
-                onClick={() => setAuthModalOpen(true)}
+                onClick={signOut}
                 className="bg-gradient-neon-orange hover:shadow-glow-orange"
               >
-                <User className="w-4 h-4 mr-2" />
-                SIGN UP
+                <LogOut className="w-4 h-4 mr-2" />
+                SIGN OUT
               </Button>
             </div>
           </div>

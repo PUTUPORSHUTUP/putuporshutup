@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   User, 
   Camera, 
@@ -14,53 +16,134 @@ import {
   TrendingUp, 
   Edit,
   Save,
-  X
+  X,
+  Loader2
 } from "lucide-react";
 
 interface UserProfile {
-  username: string;
-  email: string;
-  gamerTagPSN: string;
-  gamerTagXbox: string;
-  gamerTagSteam: string;
-  profilePic: string;
-  walletBalance: number;
-  totalWins: number;
-  totalLosses: number;
-  totalWagered: number;
+  id?: string;
+  user_id?: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  gamer_tag_psn: string | null;
+  gamer_tag_xbox: string | null;
+  gamer_tag_steam: string | null;
+  wallet_balance: number;
+  total_wins: number;
+  total_losses: number;
+  total_wagered: number;
 }
 
 export function ProfileDashboard() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({
-    username: "ProGamer2024",
-    email: "progamer@example.com",
-    gamerTagPSN: "ProGamer_PSN",
-    gamerTagXbox: "ProGamerXbox",
-    gamerTagSteam: "ProGamerSteam",
-    profilePic: "",
-    walletBalance: 2500.00,
-    totalWins: 47,
-    totalLosses: 23,
-    totalWagered: 15000.00
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editForm, setEditForm] = useState<Partial<UserProfile>>({});
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const [editForm, setEditForm] = useState(profile);
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
 
-  const handleSave = () => {
-    setProfile(editForm);
-    setIsEditing(false);
-    // TODO: Save to Supabase
-    console.log("Saving profile:", editForm);
+  const loadProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        toast({
+          title: "Error loading profile",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setProfile(data);
+      setEditForm(data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user || !profile) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(editForm)
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast({
+          title: "Error saving profile",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setProfile({ ...profile, ...editForm });
+      setIsEditing(false);
+      toast({
+        title: "Profile updated!",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: "Error saving profile",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
-    setEditForm(profile);
+    setEditForm(profile || {});
     setIsEditing(false);
   };
 
-  const winRate = profile.totalWins + profile.totalLosses > 0 
-    ? (profile.totalWins / (profile.totalWins + profile.totalLosses) * 100).toFixed(1)
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Profile not found</h2>
+          <p className="text-muted-foreground">Please try refreshing the page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const winRate = profile.total_wins + profile.total_losses > 0 
+    ? (profile.total_wins / (profile.total_wins + profile.total_losses) * 100).toFixed(1)
     : "0.0";
 
   return (
@@ -68,13 +151,13 @@ export function ProfileDashboard() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-gaming text-neon-orange">
+          <h1 className="text-4xl font-gaming text-primary">
             PLAYER PROFILE
           </h1>
           {!isEditing ? (
             <Button 
               onClick={() => setIsEditing(true)}
-              className="bg-gradient-neon-blue hover:shadow-glow-blue"
+              className="bg-primary hover:bg-primary/90"
             >
               <Edit className="w-4 h-4 mr-2" />
               EDIT PROFILE
@@ -83,15 +166,20 @@ export function ProfileDashboard() {
             <div className="flex gap-2">
               <Button 
                 onClick={handleSave}
-                className="bg-gradient-neon-green hover:shadow-glow-green"
+                disabled={saving}
+                className="bg-green-600 hover:bg-green-700"
               >
-                <Save className="w-4 h-4 mr-2" />
+                {saving ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
                 SAVE
               </Button>
               <Button 
                 onClick={handleCancel}
                 variant="outline"
-                className="border-neon-orange/30 text-neon-orange hover:bg-neon-orange/10"
+                disabled={saving}
               >
                 <X className="w-4 h-4 mr-2" />
                 CANCEL
@@ -102,9 +190,9 @@ export function ProfileDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Info */}
-          <Card className="bg-background-dark border-neon-blue/20">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-neon-blue flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
                 PROFILE INFO
               </CardTitle>
@@ -113,16 +201,17 @@ export function ProfileDashboard() {
               {/* Avatar */}
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative">
-                  <Avatar className="w-24 h-24 border-2 border-neon-blue/50">
-                    <AvatarImage src={profile.profilePic} />
-                    <AvatarFallback className="bg-background-darker text-neon-blue text-xl">
-                      {profile.username.substring(0, 2).toUpperCase()}
+                  <Avatar className="w-24 h-24 border-2 border-primary/50">
+                    <AvatarImage src={profile.avatar_url || ''} />
+                    <AvatarFallback className="text-xl">
+                      {(profile.username || profile.display_name || user?.email || 'U').substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   {isEditing && (
                     <Button
                       size="icon"
-                      className="absolute -bottom-2 -right-2 w-8 h-8 bg-neon-blue/20 hover:bg-neon-blue/30"
+                      className="absolute -bottom-2 -right-2 w-8 h-8"
+                      variant="secondary"
                     >
                       <Camera className="w-4 h-4" />
                     </Button>
@@ -133,80 +222,95 @@ export function ProfileDashboard() {
               {/* Basic Info */}
               <div className="space-y-4">
                 <div>
-                  <Label className="text-foreground-light">USERNAME</Label>
+                  <Label>USERNAME</Label>
                   {isEditing ? (
                     <Input
-                      value={editForm.username}
+                      value={editForm.username || ''}
                       onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
-                      className="mt-1 bg-background-darker border-neon-blue/30"
+                      className="mt-1"
+                      placeholder="Enter username"
                     />
                   ) : (
-                    <p className="text-foreground font-gaming">{profile.username}</p>
+                    <p className="font-gaming">{profile.username || 'Not set'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-foreground-light">EMAIL</Label>
-                  <p className="text-foreground-muted">{profile.email}</p>
+                  <Label>DISPLAY NAME</Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.display_name || ''}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, display_name: e.target.value }))}
+                      className="mt-1"
+                      placeholder="Enter display name"
+                    />
+                  ) : (
+                    <p className="font-gaming">{profile.display_name || 'Not set'}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label>EMAIL</Label>
+                  <p className="text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Gaming Accounts */}
-          <Card className="bg-background-dark border-neon-green/20">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-neon-green">GAMING ACCOUNTS</CardTitle>
+              <CardTitle>GAMING ACCOUNTS</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-foreground-light">PSN ID</Label>
+                <Label>PSN ID</Label>
                 {isEditing ? (
                   <Input
-                    value={editForm.gamerTagPSN}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, gamerTagPSN: e.target.value }))}
-                    className="mt-1 bg-background-darker border-neon-green/30"
+                    value={editForm.gamer_tag_psn || ''}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, gamer_tag_psn: e.target.value }))}
+                    className="mt-1"
                     placeholder="Your PSN ID"
                   />
                 ) : (
-                  <p className="text-foreground">{profile.gamerTagPSN || "Not linked"}</p>
+                  <p>{profile.gamer_tag_psn || "Not linked"}</p>
                 )}
               </div>
 
               <div>
-                <Label className="text-foreground-light">XBOX GAMERTAG</Label>
+                <Label>XBOX GAMERTAG</Label>
                 {isEditing ? (
                   <Input
-                    value={editForm.gamerTagXbox}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, gamerTagXbox: e.target.value }))}
-                    className="mt-1 bg-background-darker border-neon-green/30"
+                    value={editForm.gamer_tag_xbox || ''}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, gamer_tag_xbox: e.target.value }))}
+                    className="mt-1"
                     placeholder="Your Xbox Gamertag"
                   />
                 ) : (
-                  <p className="text-foreground">{profile.gamerTagXbox || "Not linked"}</p>
+                  <p>{profile.gamer_tag_xbox || "Not linked"}</p>
                 )}
               </div>
 
               <div>
-                <Label className="text-foreground-light">STEAM USERNAME</Label>
+                <Label>STEAM USERNAME</Label>
                 {isEditing ? (
                   <Input
-                    value={editForm.gamerTagSteam}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, gamerTagSteam: e.target.value }))}
-                    className="mt-1 bg-background-darker border-neon-green/30"
+                    value={editForm.gamer_tag_steam || ''}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, gamer_tag_steam: e.target.value }))}
+                    className="mt-1"
                     placeholder="Your Steam Username"
                   />
                 ) : (
-                  <p className="text-foreground">{profile.gamerTagSteam || "Not linked"}</p>
+                  <p>{profile.gamer_tag_steam || "Not linked"}</p>
                 )}
               </div>
             </CardContent>
           </Card>
 
           {/* Stats */}
-          <Card className="bg-background-dark border-neon-orange/20">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-neon-orange flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
                 <Trophy className="w-5 h-5" />
                 STATS
               </CardTitle>
@@ -214,30 +318,30 @@ export function ProfileDashboard() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-gaming text-neon-green">{profile.totalWins}</p>
-                  <p className="text-sm text-foreground-light">Wins</p>
+                  <p className="text-2xl font-gaming text-green-600">{profile.total_wins}</p>
+                  <p className="text-sm text-muted-foreground">Wins</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-gaming text-neon-orange">{profile.totalLosses}</p>
-                  <p className="text-sm text-foreground-light">Losses</p>
+                  <p className="text-2xl font-gaming text-red-600">{profile.total_losses}</p>
+                  <p className="text-sm text-muted-foreground">Losses</p>
                 </div>
               </div>
 
               <div className="text-center">
-                <p className="text-3xl font-gaming text-neon-blue">{winRate}%</p>
-                <p className="text-sm text-foreground-light">Win Rate</p>
+                <p className="text-3xl font-gaming text-primary">{winRate}%</p>
+                <p className="text-sm text-muted-foreground">Win Rate</p>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground-light">Total Wagered</span>
-                  <span className="text-neon-green font-gaming">${profile.totalWagered.toLocaleString()}</span>
+                  <span className="text-muted-foreground">Total Wagered</span>
+                  <span className="font-gaming">${profile.total_wagered.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground-light">Wallet Balance</span>
-                  <Badge className="bg-gradient-neon-green text-background">
+                  <span className="text-muted-foreground">Wallet Balance</span>
+                  <Badge variant="default">
                     <DollarSign className="w-3 h-3 mr-1" />
-                    ${profile.walletBalance.toLocaleString()}
+                    ${profile.wallet_balance.toLocaleString()}
                   </Badge>
                 </div>
               </div>
@@ -246,15 +350,15 @@ export function ProfileDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <Card className="bg-background-dark border-neon-pink/20">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-neon-pink flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
               RECENT ACTIVITY
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-foreground-muted">
+            <div className="text-center py-8 text-muted-foreground">
               No recent activity. Start your first wager to see your activity here!
             </div>
           </CardContent>

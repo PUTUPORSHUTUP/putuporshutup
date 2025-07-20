@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          gamer_tag_psn: string | null
+          gamer_tag_steam: string | null
+          gamer_tag_xbox: string | null
+          id: string
+          total_losses: number | null
+          total_wagered: number | null
+          total_wins: number | null
+          updated_at: string | null
+          user_id: string
+          username: string | null
+          wallet_balance: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          gamer_tag_psn?: string | null
+          gamer_tag_steam?: string | null
+          gamer_tag_xbox?: string | null
+          id?: string
+          total_losses?: number | null
+          total_wagered?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+          wallet_balance?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          gamer_tag_psn?: string | null
+          gamer_tag_steam?: string | null
+          gamer_tag_xbox?: string | null
+          id?: string
+          total_losses?: number | null
+          total_wagered?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+          wallet_balance?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
