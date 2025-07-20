@@ -45,7 +45,7 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Check if user is in this wager
+    // Check if user is either a participant or the creator of the wager
     const { data: participation } = await supabaseService
       .from("wager_participants")
       .select("*, wager:wagers(*)")
@@ -53,32 +53,63 @@ serve(async (req) => {
       .eq("user_id", user.id)
       .single();
 
+    // If not a participant, check if user is the creator
+    let isCreator = false;
+    let wagerData = null;
+    let refundAmount = 0;
+
     if (!participation) {
-      throw new Error("You are not a participant in this wager");
+      const { data: wager } = await supabaseService
+        .from("wagers")
+        .select("*")
+        .eq("id", wager_id)
+        .eq("creator_id", user.id)
+        .single();
+
+      if (!wager) {
+        throw new Error("You are not a participant in this wager");
+      }
+
+      isCreator = true;
+      wagerData = wager;
+      refundAmount = wager.stake_amount;
+    } else {
+      wagerData = participation.wager;
+      refundAmount = participation.stake_paid;
     }
 
     // Check if wager is still open
-    if (participation.wager.status !== 'open') {
+    if (wagerData.status !== 'open') {
       throw new Error("Cannot leave wager - match has already started");
     }
 
-    const refundAmount = participation.stake_paid;
+    // Handle different cases for participants vs creators
+    if (isCreator) {
+      // If creator is canceling, cancel the entire wager
+      await supabaseService
+        .from("wagers")
+        .update({
+          status: 'cancelled',
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wager_id);
+    } else {
+      // If participant is leaving, remove them and update pot
+      await supabaseService
+        .from("wager_participants")
+        .delete()
+        .eq("wager_id", wager_id)
+        .eq("user_id", user.id);
 
-    // Remove user from wager
-    await supabaseService
-      .from("wager_participants")
-      .delete()
-      .eq("wager_id", wager_id)
-      .eq("user_id", user.id);
-
-    // Update wager total pot
-    await supabaseService
-      .from("wagers")
-      .update({
-        total_pot: supabaseService.sql`total_pot - ${refundAmount}`,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", wager_id);
+      // Update wager total pot
+      await supabaseService
+        .from("wagers")
+        .update({
+          total_pot: wagerData.total_pot - refundAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", wager_id);
+    }
 
     // Get user's current balance
     const { data: profile } = await supabaseService
@@ -108,7 +139,7 @@ serve(async (req) => {
         type: "deposit", // Refund shows as deposit
         amount: refundAmount,
         status: "completed",
-        description: `Refund from cancelled wager: ${participation.wager.title}`,
+        description: `Refund from ${isCreator ? 'cancelled' : 'left'} wager: ${wagerData.title}`,
         created_at: new Date().toISOString()
       });
 
