@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateTournamentModal } from '@/components/tournaments/CreateTournamentModal';
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
+import { TournamentStats } from '@/components/tournaments/TournamentStats';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -216,6 +217,33 @@ const Tournaments = () => {
     }
   };
 
+  const generateBracket = async (tournamentId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-tournament-bracket', {
+        body: { tournamentId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Bracket Generated!",
+        description: `Created ${data.matchesCreated} matches across ${data.rounds} rounds.`,
+      });
+
+      loadTournaments();
+      if (selectedTournament?.id === tournamentId) {
+        await loadTournamentDetails(tournamentId);
+      }
+    } catch (error: any) {
+      console.error('Error generating bracket:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate bracket",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleViewBracket = async (tournament: Tournament) => {
     setSelectedTournament(tournament);
     await loadTournamentDetails(tournament.id);
@@ -375,6 +403,19 @@ const Tournaments = () => {
                           </Button>
                         )}
                         
+                        {/* Tournament Creator Actions */}
+                        {user?.id === tournament.creator_id && tournament.status === 'open' && 
+                         tournament.current_participants >= 2 && (
+                          <Button 
+                            onClick={() => generateBracket(tournament.id)}
+                            variant="secondary"
+                            className="w-full"
+                          >
+                            <Trophy className="w-4 h-4 mr-2" />
+                            Start Tournament
+                          </Button>
+                        )}
+                        
                         {tournament.status !== 'open' && (
                           <Button 
                             onClick={() => handleViewBracket(tournament)}
@@ -395,6 +436,7 @@ const Tournaments = () => {
           <TabsContent value="bracket" className="space-y-6">
             {selectedTournament ? (
               <div className="space-y-6">
+                {/* Tournament Header */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -411,6 +453,14 @@ const Tournaments = () => {
                   </CardHeader>
                 </Card>
 
+                {/* Tournament Statistics */}
+                <TournamentStats 
+                  tournament={selectedTournament}
+                  matches={tournamentMatches}
+                  participants={tournamentParticipants}
+                />
+
+                {/* Tournament Bracket */}
                 <TournamentBracket
                   matches={tournamentMatches}
                   participants={tournamentParticipants}
