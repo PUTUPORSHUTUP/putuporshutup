@@ -44,7 +44,7 @@ interface WagerCardProps {
 export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
-  const isParticipant = wager.user_participated && !isCreator;
+  const isParticipant = wager.user_participated;
   const creatorName = 'Player'; // We'll fetch this later if needed
 
   const getStatusColor = () => {
@@ -140,12 +140,7 @@ export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, is
 
         {/* Action Button */}
         <div className="pt-2">
-          {isCreator ? (
-            <Button disabled className="w-full" variant="outline">
-              <Clock className="w-4 h-4 mr-2" />
-              Your Wager
-            </Button>
-          ) : isParticipant ? (
+          {isParticipant ? (
             <Button 
               onClick={() => onLeave(wager.id)}
               className="w-full bg-red-600 hover:bg-red-700"
@@ -160,7 +155,7 @@ export const WagerCard = ({ wager, onJoin, onLeave, currentUserId, isJoining, is
               ) : (
                 <>
                   <LogOut className="w-4 h-4 mr-2" />
-                  Leave Wager (${wager.stake_amount} refund)
+                  {isCreator ? `Cancel Wager (${wager.stake_amount} refund)` : `Leave Wager (${wager.stake_amount} refund)`}
                 </>
               )}
             </Button>
