@@ -179,13 +179,22 @@ All colors MUST be HSL.
   transform: scale(1.2);
 }
 
+/* Match Result Reporting Styles */
+.match-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid hsl(var(--border));
+}
+
 /* React Flow Overrides for Tournament */
 .react-flow__node-match {
   padding: 0;
   background: transparent;
   border: none;
   box-shadow: none;
-}
 }
 
 @layer base {

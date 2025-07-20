@@ -9,18 +9,21 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import MatchNode from './MatchNode';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TournamentBracketProps {
   matches: any[];
   participants: any[];
   tournamentSize: number;
+  tournament: any;
 }
 
 const nodeTypes = {
   match: MatchNode,
 };
 
-export const TournamentBracket = ({ matches, participants, tournamentSize }: TournamentBracketProps) => {
+export const TournamentBracket = ({ matches, participants, tournamentSize, tournament }: TournamentBracketProps) => {
+  const { user } = useAuth();
   const { nodes, edges } = useMemo(() => {
     // Calculate tournament rounds
     const totalRounds = Math.log2(tournamentSize);
@@ -57,7 +60,14 @@ export const TournamentBracket = ({ matches, participants, tournamentSize }: Tou
           } : undefined,
           winner: match.winner_id,
           status: match.status,
-          isChampionship: round === totalRounds
+          isChampionship: round === totalRounds,
+          matchId: match.id,
+          player1ReportedWinner: match.player1_reported_winner,
+          player2ReportedWinner: match.player2_reported_winner,
+          resultDisputed: match.result_disputed,
+          confirmedByOrganizer: match.confirmed_by_organizer,
+          currentUserId: user?.id,
+          isOrganizer: user?.id === tournament.creator_id
         },
       });
 

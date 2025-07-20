@@ -415,6 +415,7 @@ const Tournaments = () => {
                   matches={tournamentMatches}
                   participants={tournamentParticipants}
                   tournamentSize={selectedTournament.max_participants}
+                  tournament={selectedTournament}
                 />
               </div>
             ) : (

@@ -149,11 +149,15 @@ export type Database = {
       tournament_matches: {
         Row: {
           completed_at: string | null
+          confirmed_by_organizer: boolean | null
           created_at: string
           id: string
           match_number: number
           player1_id: string | null
+          player1_reported_winner: string | null
           player2_id: string | null
+          player2_reported_winner: string | null
+          result_disputed: boolean | null
           round_number: number
           scheduled_time: string | null
           status: string
@@ -162,11 +166,15 @@ export type Database = {
         }
         Insert: {
           completed_at?: string | null
+          confirmed_by_organizer?: boolean | null
           created_at?: string
           id?: string
           match_number: number
           player1_id?: string | null
+          player1_reported_winner?: string | null
           player2_id?: string | null
+          player2_reported_winner?: string | null
+          result_disputed?: boolean | null
           round_number: number
           scheduled_time?: string | null
           status?: string
@@ -175,11 +183,15 @@ export type Database = {
         }
         Update: {
           completed_at?: string | null
+          confirmed_by_organizer?: boolean | null
           created_at?: string
           id?: string
           match_number?: number
           player1_id?: string | null
+          player1_reported_winner?: string | null
           player2_id?: string | null
+          player2_reported_winner?: string | null
+          result_disputed?: boolean | null
           round_number?: number
           scheduled_time?: string | null
           status?: string

@@ -1,8 +1,11 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Clock, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Trophy, Clock, CheckCircle, AlertTriangle, Flag } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface MatchNodeData {
   round: number;
@@ -20,6 +23,13 @@ interface MatchNodeData {
   winner?: string;
   status: 'pending' | 'in_progress' | 'completed';
   isChampionship?: boolean;
+  matchId: string;
+  player1ReportedWinner?: string;
+  player2ReportedWinner?: string;
+  resultDisputed?: boolean;
+  confirmedByOrganizer?: boolean;
+  currentUserId?: string;
+  isOrganizer?: boolean;
 }
 
 interface MatchNodeProps {
@@ -27,7 +37,24 @@ interface MatchNodeProps {
 }
 
 const MatchNode = memo(({ data }: MatchNodeProps) => {
-  const { round, player1, player2, winner, status, isChampionship } = data;
+  const { 
+    round, 
+    player1, 
+    player2, 
+    winner, 
+    status, 
+    isChampionship, 
+    matchId,
+    player1ReportedWinner,
+    player2ReportedWinner,
+    resultDisputed,
+    confirmedByOrganizer,
+    currentUserId,
+    isOrganizer
+  } = data;
+  
+  const [isReporting, setIsReporting] = useState(false);
+  const { toast } = useToast();
 
   const getPlayerDisplay = (player?: { id: string; name: string; avatar?: string }) => {
     if (!player) return 'TBD';
@@ -39,6 +66,10 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
   };
 
   const getStatusIcon = () => {
+    if (resultDisputed) {
+      return <AlertTriangle className="w-4 h-4 text-red-600" />;
+    }
+    
     switch (status) {
       case 'completed':
         return <CheckCircle className="w-4 h-4 text-green-600" />;
@@ -47,6 +78,54 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
       default:
         return <Clock className="w-4 h-4 text-gray-400" />;
     }
+  };
+
+  const canReportResult = () => {
+    if (status === 'completed' || !currentUserId) return false;
+    if (!player1 || !player2) return false;
+    
+    const isParticipant = currentUserId === player1.id || currentUserId === player2.id;
+    return isParticipant || isOrganizer;
+  };
+
+  const reportResult = async (winnerId: string) => {
+    if (!matchId || isReporting) return;
+    
+    setIsReporting(true);
+    try {
+      const { error } = await supabase.functions.invoke('report-match-result', {
+        body: { matchId, winnerId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Result Reported",
+        description: "Match result has been reported successfully."
+      });
+    } catch (error: any) {
+      console.error('Error reporting result:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to report result",
+        variant: "destructive"
+      });
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  const getReportingStatus = () => {
+    if (resultDisputed) {
+      return <Badge variant="destructive" className="text-xs">Disputed</Badge>;
+    }
+    if (player1ReportedWinner && player2ReportedWinner) {
+      return <Badge variant="default" className="text-xs">Both Reported</Badge>;
+    }
+    if (player1ReportedWinner || player2ReportedWinner) {
+      return <Badge variant="secondary" className="text-xs">1 Reported</Badge>;
+    }
+    return null;
   };
 
   return (
@@ -80,9 +159,12 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
           </span>
           {getStatusIcon()}
         </div>
-        <Badge variant={status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-          {status}
-        </Badge>
+        <div className="flex gap-1">
+          <Badge variant={status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+            {status}
+          </Badge>
+          {getReportingStatus()}
+        </div>
       </div>
 
       <div className="match-players">
@@ -125,6 +207,36 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
           )}
         </div>
       </div>
+
+      {/* Result Reporting Buttons */}
+      {canReportResult() && status !== 'completed' && (
+        <div className="match-actions">
+          {player1 && (
+            <Button
+              size="sm"
+              variant={player1ReportedWinner === player1.id || currentUserId === player1.id ? "default" : "outline"}
+              onClick={() => reportResult(player1.id)}
+              disabled={isReporting}
+              className="text-xs"
+            >
+              <Flag className="w-3 h-3 mr-1" />
+              {player1.name} Wins
+            </Button>
+          )}
+          {player2 && (
+            <Button
+              size="sm"
+              variant={player2ReportedWinner === player2.id || currentUserId === player2.id ? "default" : "outline"}
+              onClick={() => reportResult(player2.id)}
+              disabled={isReporting}
+              className="text-xs"
+            >
+              <Flag className="w-3 h-3 mr-1" />
+              {player2.name} Wins
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Output handle */}
       {!isChampionship && (
