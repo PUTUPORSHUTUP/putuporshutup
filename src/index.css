@@ -97,7 +97,95 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 47 100% 85%;
     --sidebar-border: 230 15% 15%;
     --sidebar-ring: 25 100% 55%;
-  }
+}
+
+/* Tournament Bracket Styles */
+.tournament-bracket-container {
+  width: 100%;
+  height: 600px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tournament-flow {
+  background: hsl(var(--background));
+}
+
+.tournament-match {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tournament-match.championship {
+  border: 2px solid #fbbf24;
+  background: linear-gradient(135deg, #fef3c7, #fbbf24);
+  box-shadow: 0 4px 8px rgba(251, 191, 36, 0.3);
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.match-players {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-slot {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  background: hsl(var(--muted));
+  transition: all 0.2s ease;
+}
+
+.player-slot.winner {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: #10b981;
+  font-weight: 600;
+}
+
+.vs-divider {
+  text-align: center;
+  padding: 2px 0;
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
+}
+
+.tournament-handle {
+  width: 8px;
+  height: 8px;
+  background: #9E86ED;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.tournament-handle:hover {
+  background: #7c3aed;
+  transform: scale(1.2);
+}
+
+/* React Flow Overrides for Tournament */
+.react-flow__node-match {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
 }
 
 @layer base {

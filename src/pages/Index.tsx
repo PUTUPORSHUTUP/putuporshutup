@@ -24,6 +24,11 @@ const Index = () => {
                     Games
                   </Button>
                 </Link>
+                <Link to="/tournaments">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Tournaments
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Button variant="ghost" className="text-white hover:bg-white/20">
                     Profile
