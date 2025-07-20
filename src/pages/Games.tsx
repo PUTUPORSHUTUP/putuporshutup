@@ -151,6 +151,9 @@ const Games = () => {
         status: wager.status as 'open' | 'in_progress' | 'completed' | 'cancelled'
       })) || [];
 
+      console.log('User participations:', userParticipations);
+      console.log('Wagers with participation status:', wagersWithCount);
+
       setWagers(wagersWithCount as Wager[]);
     } catch (error) {
       console.error('Error:', error);
