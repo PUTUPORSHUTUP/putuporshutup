@@ -1,11 +1,45 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Users, Trophy, DollarSign, Zap, Target } from "lucide-react";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { Gamepad2, Users, Trophy, DollarSign, Zap, Target, User, LogIn } from "lucide-react";
 
 const Index = () => {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-gaming">
+      {/* Auth Modal */}
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
+      
+      {/* Header */}
+      <header className="relative z-50 border-b border-border/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="font-gaming text-xl font-bold text-primary">
+              PUT UP OR SHUT UP
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => setAuthModalOpen(true)}
+                className="text-foreground hover:text-primary"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                LOG IN
+              </Button>
+              <Button
+                onClick={() => setAuthModalOpen(true)}
+                className="bg-gradient-neon-orange hover:shadow-glow-orange"
+              >
+                <User className="w-4 h-4 mr-2" />
+                SIGN UP
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 animate-pulse" />
