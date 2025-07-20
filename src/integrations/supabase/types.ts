@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_suggestions: {
         Row: {
           created_at: string
@@ -102,6 +126,7 @@ export type Database = {
           gamer_tag_steam: string | null
           gamer_tag_xbox: string | null
           id: string
+          is_admin: boolean | null
           is_premium: boolean | null
           premium_expires_at: string | null
           total_losses: number | null
@@ -121,6 +146,7 @@ export type Database = {
           gamer_tag_steam?: string | null
           gamer_tag_xbox?: string | null
           id?: string
+          is_admin?: boolean | null
           is_premium?: boolean | null
           premium_expires_at?: string | null
           total_losses?: number | null
@@ -140,6 +166,7 @@ export type Database = {
           gamer_tag_steam?: string | null
           gamer_tag_xbox?: string | null
           id?: string
+          is_admin?: boolean | null
           is_premium?: boolean | null
           premium_expires_at?: string | null
           total_losses?: number | null
@@ -529,10 +556,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      admin_analytics: {
+        Row: {
+          active_premium_users: number | null
+          new_users_this_week: number | null
+          total_deposits: number | null
+          total_tournaments: number | null
+          total_users: number | null
+          total_wagers: number | null
+          total_withdrawals: number | null
+          tournaments_this_week: number | null
+          transactions_today: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_uuid?: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

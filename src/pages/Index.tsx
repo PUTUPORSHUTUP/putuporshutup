@@ -1,12 +1,34 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut } from 'lucide-react';
+import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('user_id', user?.id)
+        .single();
+      setProfile(data);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,7 +56,15 @@ const Index = () => {
                     Profile
                   </Button>
                 </Link>
-                <Button 
+                {profile?.is_admin && (
+                  <Link to="/admin">
+                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <Button
                   variant="outline" 
                   className="border-white text-white hover:bg-white hover:text-black"
                   onClick={signOut}
