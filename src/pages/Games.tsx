@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateWagerModal } from '@/components/games/CreateWagerModal';
+import { TermsModal } from '@/components/TermsModal';
 import { WagerCard } from '@/components/games/WagerCard';
 import { SuggestGameModal } from '@/components/games/SuggestGameModal';
 import { AddGameModal } from '@/components/games/AddGameModal';
@@ -59,9 +60,18 @@ const Games = () => {
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [addGameModalOpen, setAddGameModalOpen] = useState(false);
   const [userBalance, setUserBalance] = useState(0);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Check if user has accepted terms
+  useEffect(() => {
+    const termsAccepted = localStorage.getItem('puosu_terms_accepted');
+    if (!termsAccepted && user) {
+      setShowTermsModal(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     loadGames();
@@ -530,6 +540,11 @@ const Games = () => {
         open={addGameModalOpen}
         onOpenChange={setAddGameModalOpen}
         onGameAdded={loadGames}
+      />
+
+      <TermsModal
+        open={showTermsModal}
+        onAccept={() => setShowTermsModal(false)}
       />
     </div>
   );
