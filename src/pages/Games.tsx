@@ -35,10 +35,6 @@ interface Wager {
   total_pot: number;
   created_at: string;
   game: Game;
-  creator_profile: {
-    username: string | null;
-    display_name: string | null;
-  } | null;
   participant_count: number;
 }
 
@@ -86,7 +82,6 @@ const Games = () => {
         .select(`
           *,
           game:games(*),
-          creator_profile:profiles!creator_id(username, display_name),
           participant_count:wager_participants(count)
         `)
         .eq('status', 'open')

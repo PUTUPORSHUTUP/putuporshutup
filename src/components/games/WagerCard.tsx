@@ -28,10 +28,6 @@ interface Wager {
   created_at: string;
   creator_id: string;
   game: Game;
-  creator_profile: {
-    username: string | null;
-    display_name: string | null;
-  } | null;
   participant_count: number;
 }
 
@@ -44,7 +40,7 @@ interface WagerCardProps {
 export const WagerCard = ({ wager, onJoin, currentUserId }: WagerCardProps) => {
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
-  const creatorName = wager.creator_profile?.display_name || wager.creator_profile?.username || 'Unknown Player';
+  const creatorName = 'Player'; // We'll fetch this later if needed
 
   const getStatusColor = () => {
     switch (wager.status) {
