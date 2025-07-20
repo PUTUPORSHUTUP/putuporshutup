@@ -17,8 +17,21 @@ import {
   BarChart3,
   UserCheck,
   Ban,
-  Eye
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
+  MessageSquare
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -54,12 +67,38 @@ interface Tournament {
   created_at: string;
 }
 
+interface Dispute {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  status: string;
+  created_at: string;
+  user_id: string;
+  admin_response: string | null;
+  profiles: {
+    username: string;
+    display_name: string;
+  } | null;
+  wagers?: {
+    title: string;
+  } | null;
+  tournament_matches?: {
+    tournaments: {
+      title: string;
+    } | null;
+  } | null;
+}
+
 const AdminDashboard = () => {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [adminResponse, setAdminResponse] = useState('');
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -134,6 +173,41 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
+      // Load disputes with simpler query
+      const { data: disputesData } = await supabase
+        .from('disputes')
+        .select(`
+          id,
+          type,
+          title,
+          description,
+          status,
+          created_at,
+          user_id,
+          admin_response
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      // Get user profiles for disputes
+      if (disputesData && disputesData.length > 0) {
+        const userIds = disputesData.map(d => d.user_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, username, display_name')
+          .in('user_id', userIds);
+
+        // Merge profiles with disputes
+        const disputesWithProfiles = disputesData.map(dispute => ({
+          ...dispute,
+          profiles: profilesData?.find(p => p.user_id === dispute.user_id) || null
+        }));
+        
+        setDisputes(disputesWithProfiles as Dispute[]);
+      } else {
+        setDisputes([]);
+      }
+
       setAnalytics(analyticsData);
       setUsers(usersData || []);
       setTournaments(tournamentsData || []);
@@ -146,6 +220,71 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resolveDispute = async (disputeId: string, status: 'resolved' | 'rejected', response: string) => {
+    try {
+      const { error } = await supabase
+        .from('disputes')
+        .update({
+          status,
+          admin_response: response,
+          resolved_by: user?.id,
+          resolved_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', disputeId);
+
+      if (error) throw error;
+
+      // Refresh disputes
+      await loadDashboardData();
+      
+      toast({
+        title: "Dispute Updated",
+        description: `Dispute has been ${status}.`,
+      });
+
+      setSelectedDispute(null);
+      setAdminResponse('');
+    } catch (error) {
+      console.error('Error resolving dispute:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update dispute.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-600" />;
+      case 'under_review':
+        return <Eye className="w-4 h-4 text-blue-600" />;
+      case 'resolved':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'rejected':
+        return <XCircle className="w-4 h-4 text-red-600" />;
+      default:
+        return <AlertTriangle className="w-4 h-4" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'under_review':
+        return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'resolved':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'rejected':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
@@ -178,10 +317,11 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 max-w-md">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
+            <TabsTrigger value="disputes">Disputes</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -385,6 +525,119 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Disputes Tab */}
+          <TabsContent value="disputes" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5" />
+                  Dispute Management
+                  <Badge variant="secondary" className="ml-2">
+                    {disputes.filter(d => d.status === 'pending').length} Pending
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {disputes.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No disputes found.
+                    </div>
+                  ) : (
+                    disputes.map((dispute) => (
+                      <div 
+                        key={dispute.id} 
+                        className={`p-4 border rounded-lg ${getStatusColor(dispute.status)}`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              {getStatusIcon(dispute.status)}
+                              <span className="font-medium">{dispute.title}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {dispute.type.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {dispute.description}
+                            </p>
+                            <div className="text-xs text-muted-foreground">
+                              By: {dispute.profiles?.display_name || dispute.profiles?.username || 'Unknown User'} • 
+                              {new Date(dispute.created_at).toLocaleDateString()}
+                            </div>
+                            {dispute.admin_response && (
+                              <div className="mt-3 p-3 bg-muted rounded text-sm">
+                                <strong>Admin Response:</strong> {dispute.admin_response}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {dispute.status === 'pending' && (
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setSelectedDispute(dispute)}
+                                >
+                                  <MessageSquare className="w-4 h-4 mr-1" />
+                                  Resolve
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                  <DialogTitle>Resolve Dispute</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div>
+                                    <h4 className="font-medium mb-2">{dispute.title}</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      {dispute.description}
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="space-y-2">
+                                    <label className="text-sm font-medium">Admin Response</label>
+                                    <Textarea
+                                      placeholder="Provide your resolution explanation..."
+                                      value={adminResponse}
+                                      onChange={(e) => setAdminResponse(e.target.value)}
+                                      rows={4}
+                                    />
+                                  </div>
+                                  
+                                  <div className="flex gap-2">
+                                    <Button
+                                      onClick={() => resolveDispute(dispute.id, 'resolved', adminResponse)}
+                                      disabled={!adminResponse.trim()}
+                                      className="flex-1"
+                                    >
+                                      <CheckCircle className="w-4 h-4 mr-1" />
+                                      Approve
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      onClick={() => resolveDispute(dispute.id, 'rejected', adminResponse)}
+                                      disabled={!adminResponse.trim()}
+                                      className="flex-1"
+                                    >
+                                      <XCircle className="w-4 h-4 mr-1" />
+                                      Reject
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

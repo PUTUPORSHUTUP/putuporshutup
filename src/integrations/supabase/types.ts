@@ -38,6 +38,72 @@ export type Database = {
         }
         Relationships: []
       }
+      disputes: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          description: string
+          evidence_urls: string[] | null
+          id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          tournament_match_id: string | null
+          type: string
+          updated_at: string
+          user_id: string
+          wager_id: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          description: string
+          evidence_urls?: string[] | null
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title: string
+          tournament_match_id?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+          wager_id?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          description?: string
+          evidence_urls?: string[] | null
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string
+          tournament_match_id?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          wager_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_tournament_match_id_fkey"
+            columns: ["tournament_match_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_suggestions: {
         Row: {
           created_at: string
