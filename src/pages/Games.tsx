@@ -5,10 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateWagerModal } from '@/components/games/CreateWagerModal';
 import { WagerCard } from '@/components/games/WagerCard';
+import { SuggestGameModal } from '@/components/games/SuggestGameModal';
+import { AddGameModal } from '@/components/games/AddGameModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trophy, DollarSign, Users, Gamepad2 } from 'lucide-react';
+import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings } from 'lucide-react';
 
 interface Game {
   id: string;
@@ -47,6 +49,8 @@ const Games = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [activeTab, setActiveTab] = useState('browse');
+  const [suggestModalOpen, setSuggestModalOpen] = useState(false);
+  const [addGameModalOpen, setAddGameModalOpen] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -197,14 +201,32 @@ const Games = () => {
             <h1 className="text-4xl font-gaming text-primary">GAMES & WAGERS</h1>
             <p className="text-muted-foreground mt-2">Challenge players and win big</p>
           </div>
-          <Button 
-            onClick={() => setCreateModalOpen(true)}
-            className="bg-primary hover:bg-primary/90"
-            size="lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            CREATE WAGER
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setSuggestModalOpen(true)}
+              variant="outline"
+              size="lg"
+            >
+              <Lightbulb className="w-5 h-5 mr-2" />
+              SUGGEST GAME
+            </Button>
+            <Button 
+              onClick={() => setAddGameModalOpen(true)}
+              variant="outline"
+              size="lg"
+            >
+              <Settings className="w-5 h-5 mr-2" />
+              ADD GAME
+            </Button>
+            <Button 
+              onClick={() => setCreateModalOpen(true)}
+              className="bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              CREATE WAGER
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -339,12 +361,23 @@ const Games = () => {
         </Tabs>
       </div>
 
-      {/* Create Wager Modal */}
+      {/* Modals */}
       <CreateWagerModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         selectedGame={selectedGame}
         onWagerCreated={handleWagerCreated}
+      />
+      
+      <SuggestGameModal
+        open={suggestModalOpen}
+        onOpenChange={setSuggestModalOpen}
+      />
+      
+      <AddGameModal
+        open={addGameModalOpen}
+        onOpenChange={setAddGameModalOpen}
+        onGameAdded={loadGames}
       />
     </div>
   );
