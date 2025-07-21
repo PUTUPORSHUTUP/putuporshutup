@@ -68,6 +68,11 @@ const Index = () => {
                           Profile
                         </Button>
                       </Link>
+                      <Link to="/social">
+                        <Button variant="ghost" className="text-white hover:bg-white/20">
+                          Social
+                        </Button>
+                      </Link>
                       <Link to="/leaderboards">
                         <Button variant="ghost" className="text-white hover:bg-white/20">
                           Leaderboards

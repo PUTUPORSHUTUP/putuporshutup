@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Games from "./pages/Games";
 import Tournaments from "./pages/Tournaments";
 import Leaderboards from "./pages/Leaderboards";
+import Social from "./pages/Social";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
@@ -45,6 +46,11 @@ const App = () => {
               <Route path="/tournaments" element={
                 <ProtectedRoute>
                   <Tournaments />
+                </ProtectedRoute>
+              } />
+              <Route path="/social" element={
+                <ProtectedRoute>
+                  <Social />
                 </ProtectedRoute>
               } />
               <Route path="/leaderboards" element={<Leaderboards />} />
