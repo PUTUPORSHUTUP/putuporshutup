@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, GamepadIcon } from 'lucide-react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,8 @@ const Auth = () => {
     username: '', 
     displayName: '' 
   });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -80,6 +83,15 @@ const Auth = () => {
       return;
     }
 
+    if (!captchaToken) {
+      toast({
+        title: "Captcha Required",
+        description: "Please complete the captcha verification.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -90,6 +102,7 @@ const Auth = () => {
         password: signupForm.password,
         options: {
           emailRedirectTo: redirectUrl,
+          captchaToken: captchaToken,
           data: {
             username: signupForm.username,
             display_name: signupForm.displayName,
@@ -234,7 +247,17 @@ const Auth = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <div className="space-y-2">
+                  <Label>Security Verification</Label>
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey="6LeoXkIqAAAAAOkbHh3vRJIk9iuGUZS9eU_sQbDm"
+                    onChange={(token) => setCaptchaToken(token)}
+                    onExpired={() => setCaptchaToken(null)}
+                    theme="light"
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create Account
                 </Button>
