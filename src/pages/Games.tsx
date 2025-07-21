@@ -67,6 +67,7 @@ const Games = () => {
   
   const { user } = useAuth();
   const { toast } = useToast();
+  const [selectedWager, setSelectedWager] = useState<any>(null);
 
   // Check if user has accepted terms
   useEffect(() => {
