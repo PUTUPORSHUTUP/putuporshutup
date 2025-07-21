@@ -174,7 +174,7 @@ const AdminDashboard = () => {
         .limit(20);
 
       // Load disputes with simpler query
-      const { data: disputesData, error: disputesError } = await supabase
+      const { data: disputesData } = await supabase
         .from('disputes')
         .select(`
           id,
@@ -188,9 +188,6 @@ const AdminDashboard = () => {
         `)
         .order('created_at', { ascending: false })
         .limit(50);
-
-      console.log('Disputes data:', disputesData);
-      console.log('Disputes error:', disputesError);
 
       // Get user profiles for disputes
       if (disputesData && disputesData.length > 0) {
