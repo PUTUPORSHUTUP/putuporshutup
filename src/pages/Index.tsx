@@ -10,6 +10,7 @@ import { MobileNavigation } from '@/components/ui/mobile-navigation';
 import { supabase } from '@/integrations/supabase/client';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { ShareButton } from '@/components/ui/share-button';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -159,6 +160,15 @@ const Index = () => {
                 </Link>
               </>
             )}
+          </div>
+          
+          {/* Share Button */}
+          <div className="mt-8 flex justify-center">
+            <ShareButton 
+              variant="outline" 
+              size="lg"
+              className="border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+            />
           </div>
         </div>
       </section>
