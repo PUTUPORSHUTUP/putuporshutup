@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import Games from "./pages/Games";
 import Tournaments from "./pages/Tournaments";
+import Leaderboards from "./pages/Leaderboards";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
@@ -46,6 +47,7 @@ const App = () => {
                   <Tournaments />
                 </ProtectedRoute>
               } />
+              <Route path="/leaderboards" element={<Leaderboards />} />
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminDashboard />

@@ -68,6 +68,11 @@ const Index = () => {
                           Profile
                         </Button>
                       </Link>
+                      <Link to="/leaderboards">
+                        <Button variant="ghost" className="text-white hover:bg-white/20">
+                          Leaderboards
+                        </Button>
+                      </Link>
                       {profile?.is_admin && (
                         <Link to="/admin">
                           <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
