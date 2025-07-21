@@ -103,18 +103,21 @@ export const TournamentBracket = ({ matches, participants, tournamentSize, tourn
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
-        minZoom={0.5}
+        minZoom={0.3}
         maxZoom={1.5}
         attributionPosition="bottom-left"
         className="tournament-flow"
+        panOnScroll
       >
         <Background />
-        <Controls />
+        <Controls position="top-left" />
         <MiniMap 
           nodeColor="#9E86ED"
           nodeStrokeWidth={3}
           zoomable
           pannable
+          className="!bg-background border"
+          position="bottom-right"
         />
       </ReactFlow>
     </div>

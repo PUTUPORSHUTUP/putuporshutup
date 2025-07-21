@@ -331,60 +331,65 @@ const Games = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-gaming text-primary">GAMES & WAGERS</h1>
-            <p className="text-muted-foreground mt-2">Challenge players and win big</p>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Wallet Balance */}
-            <Card>
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="p-2 bg-green-500/10 rounded-full">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Wallet Balance</p>
-                  <p className="text-lg font-bold">${userBalance.toFixed(2)}</p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.location.href = '/profile'}
-                  className="ml-auto"
-                >
-                  Add Funds
-                </Button>
-              </CardContent>
-            </Card>
+        <div className="space-y-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-gaming text-primary">GAMES & WAGERS</h1>
+              <p className="text-muted-foreground mt-2">Challenge players and win big</p>
+            </div>
             
-            <div className="flex gap-3">
-            <Button 
-              onClick={() => setSuggestModalOpen(true)}
-              variant="outline"
-              size="lg"
-            >
-              <Lightbulb className="w-5 h-5 mr-2" />
-              SUGGEST GAME
-            </Button>
-            <Button 
-              onClick={() => setAddGameModalOpen(true)}
-              variant="outline"
-              size="lg"
-            >
-              <Settings className="w-5 h-5 mr-2" />
-              ADD GAME
-            </Button>
-            <Button 
-              onClick={() => setCreateModalOpen(true)}
-              className="bg-primary hover:bg-primary/90"
-              size="lg"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              CREATE WAGER
-            </Button>
+            {/* Mobile-first action buttons */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 order-last sm:order-none">
+              <Button 
+                onClick={() => setCreateModalOpen(true)}
+                className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+                size="lg"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                CREATE WAGER
+              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => setSuggestModalOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-none"
+                >
+                  <Lightbulb className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">SUGGEST GAME</span>
+                </Button>
+                <Button 
+                  onClick={() => setAddGameModalOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-none"
+                >
+                  <Settings className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">ADD GAME</span>
+                </Button>
+              </div>
             </div>
           </div>
+          
+          {/* Wallet Balance - Mobile optimized */}
+          <Card className="sm:max-w-sm">
+            <CardContent className="p-3 sm:p-4 flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-full">
+                <DollarSign className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground">Wallet Balance</p>
+                <p className="text-lg font-bold">${userBalance.toFixed(2)}</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = '/profile'}
+              >
+                Add Funds
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Stats Cards */}

@@ -5,10 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileNavigation } from '@/components/ui/mobile-navigation';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const isMobile = useIsMobile();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -35,56 +38,64 @@ const Index = () => {
       {/* Header Navigation */}
       <header className="absolute top-0 left-0 right-0 z-20 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-white font-gaming text-xl font-bold">
+          <Link to="/" className="text-white font-gaming text-lg sm:text-xl font-bold">
             GAMING PLATFORM
           </Link>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <Link to="/games">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Games
-                  </Button>
-                </Link>
-                <Link to="/tournaments">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Tournaments
-                  </Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Profile
-                  </Button>
-                </Link>
-                {profile?.is_admin && (
-                  <Link to="/admin">
-                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                <Button
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-black"
-                  onClick={signOut}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </Button>
-              </>
+              <div className="flex items-center gap-2 sm:gap-4">
+            {isMobile ? (
+              <MobileNavigation profile={profile} />
             ) : (
               <>
-                <Link to="/auth">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
-                    Sign Up
-                  </Button>
-                </Link>
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <Link to="/games">
+                        <Button variant="ghost" className="text-white hover:bg-white/20">
+                          Games
+                        </Button>
+                      </Link>
+                      <Link to="/tournaments">
+                        <Button variant="ghost" className="text-white hover:bg-white/20">
+                          Tournaments
+                        </Button>
+                      </Link>
+                      <Link to="/profile">
+                        <Button variant="ghost" className="text-white hover:bg-white/20">
+                          Profile
+                        </Button>
+                      </Link>
+                      {profile?.is_admin && (
+                        <Link to="/admin">
+                          <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                            <Shield className="w-4 h-4" />
+                            Admin
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline" 
+                      className="border-white text-white hover:bg-white hover:text-black"
+                      onClick={signOut}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth">
+                      <Button variant="ghost" className="text-white hover:bg-white/20">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/auth">
+                      <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -104,27 +115,30 @@ const Index = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <p className="text-xl md:text-2xl mb-8 text-gray-200">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-gaming font-bold mb-4 md:mb-6">
+            GAMING PLATFORM
+          </h1>
+          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-gray-200">
             The ultimate gaming wagering platform. Put your skills where your mouth is.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
             {user ? (
-              <Link to="/games">
-                <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
+              <Link to="/games" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-primary hover:bg-primary/90">
                   START WAGERING
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                 </Button>
               </Link>
             ) : (
               <>
-                <Link to="/auth">
-                  <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
+                <Link to="/auth" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-primary hover:bg-primary/90">
                     START WAGERING
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                   </Button>
                 </Link>
-                <Link to="/auth">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-black">
+                <Link to="/auth" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white text-white hover:bg-white hover:text-black">
                     JOIN NOW
                   </Button>
                 </Link>

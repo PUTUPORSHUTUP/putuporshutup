@@ -254,20 +254,20 @@ const Profile = () => {
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* Profile Header */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <div className="relative">
-              <Avatar className="w-24 h-24">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div className="relative flex-shrink-0">
+              <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
                 <AvatarImage src={profile.avatar_url} />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className="text-xl sm:text-2xl">
                   {profile.display_name?.substring(0, 2).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 bg-primary text-white rounded-full p-2 cursor-pointer hover:bg-primary/90 transition-colors">
                 {uploading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                 ) : (
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
               </label>
               <input
@@ -280,34 +280,34 @@ const Profile = () => {
               />
             </div>
             
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-3xl font-bold">{profile.display_name || profile.username}</h1>
+            <div className="flex-1 text-center sm:text-left w-full">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold">{profile.display_name || profile.username}</h1>
                 {profile.is_premium && (
-                  <div className="flex items-center gap-1">
-                    <Crown className="w-5 h-5 text-yellow-600" />
+                  <div className="flex items-center justify-center sm:justify-start gap-1">
+                    <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
                     <Badge className="bg-yellow-600 text-white text-xs">PREMIUM</Badge>
                   </div>
                 )}
               </div>
-              <p className="text-muted-foreground mb-4">{profile.bio || 'No bio yet'}</p>
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">{profile.bio || 'No bio yet'}</p>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{profile.total_wins}</div>
-                  <div className="text-sm text-muted-foreground">Wins</div>
+                  <div className="text-xl sm:text-2xl font-bold text-green-600">{profile.total_wins}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Wins</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">{profile.total_losses}</div>
-                  <div className="text-sm text-muted-foreground">Losses</div>
+                  <div className="text-xl sm:text-2xl font-bold text-red-600">{profile.total_losses}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Losses</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{getWinRate()}%</div>
-                  <div className="text-sm text-muted-foreground">Win Rate</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{getWinRate()}%</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Win Rate</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">${profile.wallet_balance}</div>
-                  <div className="text-sm text-muted-foreground">Balance</div>
+                  <div className="text-xl sm:text-2xl font-bold text-purple-600">${profile.wallet_balance}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Balance</div>
                 </div>
               </div>
             </div>

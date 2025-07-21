@@ -102,33 +102,33 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
 
   return (
     <Card className="hover:shadow-lg transition-all duration-200">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-3 sm:pb-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="outline" className="text-xs">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1 sm:gap-2 mb-2 flex-wrap">
+              <Badge variant="outline" className="text-xs shrink-0">
                 {wager.game.display_name}
               </Badge>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs shrink-0">
                 {wager.platform}
               </Badge>
-              <div className={`w-2 h-2 rounded-full ${getStatusColor()}`} />
+              <div className={`w-2 h-2 rounded-full ${getStatusColor()} shrink-0`} />
             </div>
-            <CardTitle className="text-lg leading-tight">{wager.title}</CardTitle>
+            <CardTitle className="text-base sm:text-lg leading-tight">{wager.title}</CardTitle>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {/* Creator Info */}
-        <div className="flex items-center gap-3">
-          <Avatar className="w-8 h-8">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
             <AvatarFallback className="text-xs">
               {creatorName.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <p className="text-sm font-medium">{creatorName}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{creatorName}</p>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(wager.created_at), { addSuffix: true })}
             </p>
@@ -136,27 +136,27 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
         </div>
 
         {/* Wager Details */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-green-600" />
-            <div>
-              <p className="font-bold text-green-600">${wager.stake_amount}</p>
+            <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="font-bold text-green-600 text-sm sm:text-base">${wager.stake_amount}</p>
               <p className="text-xs text-muted-foreground">Stake</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-yellow-600" />
-            <div>
-              <p className="font-bold text-yellow-600">${wager.total_pot}</p>
+            <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="font-bold text-yellow-600 text-sm sm:text-base">${wager.total_pot}</p>
               <p className="text-xs text-muted-foreground">Total Pot</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-blue-600" />
-            <div>
-              <p className="font-bold">
+            <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="font-bold text-sm sm:text-base">
                 {wager.participant_count}/{wager.max_participants}
               </p>
               <p className="text-xs text-muted-foreground">Players</p>
@@ -164,9 +164,9 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
           </div>
 
           <div className="flex items-center gap-2">
-            <Gamepad2 className="w-4 h-4 text-purple-600" />
-            <div>
-              <p className="font-bold">{wager.game_mode || '1v1'}</p>
+            <Gamepad2 className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="font-bold text-sm sm:text-base truncate">{wager.game_mode || '1v1'}</p>
               <p className="text-xs text-muted-foreground">Mode</p>
             </div>
           </div>
@@ -240,7 +240,12 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
                 ) : (
                   <>
                     <LogOut className="w-4 h-4 mr-2" />
-                    {isCreator ? `Cancel Wager ($${wager.stake_amount} refund)` : `Leave Wager ($${wager.stake_amount} refund)`}
+                    <span className="hidden sm:inline">
+                      {isCreator ? `Cancel Wager ($${wager.stake_amount} refund)` : `Leave Wager ($${wager.stake_amount} refund)`}
+                    </span>
+                    <span className="sm:hidden">
+                      {isCreator ? 'Cancel' : 'Leave'}
+                    </span>
                   </>
                 )}
               </Button>
@@ -263,7 +268,8 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
                 ) : (
                   <>
                     <Trophy className="w-4 h-4 mr-2" />
-                    Join for ${wager.stake_amount}
+                    <span className="hidden sm:inline">Join for ${wager.stake_amount}</span>
+                    <span className="sm:hidden">Join ${wager.stake_amount}</span>
                   </>
                 )}
               </Button>

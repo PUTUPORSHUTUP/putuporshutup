@@ -100,17 +100,49 @@ All colors MUST be HSL.
     --sidebar-ring: 25 100% 55%;
 }
 
-/* Tournament Bracket Styles */
+/* Tournament bracket styles */
 .tournament-bracket-container {
+  height: 400px;
   width: 100%;
-  height: 600px;
   border: 1px solid hsl(var(--border));
   border-radius: 8px;
   overflow: hidden;
 }
 
+@media (min-width: 768px) {
+  .tournament-bracket-container {
+    height: 600px;
+  }
+}
+
 .tournament-flow {
   background: hsl(var(--background));
+}
+
+.tournament-flow .react-flow__node {
+  border-radius: 8px;
+}
+
+.tournament-flow .react-flow__edge-path {
+  stroke: hsl(var(--primary));
+  stroke-width: 2;
+}
+
+.tournament-flow .react-flow__controls {
+  button {
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+  
+  button:hover {
+    background: hsl(var(--muted));
+  }
+}
+
+.tournament-flow .react-flow__minimap {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
 }
 
 .tournament-match {
@@ -118,86 +150,94 @@ All colors MUST be HSL.
   border: 1px solid hsl(var(--border));
   border-radius: 8px;
   padding: 12px;
-  min-width: 200px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 220px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .tournament-match {
+    padding: 16px;
+    width: 250px;
+  }
 }
 
 .tournament-match.championship {
-  border: 2px solid #fbbf24;
-  background: linear-gradient(135deg, #fef3c7, #fbbf24);
-  box-shadow: 0 4px 8px rgba(251, 191, 36, 0.3);
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1));
+  border: 2px solid hsl(var(--primary));
 }
 
-.match-header {
+.tournament-match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.match-players {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.player-slot {
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  padding: 6px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 4px;
-  background: hsl(var(--muted));
-  transition: all 0.2s ease;
-}
-
-.player-slot.winner {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-  border-color: #10b981;
+  font-size: 11px;
   font-weight: 600;
-}
-
-.vs-divider {
-  text-align: center;
-  padding: 2px 0;
-  font-size: 10px;
   color: hsl(var(--muted-foreground));
 }
 
-.tournament-handle {
-  width: 8px;
-  height: 8px;
-  background: #9E86ED;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
+@media (min-width: 768px) {
+  .tournament-match-header {
+    margin-bottom: 12px;
+    font-size: 12px;
+  }
 }
 
-.tournament-handle:hover {
-  background: #7c3aed;
-  transform: scale(1.2);
-}
-
-/* Match Result Reporting Styles */
-.match-actions {
+.tournament-player-slot {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  margin-bottom: 3px;
+  border-radius: 6px;
+  background: hsl(var(--muted) / 0.3);
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+@media (min-width: 768px) {
+  .tournament-player-slot {
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+}
+
+.tournament-player-slot.winner {
+  background: hsl(var(--primary) / 0.1);
+  border: 1px solid hsl(var(--primary));
+}
+
+.tournament-player-slot.empty {
+  opacity: 0.5;
+  border: 1px dashed hsl(var(--border));
+  background: transparent;
+}
+
+.tournament-match-result {
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid hsl(var(--border));
 }
 
-/* React Flow Overrides for Tournament */
-.react-flow__node-match {
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+@media (min-width: 768px) {
+  .tournament-match-result {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
 }
 
+.tournament-winner {
+  font-weight: 600;
+  color: hsl(var(--primary));
+}
+
+/* Override react-flow styles for tournament */
+.react-flow__node-match {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 @layer base {
