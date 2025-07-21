@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { ShareButton } from '@/components/ui/share-button';
+import { RealTimeStats } from '@/components/ui/real-time-stats';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -238,24 +239,7 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">Join thousands of competitive gamers</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">10K+</div>
-              <div className="text-muted-foreground">Active Players</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">$2M+</div>
-              <div className="text-muted-foreground">Total Winnings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">50K+</div>
-              <div className="text-muted-foreground">Matches Played</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">24/7</div>
-              <div className="text-muted-foreground">Support</div>
-            </div>
-          </div>
+          <RealTimeStats />
         </div>
       </section>
 
