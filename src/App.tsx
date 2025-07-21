@@ -21,8 +21,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <NotificationProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <NotificationProvider>
             <TooltipProvider>
               <div className="min-h-screen bg-background font-gaming">
                 <Toaster />
@@ -57,10 +57,10 @@ const App = () => {
             </BrowserRouter>
           </div>
         </TooltipProvider>
-      </AuthProvider>
-      </NotificationProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
