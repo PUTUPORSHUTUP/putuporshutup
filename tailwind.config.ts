@@ -79,6 +79,7 @@ export default {
 		},
 		fontFamily: {
 			'gaming': ['Orbitron', 'monospace'],
+			'orbitron': ['Orbitron', 'sans-serif'],
 		},
 		borderRadius: {
 			lg: 'var(--radius)',
