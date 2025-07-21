@@ -40,11 +40,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header Navigation */}
-      <header className="absolute top-0 left-0 right-0 z-20 bg-black/20 backdrop-blur-sm">
+      <header className="bg-neon-green text-black py-6 text-center">
+        <h1 className="font-gaming text-2xl sm:text-4xl font-bold tracking-wider">
+          PUT UP OR SHUT UP
+        </h1>
+      </header>
+
+      {/* Navigation Bar */}
+      <nav className="bg-black/20 backdrop-blur-sm border-b border-neon-green/20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-white font-gaming text-lg sm:text-xl font-bold">
-            GAMING PLATFORM
-          </Link>
               <div className="flex items-center gap-2 sm:gap-4">
             {isMobile ? (
               <MobileNavigation profile={profile} />
@@ -117,7 +121,7 @@ const Index = () => {
             )}
           </div>
         </div>
-      </header>
+      </nav>
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -132,31 +136,37 @@ const Index = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-gaming font-bold mb-4 md:mb-6">
-            GAMING PLATFORM
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-gaming font-bold mb-4 md:mb-6 text-neon-green">
+            DON'T BRAG
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-gray-200">
-            The ultimate gaming wagering platform. Put your skills where your mouth is.
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-gaming font-bold mb-6 md:mb-8">
+            WAGER AND LOSE
+          </h2>
+          <h3 className="text-4xl sm:text-5xl md:text-7xl font-gaming font-bold mb-6 md:mb-8 text-neon-green">
+            WAGER WIN BRAG!
+          </h3>
+          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-gray-200 max-w-2xl mx-auto">
+            Put your money where your mouth is. Real games, real stakes, real bragging rights.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
             {user ? (
               <Link to="/games" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-primary hover:bg-primary/90">
-                  START WAGERING
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-gaming font-bold">
+                  PUT UP OR SHUT UP
                   <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                 </Button>
               </Link>
             ) : (
               <>
                 <Link to="/auth" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-primary hover:bg-primary/90">
-                    START WAGERING
+                  <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-gaming font-bold">
+                    PUT UP OR SHUT UP
                     <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                   </Button>
                 </Link>
                 <Link to="/auth" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white text-white hover:bg-white hover:text-black">
-                    JOIN NOW
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-gaming font-bold">
+                    PROVE YOURSELF
                   </Button>
                 </Link>
               </>
@@ -244,30 +254,30 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary">
+      <section className="py-20 bg-neon-green">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-gaming font-bold text-white mb-6">
+          <h2 className="text-4xl font-gaming font-bold text-black mb-6">
             READY TO PUT UP OR SHUT UP?
           </h2>
-          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join the most competitive gaming community. Show your skills, earn respect, and win big.
+          <p className="text-xl text-black/80 mb-8 max-w-2xl mx-auto font-gaming">
+            Stop talking. Start proving. Winner takes all.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {user ? (
               <Link to="/games">
-                <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-black text-black hover:bg-black hover:text-neon-green font-gaming font-bold">
                   BROWSE WAGERS
                 </Button>
               </Link>
             ) : (
               <>
                 <Link to="/auth">
-                  <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-                    CREATE ACCOUNT
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-black text-black hover:bg-black hover:text-neon-green font-gaming font-bold">
+                    JOIN THE BATTLE
                   </Button>
                 </Link>
                 <Link to="/games">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-primary">
+                  <Button size="lg" className="text-lg px-8 py-6 bg-black text-neon-green hover:bg-black/80 font-gaming font-bold">
                     BROWSE WAGERS
                   </Button>
                 </Link>
