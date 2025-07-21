@@ -32,6 +32,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from '@/components/ui/dialog';
+import { DisputeManagement } from '@/components/admin/DisputeManagement';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -532,115 +533,7 @@ const AdminDashboard = () => {
 
           {/* Disputes Tab */}
           <TabsContent value="disputes" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5" />
-                  Dispute Management
-                  <Badge variant="secondary" className="ml-2">
-                    {disputes.filter(d => d.status === 'pending').length} Pending
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {disputes.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No disputes found.
-                    </div>
-                  ) : (
-                    disputes.map((dispute) => (
-                      <div 
-                        key={dispute.id} 
-                        className={`p-4 border rounded-lg ${getStatusColor(dispute.status)}`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              {getStatusIcon(dispute.status)}
-                              <span className="font-medium">{dispute.title}</span>
-                              <Badge variant="outline" className="text-xs">
-                                {dispute.type.replace('_', ' ')}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {dispute.description}
-                            </p>
-                            <div className="text-xs text-muted-foreground">
-                              By: {dispute.profiles?.display_name || dispute.profiles?.username || 'Unknown User'} • 
-                              {new Date(dispute.created_at).toLocaleDateString()}
-                            </div>
-                            {dispute.admin_response && (
-                              <div className="mt-3 p-3 bg-muted rounded text-sm">
-                                <strong>Admin Response:</strong> {dispute.admin_response}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {dispute.status === 'pending' && (
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => setSelectedDispute(dispute)}
-                                >
-                                  <MessageSquare className="w-4 h-4 mr-1" />
-                                  Resolve
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                  <DialogTitle>Resolve Dispute</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                  <div>
-                                    <h4 className="font-medium mb-2">{dispute.title}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      {dispute.description}
-                                    </p>
-                                  </div>
-                                  
-                                  <div className="space-y-2">
-                                    <label className="text-sm font-medium">Admin Response</label>
-                                    <Textarea
-                                      placeholder="Provide your resolution explanation..."
-                                      value={adminResponse}
-                                      onChange={(e) => setAdminResponse(e.target.value)}
-                                      rows={4}
-                                    />
-                                  </div>
-                                  
-                                  <div className="flex gap-2">
-                                    <Button
-                                      onClick={() => resolveDispute(dispute.id, 'resolved', adminResponse)}
-                                      disabled={!adminResponse.trim()}
-                                      className="flex-1"
-                                    >
-                                      <CheckCircle className="w-4 h-4 mr-1" />
-                                      Approve
-                                    </Button>
-                                    <Button
-                                      variant="destructive"
-                                      onClick={() => resolveDispute(dispute.id, 'rejected', adminResponse)}
-                                      disabled={!adminResponse.trim()}
-                                      className="flex-1"
-                                    >
-                                      <XCircle className="w-4 h-4 mr-1" />
-                                      Reject
-                                    </Button>
-                                  </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <DisputeManagement />
           </TabsContent>
 
           {/* Analytics Tab */}
