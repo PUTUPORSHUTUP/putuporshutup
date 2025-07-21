@@ -12,17 +12,21 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import { NotificationProvider } from '@/components/notifications/NotificationProvider';
 
 const App = () => {
   const queryClient = new QueryClient();
   
   return (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <div className="min-h-screen bg-background font-gaming">
-          <Toaster />
-          <Sonner />
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <div className="min-h-screen bg-background font-gaming">
+                <Toaster />
+                <Sonner />
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
@@ -50,10 +54,12 @@ const App = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </AuthProvider>
+            </BrowserRouter>
+          </div>
+        </TooltipProvider>
+      </AuthProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   </QueryClientProvider>
   );
 };

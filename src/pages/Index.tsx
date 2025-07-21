@@ -8,6 +8,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileNavigation } from '@/components/ui/mobile-navigation';
 import { supabase } from '@/integrations/supabase/client';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -49,6 +51,8 @@ const Index = () => {
                 {user ? (
                   <>
                     <div className="flex items-center gap-4">
+                      <ThemeToggle />
+                      <NotificationCenter />
                       <Link to="/games">
                         <Button variant="ghost" className="text-white hover:bg-white/20">
                           Games
@@ -84,6 +88,7 @@ const Index = () => {
                   </>
                 ) : (
                   <>
+                    <ThemeToggle />
                     <Link to="/auth">
                       <Button variant="ghost" className="text-white hover:bg-white/20">
                         Login
