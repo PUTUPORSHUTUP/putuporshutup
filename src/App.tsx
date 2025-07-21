@@ -38,11 +38,7 @@ const App = () => {
                   <Profile />
                 </ProtectedRoute>
               } />
-              <Route path="/games" element={
-                <ProtectedRoute>
-                  <Games />
-                </ProtectedRoute>
-              } />
+              <Route path="/games" element={<Games />} />
               <Route path="/tournaments" element={
                 <ProtectedRoute>
                   <Tournaments />
