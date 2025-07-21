@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, GamepadIcon } from 'lucide-react';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -19,10 +18,9 @@ const Auth = () => {
     password: '', 
     confirmPassword: '', 
     username: '', 
-    displayName: '' 
+    displayName: '',
+    honeypot: '' // Hidden field to catch bots
   });
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -83,10 +81,11 @@ const Auth = () => {
       return;
     }
 
-    if (!captchaToken) {
+    // Bot protection: if honeypot field is filled, it's likely a bot
+    if (signupForm.honeypot) {
       toast({
-        title: "Captcha Required",
-        description: "Please complete the captcha verification.",
+        title: "Signup Failed",
+        description: "Invalid submission detected.",
         variant: "destructive",
       });
       return;
@@ -102,7 +101,6 @@ const Auth = () => {
         password: signupForm.password,
         options: {
           emailRedirectTo: redirectUrl,
-          captchaToken: captchaToken,
           data: {
             username: signupForm.username,
             display_name: signupForm.displayName,
@@ -247,17 +245,17 @@ const Auth = () => {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Security Verification</Label>
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                    onChange={(token) => setCaptchaToken(token)}
-                    onExpired={() => setCaptchaToken(null)}
-                    theme="light"
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
+                {/* Hidden honeypot field to catch bots */}
+                <input
+                  type="text"
+                  name="honeypot"
+                  value={signupForm.honeypot}
+                  onChange={(e) => setSignupForm({ ...signupForm, honeypot: e.target.value })}
+                  style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+                <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create Account
                 </Button>
