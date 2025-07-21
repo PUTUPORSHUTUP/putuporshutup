@@ -27,15 +27,50 @@ interface PremiumSubscriptionProps {
 }
 
 export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription }: PremiumSubscriptionProps) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({ basic: false, premium: false });
   const [checking, setChecking] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const handleUpgradeToBasic = async () => {
+    if (!user) return;
+
+    setLoading(prev => ({ ...prev, basic: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke('create-basic-subscription');
+
+      if (error) {
+        toast({
+          title: "Subscription Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data.url) {
+        window.open(data.url, '_blank');
+        toast({
+          title: "Redirecting to Checkout",
+          description: "Complete your basic subscription in the new tab.",
+        });
+      }
+    } catch (error) {
+      console.error('Basic subscription error:', error);
+      toast({
+        title: "Subscription Error",
+        description: "Unable to process subscription request.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(prev => ({ ...prev, basic: false }));
+    }
+  };
+
   const handleUpgradeToPremium = async () => {
     if (!user) return;
 
-    setLoading(true);
+    setLoading(prev => ({ ...prev, premium: true }));
     try {
       const { data, error } = await supabase.functions.invoke('create-premium-subscription');
 
@@ -48,10 +83,8 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
         return;
       }
 
-      // Redirect to Stripe Checkout
       if (data.url) {
         window.open(data.url, '_blank');
-        
         toast({
           title: "Redirecting to Checkout",
           description: "Complete your premium subscription in the new tab.",
@@ -65,7 +98,7 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, premium: false }));
     }
   };
 
@@ -90,110 +123,152 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
     }
   };
 
-  const premiumFeatures = [
+  const basicFeatures = [
     { icon: Zap, title: "50% Off All Fees", description: "Save on every deposit" },
-    { icon: Trophy, title: "Exclusive Tournaments", description: "Premium-only competitions" },
     { icon: Star, title: "Priority Entry", description: "Skip the queue in tournaments" },
-    { icon: Shield, title: "Premium Support", description: "Priority customer service" },
+    { icon: Shield, title: "Basic Support", description: "Enhanced customer service" }
+  ];
+
+  const premiumFeatures = [
+    { icon: Zap, title: "No Fees Ever", description: "Zero fees on all deposits" },
+    { icon: Trophy, title: "Exclusive Tournaments", description: "Premium-only competitions" },
+    { icon: Star, title: "VIP Priority", description: "First access to everything" },
+    { icon: Shield, title: "Premium Support", description: "24/7 priority customer service" },
     { icon: Crown, title: "Elite Status", description: "Special badges and recognition" }
   ];
 
   const isSubscribed = currentSubscription?.subscribed;
-  const subscriptionStatus = currentSubscription?.status;
 
   return (
-    <Card className="bg-gradient-to-br from-yellow-500/5 to-yellow-600/10 border-yellow-500/20">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Crown className="w-6 h-6 text-yellow-600" />
-          Premium Membership
-          {isSubscribed && (
-            <Badge className="bg-yellow-600 text-white">
-              ACTIVE
-            </Badge>
-          )}
-        </CardTitle>
-      </CardHeader>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">Choose Your Membership</h2>
+        <p className="text-muted-foreground">Unlock exclusive benefits and save on fees</p>
+      </div>
 
-      <CardContent className="space-y-6">
-        {/* Current Status */}
-        {isSubscribed ? (
-          <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-600/5 border border-green-500/20 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Check className="w-5 h-5 text-green-600" />
-              <span className="font-medium text-green-600">Premium Active</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {currentSubscription?.current_period_end && (
-                <>Renews on {new Date(currentSubscription.current_period_end * 1000).toLocaleDateString()}</>
-              )}
-              {currentSubscription?.cancel_at_period_end && (
-                <span className="text-yellow-600"> (Cancels at period end)</span>
-              )}
-            </p>
+      {/* Current Status */}
+      {isSubscribed && (
+        <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-600/5 border border-green-500/20 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <Check className="w-5 h-5 text-green-600" />
+            <span className="font-medium text-green-600">Subscription Active</span>
           </div>
-        ) : (
-          <div className="text-center p-6">
-            <Crown className="w-12 h-12 mx-auto text-yellow-600 mb-3" />
-            <h3 className="text-xl font-bold mb-2">Unlock Premium Benefits</h3>
-            <div className="text-4xl font-bold text-yellow-600 mb-2">$9.99</div>
-            <p className="text-sm text-muted-foreground">per month</p>
-          </div>
-        )}
-
-        {/* Premium Features */}
-        <div className="space-y-3">
-          <h4 className="font-medium text-sm">Premium Features:</h4>
-          <div className="grid gap-3">
-            {premiumFeatures.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <feature.icon className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm">{feature.title}</p>
-                  <p className="text-xs text-muted-foreground">{feature.description}</p>
-                </div>
-                {isSubscribed && <Check className="w-4 h-4 text-green-600 ml-auto" />}
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-muted-foreground">
+            {currentSubscription?.current_period_end && (
+              <>Renews on {new Date(currentSubscription.current_period_end * 1000).toLocaleDateString()}</>
+            )}
+            {currentSubscription?.cancel_at_period_end && (
+              <span className="text-yellow-600"> (Cancels at period end)</span>
+            )}
+          </p>
+          <Button 
+            onClick={checkSubscriptionStatus}
+            disabled={checking}
+            variant="outline"
+            size="sm"
+            className="mt-2"
+          >
+            {checking ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              "Check Status"
+            )}
+          </Button>
         </div>
+      )}
 
-        {/* Action Buttons */}
-        <div className="space-y-2">
-          {!isSubscribed ? (
+      {/* Subscription Tiers */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Basic Tier */}
+        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-600/10 border-blue-500/20 relative">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="w-6 h-6 text-blue-600" />
+              Basic
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">$9.99</div>
+              <p className="text-sm text-muted-foreground">per month</p>
+            </div>
+
+            <div className="space-y-3">
+              {basicFeatures.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <feature.icon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">{feature.title}</p>
+                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Button 
+              onClick={handleUpgradeToBasic}
+              disabled={loading.basic || isSubscribed}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {loading.basic ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Star className="w-4 h-4 mr-2" />
+              )}
+              {isSubscribed ? "Current Plan" : "Choose Basic"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Premium Tier */}
+        <Card className="bg-gradient-to-br from-yellow-500/5 to-yellow-600/10 border-yellow-500/20 relative">
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <Badge className="bg-yellow-600 text-white px-3 py-1">BEST VALUE</Badge>
+          </div>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="w-6 h-6 text-yellow-600" />
+              Premium
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-yellow-600">$19.99</div>
+              <p className="text-sm text-muted-foreground">per month</p>
+            </div>
+
+            <div className="space-y-3">
+              {premiumFeatures.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <feature.icon className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">{feature.title}</p>
+                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <Button 
               onClick={handleUpgradeToPremium}
-              disabled={loading}
+              disabled={loading.premium || isSubscribed}
               className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
-              size="lg"
             >
-              {loading ? (
+              {loading.premium ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (
                 <Crown className="w-4 h-4 mr-2" />
               )}
-              Upgrade to Premium
+              {isSubscribed ? "Current Plan" : "Choose Premium"}
             </Button>
-          ) : (
-            <Button 
-              onClick={checkSubscriptionStatus}
-              disabled={checking}
-              variant="outline"
-              className="w-full"
-            >
-              {checking ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                "Check Status"
-              )}
-            </Button>
-          )}
+          </CardContent>
+        </Card>
+      </div>
 
-          <p className="text-xs text-center text-muted-foreground">
-            Cancel anytime. No hidden fees.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      <p className="text-xs text-center text-muted-foreground">
+        Cancel anytime. No hidden fees.
+      </p>
+    </div>
   );
 };

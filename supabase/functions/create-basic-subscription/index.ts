@@ -34,7 +34,7 @@ serve(async (req) => {
       throw new Error("User not authenticated");
     }
 
-    console.log("Creating premium subscription for user:", user.email);
+    console.log("Creating basic subscription for user:", user.email);
 
     // Check if customer exists, create if not
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -67,11 +67,11 @@ serve(async (req) => {
       .single();
 
     if (existingSubscription) {
-      throw new Error("User already has an active premium subscription");
+      throw new Error("User already has an active subscription");
     }
 
-    // Create Stripe Price for Premium Monthly ($19.99)
-    let priceId = "price_premium_monthly";
+    // Create Stripe Price for Basic Monthly ($9.99)
+    let priceId = "price_basic_monthly";
     
     try {
       // Try to retrieve existing price
@@ -79,14 +79,14 @@ serve(async (req) => {
     } catch (error) {
       // Create price if it doesn't exist
       const price = await stripe.prices.create({
-        unit_amount: 1999, // $19.99
+        unit_amount: 999, // $9.99
         currency: "usd",
         recurring: { interval: "month" },
         product_data: {
-          name: "Gaming Platform Premium",
-          description: "No fees ever, exclusive tournaments, VIP priority, 24/7 support, elite status"
+          name: "Gaming Platform Basic",
+          description: "50% off deposit fees, priority entry, enhanced support"
         },
-        lookup_key: "premium_monthly",
+        lookup_key: "basic_monthly",
       });
       priceId = price.id;
     }
@@ -103,17 +103,17 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/profile?subscription=cancelled`,
       metadata: {
         user_id: user.id,
-        plan: "premium_monthly"
+        plan: "basic_monthly"
       },
       subscription_data: {
         metadata: {
           user_id: user.id,
-          plan: "premium_monthly"
+          plan: "basic_monthly"
         }
       }
     });
 
-    console.log("Subscription session created:", session.id);
+    console.log("Basic subscription session created:", session.id);
 
     return new Response(JSON.stringify({ 
       url: session.url,
@@ -124,7 +124,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("Premium subscription error:", error);
+    console.error("Basic subscription error:", error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : "Subscription creation failed" 
     }), {
