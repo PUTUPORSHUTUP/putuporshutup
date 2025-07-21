@@ -12,7 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useResponsibleGambling } from '@/hooks/useResponsibleGambling';
 import { ResponsibleGamblingWarning } from './ResponsibleGamblingWarning';
-import { Loader2, DollarSign } from 'lucide-react';
+import { ShareButton } from '@/components/ui/share-button';
+import { Loader2, DollarSign, UserPlus } from 'lucide-react';
 
 interface Game {
   id: string;
@@ -324,19 +325,30 @@ export const CreateWagerModal = ({
             </div>
           </div>
 
-          <div className="flex justify-end gap-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Create Wager
-            </Button>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              <span className="text-sm font-medium">Invite Players:</span>
+              <ShareButton 
+                variant="outline" 
+                size="sm"
+              />
+            </div>
+            
+            <div className="flex gap-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Create Wager
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
