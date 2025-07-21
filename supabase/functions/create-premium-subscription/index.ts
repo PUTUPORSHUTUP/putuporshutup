@@ -13,8 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    // Initialize Stripe with live secret key for real payments
+    const stripe = new Stripe(Deno.env.get("STRIPE_LIVE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
 
