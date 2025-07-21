@@ -114,132 +114,284 @@ All colors MUST be HSL.
   height: 400px;
   width: 100%;
   border: 1px solid hsl(var(--border));
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  background: hsl(var(--background));
+  position: relative;
 }
 
 @media (min-width: 768px) {
   .tournament-bracket-container {
-    height: 600px;
+    height: 650px;
   }
 }
 
 .tournament-flow {
-  background: hsl(var(--background));
+  background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted) / 0.3));
+  transition: all 0.3s ease;
 }
 
 .tournament-flow .react-flow__node {
-  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tournament-flow .react-flow__node:hover {
+  transform: scale(1.02);
+}
+
+.tournament-flow .react-flow__edge {
+  transition: all 0.3s ease;
+}
+
+.tournament-flow .react-flow__edge.animated {
+  animation: pulse-edge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-edge {
+  0%, 100% { 
+    stroke-width: 2px; 
+    opacity: 0.8;
+  }
+  50% { 
+    stroke-width: 3px; 
+    opacity: 1;
+  }
 }
 
 .tournament-flow .react-flow__edge-path {
-  stroke: hsl(var(--primary));
-  stroke-width: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .tournament-flow .react-flow__controls {
-  button {
-    background: hsl(var(--background));
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--foreground));
-  }
-  
-  button:hover {
-    background: hsl(var(--muted));
-  }
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tournament-flow .react-flow__controls button {
+  background: hsl(var(--background));
+  border: none;
+  color: hsl(var(--foreground));
+  transition: all 0.2s ease;
+}
+
+.tournament-flow .react-flow__controls button:hover {
+  background: hsl(var(--muted));
+  transform: scale(1.05);
 }
 
 .tournament-flow .react-flow__minimap {
-  background: hsl(var(--background));
+  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .tournament-match {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 12px;
   width: 220px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tournament-match::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--secondary)));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tournament-match:hover::before {
+  opacity: 1;
+}
+
+.tournament-match:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-color: hsl(var(--primary) / 0.5);
 }
 
 @media (min-width: 768px) {
   .tournament-match {
     padding: 16px;
-    width: 250px;
+    width: 280px;
   }
 }
 
 .tournament-match.championship {
   background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1));
   border: 2px solid hsl(var(--primary));
+  box-shadow: 0 8px 20px hsl(var(--primary) / 0.3);
+  animation: championship-glow 3s ease-in-out infinite;
 }
 
-.tournament-match-header {
+@keyframes championship-glow {
+  0%, 100% { 
+    box-shadow: 0 8px 20px hsl(var(--primary) / 0.3);
+  }
+  50% { 
+    box-shadow: 0 8px 30px hsl(var(--primary) / 0.5);
+  }
+}
+
+.tournament-match.championship::before {
+  opacity: 1;
+  background: linear-gradient(90deg, hsl(var(--primary)), gold, hsl(var(--primary)));
+  height: 4px;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  font-size: 11px;
+  margin-bottom: 12px;
+  animation: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.match-players {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.player-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: hsl(var(--muted) / 0.3);
+  border: 1px solid hsl(var(--border));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slide-in 0.5s ease-out;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.player-slot:hover {
+  background: hsl(var(--muted) / 0.5);
+  transform: translateX(4px);
+}
+
+.player-slot.winner {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
+  border: 1px solid hsl(var(--primary));
+  color: hsl(var(--primary));
   font-weight: 600;
+  animation: winner-pulse 2s ease-in-out infinite;
+}
+
+@keyframes winner-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.3);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
+}
+
+.vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+  position: relative;
+}
+
+.vs-divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+}
+
+.match-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fade-in 0.5s ease-out 0.2s both;
+}
+
+.match-actions button {
+  transition: all 0.2s ease;
+}
+
+.match-actions button:hover {
+  transform: scale(1.02);
+}
+
+.tournament-handle {
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.tournament-handle:hover {
+  background: hsl(var(--primary));
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.3);
+}
+
+/* Real-time update indicator */
+.tournament-match.updating {
+  animation: update-flash 0.8s ease-in-out;
+}
+
+@keyframes update-flash {
+  0%, 100% { background: hsl(var(--card)); }
+  50% { background: hsl(var(--primary) / 0.1); }
+}
+
+/* Status indicators */
+.status-pending {
   color: hsl(var(--muted-foreground));
 }
 
-@media (min-width: 768px) {
-  .tournament-match-header {
-    margin-bottom: 12px;
-    font-size: 12px;
-  }
+.status-in-progress {
+  color: hsl(var(--warning));
+  animation: status-pulse 2s ease-in-out infinite;
 }
 
-.tournament-player-slot {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px;
-  margin-bottom: 3px;
-  border-radius: 6px;
-  background: hsl(var(--muted) / 0.3);
-  transition: all 0.2s ease;
-  font-size: 12px;
+.status-completed {
+  color: hsl(var(--success));
 }
 
-@media (min-width: 768px) {
-  .tournament-player-slot {
-    gap: 8px;
-    padding: 8px;
-    margin-bottom: 4px;
-    font-size: 14px;
-  }
-}
-
-.tournament-player-slot.winner {
-  background: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary));
-}
-
-.tournament-player-slot.empty {
-  opacity: 0.5;
-  border: 1px dashed hsl(var(--border));
-  background: transparent;
-}
-
-.tournament-match-result {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid hsl(var(--border));
-}
-
-@media (min-width: 768px) {
-  .tournament-match-result {
-    margin-top: 12px;
-    padding-top: 12px;
-  }
-}
-
-.tournament-winner {
-  font-weight: 600;
-  color: hsl(var(--primary));
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 /* Override react-flow styles for tournament */

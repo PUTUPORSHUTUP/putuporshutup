@@ -1,9 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, CheckCircle, AlertTriangle, Flag } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, AlertTriangle, Flag, Zap, Crown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,6 +30,8 @@ interface MatchNodeData {
   confirmedByOrganizer?: boolean;
   currentUserId?: string;
   isOrganizer?: boolean;
+  isUpdating?: boolean;
+  tournamentId?: string;
 }
 
 interface MatchNodeProps {
@@ -50,11 +52,23 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
     resultDisputed,
     confirmedByOrganizer,
     currentUserId,
-    isOrganizer
+    isOrganizer,
+    isUpdating,
+    tournamentId
   } = data;
   
   const [isReporting, setIsReporting] = useState(false);
+  const [justUpdated, setJustUpdated] = useState(false);
   const { toast } = useToast();
+
+  // Handle real-time update animations
+  useEffect(() => {
+    if (isUpdating) {
+      setJustUpdated(true);
+      const timer = setTimeout(() => setJustUpdated(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isUpdating]);
 
   const getPlayerDisplay = (player?: { id: string; name: string; avatar?: string }) => {
     if (!player) return 'TBD';
@@ -67,16 +81,27 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
 
   const getStatusIcon = () => {
     if (resultDisputed) {
-      return <AlertTriangle className="w-4 h-4 text-red-600" />;
+      return <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />;
     }
     
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-success" />;
       case 'in_progress':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return <Zap className="w-4 h-4 text-warning animate-pulse" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-400" />;
+        return <Clock className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const getStatusBadgeVariant = () => {
+    switch (status) {
+      case 'completed':
+        return 'default';
+      case 'in_progress':
+        return 'secondary';
+      default:
+        return 'outline';
     }
   };
 
@@ -101,7 +126,7 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
 
       toast({
         title: "Result Reported",
-        description: "Match result has been reported successfully."
+        description: "Match result has been reported successfully.",
       });
     } catch (error: any) {
       console.error('Error reporting result:', error);
@@ -117,19 +142,25 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
 
   const getReportingStatus = () => {
     if (resultDisputed) {
-      return <Badge variant="destructive" className="text-xs">Disputed</Badge>;
+      return <Badge variant="destructive" className="text-xs animate-pulse">Disputed</Badge>;
     }
     if (player1ReportedWinner && player2ReportedWinner) {
-      return <Badge variant="default" className="text-xs">Both Reported</Badge>;
+      if (player1ReportedWinner === player2ReportedWinner) {
+        return <Badge variant="default" className="text-xs">Agreed</Badge>;
+      } else {
+        return <Badge variant="destructive" className="text-xs">Conflict</Badge>;
+      }
     }
     if (player1ReportedWinner || player2ReportedWinner) {
-      return <Badge variant="secondary" className="text-xs">1 Reported</Badge>;
+      return <Badge variant="secondary" className="text-xs">Reported</Badge>;
     }
     return null;
   };
 
+  const matchClassName = `tournament-match ${isChampionship ? 'championship' : ''} ${justUpdated ? 'updating' : ''}`;
+
   return (
-    <div className={`tournament-match ${isChampionship ? 'championship' : ''}`}>
+    <div className={matchClassName}>
       {/* Input handles */}
       {round > 1 && (
         <>
@@ -153,15 +184,15 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
       {/* Match content */}
       <div className="match-header">
         <div className="flex items-center gap-2">
-          {isChampionship && <Trophy className="w-4 h-4 text-yellow-600" />}
+          {isChampionship && <Crown className="w-4 h-4 text-warning animate-pulse" />}
           <span className="text-xs font-medium">
             {isChampionship ? 'CHAMPIONSHIP' : `Round ${round}`}
           </span>
           {getStatusIcon()}
         </div>
         <div className="flex gap-1">
-          <Badge variant={status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-            {status}
+          <Badge variant={getStatusBadgeVariant()} className="text-xs capitalize">
+            {status.replace('_', ' ')}
           </Badge>
           {getReportingStatus()}
         </div>
@@ -170,8 +201,11 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
       <div className="match-players">
         {/* Player 1 */}
         <div className={`player-slot ${isPlayerWinner(player1?.id) ? 'winner' : ''}`}>
-          <div className="flex items-center gap-2">
-            <Avatar className="w-6 h-6">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Avatar className="w-6 h-6 flex-shrink-0">
+              {player1?.avatar && (
+                <AvatarImage src={player1.avatar} alt={player1.name} />
+              )}
               <AvatarFallback className="text-xs">
                 {player1 ? player1.name.substring(0, 2).toUpperCase() : 'T'}
               </AvatarFallback>
@@ -181,19 +215,22 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
             </span>
           </div>
           {isPlayerWinner(player1?.id) && (
-            <Trophy className="w-3 h-3 text-yellow-600 flex-shrink-0" />
+            <Trophy className="w-4 h-4 text-warning flex-shrink-0 animate-bounce" />
           )}
         </div>
 
         {/* VS Divider */}
         <div className="vs-divider">
-          <span className="text-xs text-muted-foreground">VS</span>
+          <span className="text-xs text-muted-foreground font-bold">VS</span>
         </div>
 
         {/* Player 2 */}
         <div className={`player-slot ${isPlayerWinner(player2?.id) ? 'winner' : ''}`}>
-          <div className="flex items-center gap-2">
-            <Avatar className="w-6 h-6">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Avatar className="w-6 h-6 flex-shrink-0">
+              {player2?.avatar && (
+                <AvatarImage src={player2.avatar} alt={player2.name} />
+              )}
               <AvatarFallback className="text-xs">
                 {player2 ? player2.name.substring(0, 2).toUpperCase() : 'T'}
               </AvatarFallback>
@@ -203,7 +240,7 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
             </span>
           </div>
           {isPlayerWinner(player2?.id) && (
-            <Trophy className="w-3 h-3 text-yellow-600 flex-shrink-0" />
+            <Trophy className="w-4 h-4 text-warning flex-shrink-0 animate-bounce" />
           )}
         </div>
       </div>
@@ -217,7 +254,7 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
               variant={player1ReportedWinner === player1.id || currentUserId === player1.id ? "default" : "outline"}
               onClick={() => reportResult(player1.id)}
               disabled={isReporting}
-              className="text-xs"
+              className="text-xs transition-all duration-200"
             >
               <Flag className="w-3 h-3 mr-1" />
               {player1.name} Wins
@@ -229,12 +266,19 @@ const MatchNode = memo(({ data }: MatchNodeProps) => {
               variant={player2ReportedWinner === player2.id || currentUserId === player2.id ? "default" : "outline"}
               onClick={() => reportResult(player2.id)}
               disabled={isReporting}
-              className="text-xs"
+              className="text-xs transition-all duration-200"
             >
               <Flag className="w-3 h-3 mr-1" />
               {player2.name} Wins
             </Button>
           )}
+        </div>
+      )}
+
+      {/* Winner advancement indicator */}
+      {status === 'completed' && winner && !isChampionship && (
+        <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
+          <div className="w-4 h-4 bg-primary rounded-full animate-pulse shadow-lg"></div>
         </div>
       )}
 

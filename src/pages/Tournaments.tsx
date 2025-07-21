@@ -466,6 +466,7 @@ const Tournaments = () => {
                   participants={tournamentParticipants}
                   tournamentSize={selectedTournament.max_participants}
                   tournament={selectedTournament}
+                  onMatchUpdate={() => loadTournamentDetails(selectedTournament.id)}
                 />
               </div>
             ) : (
