@@ -12,7 +12,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save, Crown } from 'lucide-react';
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from '@/components/ui/alert-dialog';
+import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save, Crown, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -45,8 +57,9 @@ interface WagerHistory {
 }
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [wagerHistory, setWagerHistory] = useState<WagerHistory[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
@@ -54,6 +67,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loadingSubscription, setLoadingSubscription] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -224,6 +238,39 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteProfile = async () => {
+    if (!user || !profile) return;
+
+    setDeleting(true);
+    try {
+      // Delete the profile (this will cascade and delete related data due to foreign keys)
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile Deleted",
+        description: "Your profile has been permanently deleted.",
+      });
+
+      // Sign out and redirect
+      await signOut();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete profile. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const getWinRate = () => {
     if (!profile || (profile.total_wins + profile.total_losses) === 0) return 0;
     return Math.round((profile.total_wins / (profile.total_wins + profile.total_losses)) * 100);
@@ -390,19 +437,56 @@ const Profile = () => {
                 </div>
               </div>
 
-              <Button onClick={handleSaveProfile} disabled={saving} className="w-full md:w-auto">
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Profile
-                  </>
-                )}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={handleSaveProfile} disabled={saving} className="flex-1 sm:flex-none">
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Profile
+                    </>
+                  )}
+                </Button>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="flex-1 sm:flex-none">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Profile
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Profile Permanently?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your profile, 
+                        including all your wager history, stats, and account data.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteProfile} 
+                        disabled={deleting}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {deleting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          'Delete Forever'
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -21,7 +21,10 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  MessageSquare
+  MessageSquare,
+  Trash2,
+  UserX,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,6 +35,17 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from '@/components/ui/dialog';
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from '@/components/ui/alert-dialog';
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
 
 interface AdminAnalytics {
@@ -100,6 +114,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [adminResponse, setAdminResponse] = useState('');
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -221,6 +236,35 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteUserProfile = async (userId: string) => {
+    setDeletingUser(userId);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Refresh data
+      await loadDashboardData();
+      
+      toast({
+        title: "User Deleted",
+        description: "User profile has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user profile.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingUser(null);
     }
   };
 
@@ -488,6 +532,41 @@ const AdminDashboard = () => {
                         <Badge variant="outline" className="text-xs">
                           {new Date(user.created_at).toLocaleDateString()}
                         </Badge>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="destructive">
+                              <UserX className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete User Profile?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete {user.display_name || user.username}'s profile, 
+                                including all their data, wagers, and history. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteUserProfile(user.user_id)}
+                                disabled={deletingUser === user.user_id}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                {deletingUser === user.user_id ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  'Delete User'
+                                )}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   ))}
