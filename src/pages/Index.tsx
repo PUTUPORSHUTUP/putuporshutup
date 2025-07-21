@@ -148,22 +148,22 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
             {user ? (
               <Link to="/games" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-gaming font-bold">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-semibold">
                   PUT UP OR SHUT UP
                   <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                 </Button>
               </Link>
             ) : (
               <>
-              <Link to="/auth" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-semibold">
-                  Enter the Arena
-                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
-                </Button>
-              </Link>
                 <Link to="/auth" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-gaming font-bold">
-                    PROVE YOURSELF
+                  <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-semibold">
+                    Enter the Arena
+                    <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/games" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron font-semibold">
+                    Browse Games
                   </Button>
                 </Link>
               </>
