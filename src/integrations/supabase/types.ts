@@ -921,25 +921,26 @@ export type Database = {
       }
     }
     Views: {
-      admin_analytics: {
-        Row: {
-          active_premium_users: number | null
-          new_users_this_week: number | null
-          total_deposits: number | null
-          total_tournaments: number | null
-          total_users: number | null
-          total_wagers: number | null
-          total_withdrawals: number | null
-          tournaments_this_week: number | null
-          transactions_today: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       cleanup_expired_queue_entries: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_admin_analytics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_deposits: number
+          total_withdrawals: number
+          active_premium_users: number
+          total_users: number
+          total_tournaments: number
+          total_wagers: number
+          transactions_today: number
+          tournaments_this_week: number
+          new_users_this_week: number
+        }[]
       }
       is_admin: {
         Args: { user_uuid?: string }

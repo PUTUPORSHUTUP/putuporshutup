@@ -136,11 +136,11 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Load analytics
-      const { data: analyticsData } = await supabase
-        .from('admin_analytics')
-        .select('*')
-        .single();
+      // Load analytics using the secure function
+      const { data: analyticsArray } = await supabase
+        .rpc('get_admin_analytics');
+      
+      const analyticsData = analyticsArray?.[0] || null;
 
       // Load recent users
       const { data: usersData } = await supabase
