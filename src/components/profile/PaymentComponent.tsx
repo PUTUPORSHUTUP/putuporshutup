@@ -92,7 +92,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
       return;
     }
 
-    const feeCalculation = calculateDepositFee(amount, isPremiumUser);
+    const feeCalculation = calculateDepositFee(amount, isPremiumUser ? 'basic' : 'none');
 
     setProcessingDeposit(true);
     try {
@@ -221,7 +221,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
   };
 
   // Calculate fee preview for current deposit amount
-  const feePreview = depositAmount ? calculateDepositFee(parseFloat(depositAmount) || 0, isPremiumUser) : null;
+  const feePreview = depositAmount ? calculateDepositFee(parseFloat(depositAmount) || 0, isPremiumUser ? 'basic' : 'none') : null;
   const feeStructure = getFeeStructure();
 
   return (
