@@ -195,9 +195,14 @@ const Index = () => {
                 <CardTitle className="text-xl font-orbitron font-semibold mb-4">🎮 Supported Titles</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground font-orbitron">
+                <p className="text-muted-foreground font-orbitron mb-4">
                   Madden 25, NBA 2K25, MLB The Show, Call of Duty, Fortnite — and more to come.
                 </p>
+                <Link to="/games">
+                  <Button variant="outline" size="sm" className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
+                    View All Games
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
