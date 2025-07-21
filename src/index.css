@@ -47,6 +47,7 @@ All colors MUST be HSL.
     /* Neon Purple for special elements */
     --neon-purple: 280 100% 70%;
     --neon-cyan: 180 100% 60%;
+    --neon-green: 141 80% 65%;
     --money-green: 120 80% 45%;
     
     /* Gradients */

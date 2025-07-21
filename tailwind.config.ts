@@ -65,6 +65,7 @@ export default {
 			// Gaming-specific neon colors
 			'neon-purple': 'hsl(var(--neon-purple))',
 			'neon-cyan': 'hsl(var(--neon-cyan))',
+			'neon-green': 'hsl(var(--neon-green))',
 			'money-green': 'hsl(var(--money-green))'
 		},
 		backgroundImage: {
