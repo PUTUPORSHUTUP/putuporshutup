@@ -29,12 +29,12 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         icons: [
           {
-            src: '/lovable-uploads/3f2b1827-906a-40f5-b33e-a7bd8db103de.png',
+            src: '/lovable-uploads/1930f879-1b39-46b0-979f-fd849f770134.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/lovable-uploads/3f2b1827-906a-40f5-b33e-a7bd8db103de.png',
+            src: '/lovable-uploads/1930f879-1b39-46b0-979f-fd849f770134.png',
             sizes: '512x512',
             type: 'image/png'
           }
