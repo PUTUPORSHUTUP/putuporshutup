@@ -251,7 +251,7 @@ const Auth = () => {
                   <Label>Security Verification</Label>
                   <ReCAPTCHA
                     ref={recaptchaRef}
-                    sitekey="6LeoXkIqAAAAAOkbHh3vRJIk9iuGUZS9eU_sQbDm"
+                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
                     onChange={(token) => setCaptchaToken(token)}
                     onExpired={() => setCaptchaToken(null)}
                     theme="light"
