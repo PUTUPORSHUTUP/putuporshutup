@@ -8,10 +8,13 @@ import { TermsModal } from '@/components/TermsModal';
 import { WagerCard } from '@/components/games/WagerCard';
 import { SuggestGameModal } from '@/components/games/SuggestGameModal';
 import { AddGameModal } from '@/components/games/AddGameModal';
+import { MatchingPreferences } from '@/components/games/MatchingPreferences';
+import { QuickMatch } from '@/components/games/QuickMatch';
+import { MatchNotifications } from '@/components/games/MatchNotifications';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings } from 'lucide-react';
+import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings, Target, Bell } from 'lucide-react';
 
 interface Game {
   id: string;
@@ -449,8 +452,10 @@ const Games = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="browse">Browse Wagers</TabsTrigger>
+            <TabsTrigger value="quick-match">Quick Match</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="games">All Games</TabsTrigger>
           </TabsList>
 
@@ -524,6 +529,43 @@ const Games = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="quick-match" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <QuickMatch 
+                onMatchFound={(wagerId) => {
+                  // Navigate to the wager or show success message
+                  toast({
+                    title: "Match Found!",
+                    description: "Your wager has been created and you've been matched!",
+                  });
+                  loadWagers();
+                  setActiveTab('browse');
+                }}
+              />
+              <MatchingPreferences 
+                onPreferencesUpdate={() => {
+                  toast({
+                    title: "Preferences Updated",
+                    description: "Your matching preferences have been saved.",
+                  });
+                }}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6">
+            <MatchNotifications 
+              onNavigateToWager={(wagerId) => {
+                // Could navigate to a specific wager view
+                setActiveTab('browse');
+                toast({
+                  title: "Viewing Wager",
+                  description: "Check the browse tab for your matched wager.",
+                });
+              }}
+            />
           </TabsContent>
         </Tabs>
       </div>

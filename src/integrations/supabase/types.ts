@@ -182,6 +182,153 @@ export type Database = {
         }
         Relationships: []
       }
+      match_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          match_queue_id: string
+          matched_user_id: string
+          message: string
+          notification_type: string
+          read: boolean
+          user_id: string
+          wager_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_queue_id: string
+          matched_user_id: string
+          message: string
+          notification_type?: string
+          read?: boolean
+          user_id: string
+          wager_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_queue_id?: string
+          matched_user_id?: string
+          message?: string
+          notification_type?: string
+          read?: boolean
+          user_id?: string
+          wager_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_notifications_match_queue_id_fkey"
+            columns: ["match_queue_id"]
+            isOneToOne: false
+            referencedRelation: "match_queue"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_notifications_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_preferences: {
+        Row: {
+          auto_match_enabled: boolean
+          created_at: string
+          id: string
+          max_queue_time_minutes: number
+          max_stake: number
+          min_stake: number
+          preferred_games: string[]
+          preferred_platforms: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_match_enabled?: boolean
+          created_at?: string
+          id?: string
+          max_queue_time_minutes?: number
+          max_stake?: number
+          min_stake?: number
+          preferred_games?: string[]
+          preferred_platforms?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_match_enabled?: boolean
+          created_at?: string
+          id?: string
+          max_queue_time_minutes?: number
+          max_stake?: number
+          min_stake?: number
+          preferred_games?: string[]
+          preferred_platforms?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      match_queue: {
+        Row: {
+          expires_at: string
+          game_id: string
+          id: string
+          matched_at: string | null
+          matched_with_user_id: string | null
+          platform: string
+          queue_status: string
+          queued_at: string
+          stake_amount: number
+          user_id: string
+          wager_id: string | null
+        }
+        Insert: {
+          expires_at: string
+          game_id: string
+          id?: string
+          matched_at?: string | null
+          matched_with_user_id?: string | null
+          platform: string
+          queue_status?: string
+          queued_at?: string
+          stake_amount: number
+          user_id: string
+          wager_id?: string | null
+        }
+        Update: {
+          expires_at?: string
+          game_id?: string
+          id?: string
+          matched_at?: string | null
+          matched_with_user_id?: string | null
+          platform?: string
+          queue_status?: string
+          queued_at?: string
+          stake_amount?: number
+          user_id?: string
+          wager_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_queue_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_queue_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -638,6 +785,10 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_expired_queue_entries: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_uuid?: string }
         Returns: boolean
