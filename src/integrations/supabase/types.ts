@@ -161,6 +161,44 @@ export type Database = {
         }
         Relationships: []
       }
+      game_modes: {
+        Row: {
+          created_at: string | null
+          game_id: string | null
+          id: string
+          is_active: boolean | null
+          max_players: number | null
+          mode_description: string | null
+          mode_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_players?: number | null
+          mode_description?: string | null
+          mode_name: string
+        }
+        Update: {
+          created_at?: string | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_players?: number | null
+          mode_description?: string | null
+          mode_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_modes_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_suggestions: {
         Row: {
           created_at: string
