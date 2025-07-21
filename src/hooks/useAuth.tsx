@@ -36,9 +36,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const cleanupAuthState = () => {
+    // Remove standard auth tokens
+    localStorage.removeItem('supabase.auth.token');
+    // Remove all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Remove from sessionStorage if in use
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
   const signOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/auth';
+    try {
+      // Clean up auth state first
+      cleanupAuthState();
+      // Attempt global sign out
+      await supabase.auth.signOut({ scope: 'global' });
+      // Force page reload for clean state
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Force redirect even if sign out fails
+      window.location.href = '/auth';
+    }
   };
 
   const value = {
