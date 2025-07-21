@@ -98,6 +98,15 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 47 100% 85%;
     --sidebar-border: 230 15% 15%;
     --sidebar-ring: 25 100% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 /* Tournament bracket styles */
@@ -238,14 +247,4 @@ All colors MUST be HSL.
   background: transparent;
   border: none;
   padding: 0;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
 }
