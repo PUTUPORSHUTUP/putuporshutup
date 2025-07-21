@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentComponent } from "./PaymentComponent";
+import { ResponsibleGambling } from "./ResponsibleGambling";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, 
   Camera, 
@@ -18,7 +20,8 @@ import {
   Edit,
   Save,
   X,
-  Loader2
+  Loader2,
+  Shield
 } from "lucide-react";
 
 interface UserProfile {
@@ -395,11 +398,27 @@ export function ProfileDashboard() {
           </Card>
         </div>
 
-        {/* Payment Management */}
-        <PaymentComponent 
-          balance={profile.wallet_balance} 
-          onBalanceUpdate={loadProfile} 
-        />
+        {/* Tabbed Content */}
+        <Tabs defaultValue="payments" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="payments">Payments & Wallet</TabsTrigger>
+            <TabsTrigger value="responsible" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Responsible Gaming
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="payments" className="mt-6">
+            <PaymentComponent 
+              balance={profile.wallet_balance} 
+              onBalanceUpdate={loadProfile} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="responsible" className="mt-6">
+            <ResponsibleGambling />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

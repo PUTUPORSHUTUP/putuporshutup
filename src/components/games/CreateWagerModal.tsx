@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useResponsibleGambling } from '@/hooks/useResponsibleGambling';
+import { ResponsibleGamblingWarning } from './ResponsibleGamblingWarning';
 import { Loader2, DollarSign } from 'lucide-react';
 
 interface Game {
@@ -47,6 +49,7 @@ export const CreateWagerModal = ({
 
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isExcluded, exclusionMessage, checkLimit } = useResponsibleGambling();
 
   useEffect(() => {
     loadGames();
@@ -76,6 +79,16 @@ export const CreateWagerModal = ({
     e.preventDefault();
     if (!user) return;
 
+    // Check if user is excluded
+    if (isExcluded) {
+      toast({
+        title: "Account Restricted",
+        description: exclusionMessage || "You are currently excluded from wagering activities.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Validate stake amount
@@ -84,6 +97,16 @@ export const CreateWagerModal = ({
         toast({
           title: "Invalid stake amount",
           description: "Stake amount must be greater than 0",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check daily wager limit
+      if (!checkLimit('daily_wager', stakeAmount)) {
+        toast({
+          title: "Daily Wager Limit Exceeded",
+          description: "This wager exceeds your daily wagering limit.",
           variant: "destructive",
         });
         return;
@@ -188,6 +211,11 @@ export const CreateWagerModal = ({
         <DialogHeader>
           <DialogTitle className="font-gaming text-xl">CREATE NEW WAGER</DialogTitle>
         </DialogHeader>
+
+        <ResponsibleGamblingWarning 
+          isExcluded={isExcluded} 
+          exclusionMessage={exclusionMessage}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">

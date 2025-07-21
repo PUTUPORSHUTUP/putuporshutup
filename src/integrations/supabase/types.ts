@@ -44,6 +44,42 @@ export type Database = {
         }
         Relationships: []
       }
+      addiction_resources: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          phone_number: string | null
+          resource_type: string
+          title: string
+          url: string
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          phone_number?: string | null
+          resource_type: string
+          title: string
+          url: string
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          phone_number?: string | null
+          resource_type?: string
+          title?: string
+          url?: string
+        }
+        Relationships: []
+      }
       admin_roles: {
         Row: {
           granted_at: string
@@ -544,6 +580,39 @@ export type Database = {
         }
         Relationships: []
       }
+      self_exclusions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          exclusion_type: string
+          id: string
+          is_active: boolean
+          reason: string | null
+          start_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          exclusion_type: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          start_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          exclusion_type?: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          start_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -787,6 +856,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_limits: {
+        Row: {
+          created_at: string
+          effective_date: string
+          id: string
+          limit_amount: number
+          limit_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          limit_amount: number
+          limit_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          limit_amount?: number
+          limit_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wager_participants: {
         Row: {
           id: string
@@ -948,6 +1047,10 @@ export type Database = {
       }
       is_user_admin: {
         Args: { user_id?: string }
+        Returns: boolean
+      }
+      is_user_excluded: {
+        Args: { user_uuid?: string }
         Returns: boolean
       }
     }
