@@ -136,14 +136,11 @@ const Index = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-orbitron font-semibold mb-2 text-neon-green">
-            Don't Brag, Wager and Lose
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-orbitron font-semibold mb-6 md:mb-8 text-neon-green">
+            Compete for bragging rights and payouts.
           </h1>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-orbitron font-semibold mb-6 md:mb-8 text-neon-green">
-            Wager. Win. Brag!
-          </h2>
           <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-gray-200 max-w-2xl mx-auto font-orbitron">
-            The boldest new way to compete in video games. Bet against your rivals, prove your skill, and walk away with real cash. Madden, 2K, Call of Duty, Fortnite — if you play, you pay.
+            Prove your skills in head-to-head video game challenges. Real competition. Real rewards. No luck — just skill.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
             {user ? (
@@ -208,11 +205,11 @@ const Index = () => {
 
             <Card className="text-center p-8 hover:shadow-lg transition-shadow border-2 border-neon-green bg-card/50">
               <CardHeader>
-                <CardTitle className="text-xl font-orbitron font-semibold mb-4">💰 Secure Wagers</CardTitle>
+                <CardTitle className="text-xl font-orbitron font-semibold mb-4">💰 Secure Entry Fees</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground font-orbitron">
-                  Your money is held safely in escrow until the match is complete. Winner takes all.
+                  Your money is held safely in escrow until the match is complete. Winner receives prize pool after match verification.
                 </p>
               </CardContent>
             </Card>
@@ -261,13 +258,13 @@ const Index = () => {
             READY TO PUT UP OR SHUT UP?
           </h2>
           <p className="text-xl text-black/80 mb-8 max-w-2xl mx-auto font-gaming">
-            Stop talking. Start proving. Winner takes all.
+            Stop talking. Start proving. Earn rewards by winning skill-based matches.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {user ? (
               <Link to="/games">
                 <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-black text-black hover:bg-black hover:text-neon-green font-gaming font-bold">
-                  BROWSE WAGERS
+                  BROWSE CHALLENGES
                 </Button>
               </Link>
             ) : (
@@ -279,7 +276,7 @@ const Index = () => {
                 </Link>
                 <Link to="/games">
                   <Button size="lg" className="text-lg px-8 py-6 bg-black text-neon-green hover:bg-black/80 font-gaming font-bold">
-                    BROWSE WAGERS
+                    BROWSE CHALLENGES
                   </Button>
                 </Link>
               </>
