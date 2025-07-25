@@ -47,6 +47,7 @@ import {
   AlertDialogTrigger 
 } from '@/components/ui/alert-dialog';
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
+import { MatchManagement } from '@/components/admin/MatchManagement';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -362,8 +363,9 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-6 max-w-3xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
@@ -496,6 +498,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Matches Tab */}
+          <TabsContent value="matches" className="space-y-6">
+            <MatchManagement />
           </TabsContent>
 
           {/* Users Tab */}

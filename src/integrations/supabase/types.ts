@@ -687,16 +687,23 @@ export type Database = {
       }
       tournament_matches: {
         Row: {
+          admin_actioned_by: string | null
+          admin_notes: string | null
+          admin_override: boolean | null
           completed_at: string | null
           confirmed_by_organizer: boolean | null
           created_at: string
+          dispute_status: string | null
           id: string
+          last_admin_action_at: string | null
           match_number: number
+          override_reason: string | null
           player1_id: string | null
           player1_reported_winner: string | null
           player2_id: string | null
           player2_reported_winner: string | null
           result_disputed: boolean | null
+          result_proof_url: string | null
           round_number: number
           scheduled_time: string | null
           status: string
@@ -704,16 +711,23 @@ export type Database = {
           winner_id: string | null
         }
         Insert: {
+          admin_actioned_by?: string | null
+          admin_notes?: string | null
+          admin_override?: boolean | null
           completed_at?: string | null
           confirmed_by_organizer?: boolean | null
           created_at?: string
+          dispute_status?: string | null
           id?: string
+          last_admin_action_at?: string | null
           match_number: number
+          override_reason?: string | null
           player1_id?: string | null
           player1_reported_winner?: string | null
           player2_id?: string | null
           player2_reported_winner?: string | null
           result_disputed?: boolean | null
+          result_proof_url?: string | null
           round_number: number
           scheduled_time?: string | null
           status?: string
@@ -721,16 +735,23 @@ export type Database = {
           winner_id?: string | null
         }
         Update: {
+          admin_actioned_by?: string | null
+          admin_notes?: string | null
+          admin_override?: boolean | null
           completed_at?: string | null
           confirmed_by_organizer?: boolean | null
           created_at?: string
+          dispute_status?: string | null
           id?: string
+          last_admin_action_at?: string | null
           match_number?: number
+          override_reason?: string | null
           player1_id?: string | null
           player1_reported_winner?: string | null
           player2_id?: string | null
           player2_reported_winner?: string | null
           result_disputed?: boolean | null
+          result_proof_url?: string | null
           round_number?: number
           scheduled_time?: string | null
           status?: string
@@ -985,15 +1006,22 @@ export type Database = {
       }
       wagers: {
         Row: {
+          admin_actioned_by: string | null
+          admin_notes: string | null
+          admin_override: boolean | null
           created_at: string | null
           creator_id: string
           description: string | null
+          dispute_status: string | null
           end_time: string | null
           game_id: string
           game_mode: string | null
           id: string
+          last_admin_action_at: string | null
           max_participants: number | null
+          override_reason: string | null
           platform: string
+          result_proof_url: string | null
           stake_amount: number
           start_time: string | null
           status: string | null
@@ -1003,15 +1031,22 @@ export type Database = {
           winner_id: string | null
         }
         Insert: {
+          admin_actioned_by?: string | null
+          admin_notes?: string | null
+          admin_override?: boolean | null
           created_at?: string | null
           creator_id: string
           description?: string | null
+          dispute_status?: string | null
           end_time?: string | null
           game_id: string
           game_mode?: string | null
           id?: string
+          last_admin_action_at?: string | null
           max_participants?: number | null
+          override_reason?: string | null
           platform: string
+          result_proof_url?: string | null
           stake_amount: number
           start_time?: string | null
           status?: string | null
@@ -1021,15 +1056,22 @@ export type Database = {
           winner_id?: string | null
         }
         Update: {
+          admin_actioned_by?: string | null
+          admin_notes?: string | null
+          admin_override?: boolean | null
           created_at?: string | null
           creator_id?: string
           description?: string | null
+          dispute_status?: string | null
           end_time?: string | null
           game_id?: string
           game_mode?: string | null
           id?: string
+          last_admin_action_at?: string | null
           max_participants?: number | null
+          override_reason?: string | null
           platform?: string
+          result_proof_url?: string | null
           stake_amount?: number
           start_time?: string | null
           status?: string | null
