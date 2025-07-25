@@ -32,6 +32,31 @@ const chargeEntryFee = async ({ amountInCents, paymentMethodId, userId, challeng
   return data;
 };
 
+// PAYOUT TO WINNER — TILLED SANDBOX
+const releaseTilledPayout = async ({ amountInCents, destinationAccountId, challengeId }) => {
+  const TILLED_SECRET_KEY = Deno.env.get("TILLED_SECRET_KEY");
+  
+  const response = await fetch('https://api-sandbox.tilled.com/v1/transfers', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${TILLED_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      amount: amountInCents,            // Ex: 940 = $9.40 payout after 6% fee
+      currency: 'usd',
+      destination: destinationAccountId,  // Tilled connected account of winner
+      metadata: {
+        challenge_id: challengeId,
+        payout_reason: 'winner'
+      }
+    })
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -66,8 +91,77 @@ serve(async (req) => {
     console.log("Processing Tilled payment for user:", user.email);
 
     // Get request body
-    const { amount, totalCharge, platformFee, challengeId, type = "wallet_deposit" } = await req.json();
+    const { amount, totalCharge, platformFee, challengeId, type = "wallet_deposit", destinationAccountId } = await req.json();
     
+    // Handle payout requests
+    if (type === 'payout') {
+      if (!amount || amount < 1) {
+        throw new Error("Invalid payout amount");
+      }
+      
+      if (!destinationAccountId) {
+        throw new Error("Destination account ID required for payouts");
+      }
+      
+      if (!challengeId) {
+        throw new Error("Challenge ID required for payouts");
+      }
+
+      const amountInCents = Math.round(amount * 100);
+      
+      console.log("Processing Tilled payout:", {
+        amountInCents,
+        destinationAccountId,
+        challengeId
+      });
+
+      // Release payout to winner
+      const payoutResult = await releaseTilledPayout({
+        amountInCents,
+        destinationAccountId,
+        challengeId
+      });
+
+      console.log("Tilled payout result:", payoutResult);
+
+      if (payoutResult.error) {
+        throw new Error(`Tilled payout failed: ${payoutResult.error.message || 'Unknown error'}`);
+      }
+
+      // Log payout transaction
+      const supabaseService = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+
+      const { error: transactionError } = await supabaseService.from("transactions").insert({
+        user_id: user.id,
+        type: 'payout',
+        amount: amount,
+        status: payoutResult.status === 'succeeded' ? 'completed' : 'pending',
+        stripe_payment_intent: payoutResult.id, // Using same field for Tilled transfer ID
+        description: `Challenge Winner Payout - Tilled Sandbox`,
+        created_at: new Date().toISOString()
+      });
+
+      if (transactionError) {
+        console.error("Payout transaction logging error:", transactionError);
+      }
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        payout: payoutResult,
+        amount: amount,
+        type: 'payout',
+        challengeId: challengeId
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+    
+    // Handle charge requests (existing logic)
     if (!amount || amount < 1) {
       throw new Error("Invalid amount");
     }
@@ -138,8 +232,6 @@ serve(async (req) => {
         console.error("Balance update error:", balanceError);
       }
     }
-
-    // TODO: More endpoints (payouts, webhooks) coming next
     
     return new Response(JSON.stringify({ 
       success: true,
