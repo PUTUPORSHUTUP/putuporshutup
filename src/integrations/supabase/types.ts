@@ -613,6 +613,36 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          page_path: string
+          session_id: string | null
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          page_path?: string
+          session_id?: string | null
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          page_path?: string
+          session_id?: string | null
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -1039,6 +1069,15 @@ export type Database = {
           transactions_today: number
           tournaments_this_week: number
           new_users_this_week: number
+        }[]
+      }
+      get_visit_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_visits: number
+          unique_visitors: number
+          visits_today: number
+          visits_this_week: number
         }[]
       }
       is_admin: {

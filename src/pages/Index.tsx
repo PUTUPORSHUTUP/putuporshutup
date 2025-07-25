@@ -12,6 +12,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { ShareButton } from '@/components/ui/share-button';
 import { RealTimeStats } from '@/components/ui/real-time-stats';
+import { VisitorCounter } from '@/components/ui/visitor-counter';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -255,6 +256,12 @@ const Index = () => {
           </div>
           
           <RealTimeStats />
+          
+          {/* Visitor Counter */}
+          <div className="mt-16">
+            <h3 className="text-2xl font-orbitron font-bold mb-8 text-center">Site Traffic</h3>
+            <VisitorCounter />
+          </div>
         </div>
       </section>
 
