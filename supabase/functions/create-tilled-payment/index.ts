@@ -57,6 +57,28 @@ const releaseTilledPayout = async ({ amountInCents, destinationAccountId, challe
   return data;
 };
 
+// REFUND ENTRY FEE — TILLED SANDBOX
+const refundTilledCharge = async ({ chargeId, reason = "match_canceled" }) => {
+  const TILLED_SECRET_KEY = Deno.env.get("TILLED_SECRET_KEY");
+  
+  const response = await fetch(`https://api-sandbox.tilled.com/v1/charges/${chargeId}/refunds`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${TILLED_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      reason, // Optional: "requested_by_customer", "duplicate", "fraudulent", etc.
+      metadata: {
+        refund_reason: reason
+      }
+    })
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -91,7 +113,63 @@ serve(async (req) => {
     console.log("Processing Tilled payment for user:", user.email);
 
     // Get request body
-    const { amount, totalCharge, platformFee, challengeId, type = "wallet_deposit", destinationAccountId } = await req.json();
+    const { amount, totalCharge, platformFee, challengeId, type = "wallet_deposit", destinationAccountId, chargeId, reason } = await req.json();
+    
+    // Handle refund requests
+    if (type === 'refund') {
+      if (!chargeId) {
+        throw new Error("Charge ID required for refunds");
+      }
+      
+      console.log("Processing Tilled refund:", {
+        chargeId,
+        reason: reason || "match_canceled"
+      });
+
+      // Process refund using Tilled
+      const refundResult = await refundTilledCharge({
+        chargeId,
+        reason: reason || "match_canceled"
+      });
+
+      console.log("Tilled refund result:", refundResult);
+
+      if (refundResult.error) {
+        throw new Error(`Tilled refund failed: ${refundResult.error.message || 'Unknown error'}`);
+      }
+
+      // Log refund transaction
+      const supabaseService = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+
+      const { error: transactionError } = await supabaseService.from("transactions").insert({
+        user_id: user.id,
+        type: 'refund',
+        amount: -(refundResult.amount / 100), // Convert back to dollars and make negative
+        status: refundResult.status === 'succeeded' ? 'completed' : 'pending',
+        stripe_payment_intent: refundResult.id, // Using same field for Tilled refund ID
+        description: `Match Refund - ${reason || "match_canceled"} - Tilled Sandbox`,
+        created_at: new Date().toISOString()
+      });
+
+      if (transactionError) {
+        console.error("Refund transaction logging error:", transactionError);
+      }
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        refund: refundResult,
+        amount: refundResult.amount / 100,
+        type: 'refund',
+        reason: reason || "match_canceled"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
     
     // Handle payout requests
     if (type === 'payout') {
