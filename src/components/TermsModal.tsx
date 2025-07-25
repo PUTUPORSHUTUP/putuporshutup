@@ -57,50 +57,52 @@ export const TermsModal = ({ open, onAccept }: TermsModalProps) => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <h3 className="font-semibold text-red-600">1. Age Restriction</h3>
-                <p>Users must be 18 years or older to use this platform. In jurisdictions where the age of majority is 21, users must be 21 or older.</p>
+            <div className="space-y-4">
+              <p className="text-sm font-medium">
+                By participating in a challenge on the Put Up or Shut Up platform, you agree to the following:
+              </p>
+              
+              <div className="space-y-3 text-sm">
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">1.</span>
+                  <p>All matches are based solely on skill. No form of gambling or chance is involved.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">2.</span>
+                  <p>Challenge fees are held securely and only released based on valid match results.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">3.</span>
+                  <p>If you fail to submit results or proof within the designated time, you may forfeit your entry fee.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">4.</span>
+                  <p>All disputes are reviewed by PUOSU moderators. Their decision is final.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">5.</span>
+                  <p>Internet disconnections, console crashes, and lag are not valid excuses unless verified with proof.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">6.</span>
+                  <p>Use of cheats, mods, or unauthorized tools will result in forfeiture and possible ban.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <span className="text-primary font-semibold">7.</span>
+                  <p>Refunds are not guaranteed unless both players agree, or an admin rules it necessary.</p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="font-semibold text-blue-600">2. Skill-Based Betting Disclosure</h3>
-                <p>PUOSU is a skill-based competition platform. Users wager on their own gaming performance in peer-vs-peer matches. No games of chance are offered or hosted by PUOSU.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-orange-600">3. No Responsibility for Lost Connections</h3>
-                <p>PUOSU is not liable for any losses resulting from internet disconnection, power outages, or hardware/software failures during gameplay.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-purple-600">4. Cheating and Match Integrity</h3>
-                <p>If a user is found cheating or manipulating gameplay results, they forfeit their deposit and may be banned from the platform permanently.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-green-600">5. Dispute Resolution</h3>
-                <p>Disputes must be submitted through the in-app admin panel within 15 minutes of match completion. The decision of PUOSU Admins is final in all dispute cases.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-indigo-600">6. Platform Responsibility Limitation</h3>
-                <p>PUOSU is not responsible for verifying user skill levels or performance. Wagers are placed at the user's own risk and discretion.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-pink-600">7. Content & Communication</h3>
-                <p>Users may not post offensive, threatening, or harassing content. Violations will result in immediate suspension or permanent ban.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-teal-600">8. Refunds and Withdrawals</h3>
-                <p>All wagers are final. There are no refunds except in cases of confirmed technical errors or admin-approved exceptions.</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-700">9. Terms Acceptance</h3>
-                <p>By using PUOSU, users agree to these terms and any future revisions.</p>
+              <div className="bg-muted/50 rounded-lg p-3 mt-4">
+                <p className="text-sm font-medium text-center">
+                  By tapping "Accept Challenge," you accept these terms and agree to play fairly.
+                </p>
               </div>
 
               <div className="border-t pt-3 mt-4">
