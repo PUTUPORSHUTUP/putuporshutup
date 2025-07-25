@@ -7,6 +7,14 @@ interface FeeCalculation {
   membershipTier: 'none' | 'basic' | 'premium';
 }
 
+interface ChallengeFeeCalculation {
+  challengeAmount: number;
+  platformFee: number;
+  platformFeePercentage: number;
+  totalToWinner: number;
+  membershipTier: 'none' | 'basic' | 'premium';
+}
+
 export const calculateDepositFee = (amount: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): FeeCalculation => {
   let feePercentage = 0;
   
@@ -50,3 +58,34 @@ export const getFeeStructure = () => [
 
 export const BASIC_MONTHLY_COST = 9.99;
 export const PREMIUM_MONTHLY_COST = 19.99;
+
+// Challenge fee calculation with 6% platform fee
+export const calculateChallengeFee = (challengeAmount: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): ChallengeFeeCalculation => {
+  let feePercentage = 6; // 6% platform fee for challenges
+  
+  // Apply membership discounts
+  if (membershipTier === 'basic') {
+    feePercentage = feePercentage * 0.5; // 50% fee reduction for basic
+  } else if (membershipTier === 'premium') {
+    feePercentage = 0; // No fees for premium
+  }
+  
+  const platformFee = Math.round((challengeAmount * (feePercentage / 100)) * 100) / 100;
+  const totalToWinner = challengeAmount - platformFee;
+  
+  return {
+    challengeAmount,
+    platformFee,
+    platformFeePercentage: feePercentage,
+    totalToWinner,
+    membershipTier
+  };
+};
+
+// Timeout handling for challenges (auto-refund after 24 hours)
+export const CHALLENGE_TIMEOUT_HOURS = 24;
+export const isChallengePastTimeout = (createdAt: string): boolean => {
+  const timeoutThreshold = new Date();
+  timeoutThreshold.setHours(timeoutThreshold.getHours() - CHALLENGE_TIMEOUT_HOURS);
+  return new Date(createdAt) < timeoutThreshold;
+};

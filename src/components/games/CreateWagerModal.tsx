@@ -106,8 +106,8 @@ export const CreateWagerModal = ({
       // Check daily wager limit
       if (!checkLimit('daily_wager', stakeAmount)) {
         toast({
-          title: "Daily Wager Limit Exceeded",
-          description: "This wager exceeds your daily wagering limit.",
+          title: "Daily Challenge Limit Exceeded",
+          description: "This challenge exceeds your daily challenge limit.",
           variant: "destructive",
         });
         return;
@@ -123,7 +123,7 @@ export const CreateWagerModal = ({
       if (!profile || profile.wallet_balance < stakeAmount) {
         toast({
           title: "Insufficient Funds",
-          description: "You don't have enough funds to create this wager.",
+          description: "You don't have enough funds to create this challenge.",
           variant: "destructive",
         });
         return;
@@ -148,7 +148,7 @@ export const CreateWagerModal = ({
 
       if (wagerError) {
         toast({
-          title: "Error creating wager",
+          title: "Error creating challenge",
           description: wagerError.message,
           variant: "destructive",
         });
@@ -193,7 +193,7 @@ export const CreateWagerModal = ({
 
       onWagerCreated();
     } catch (error) {
-      console.error('Error creating wager:', error);
+      console.error('Error creating challenge:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred.",
@@ -210,7 +210,7 @@ export const CreateWagerModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-gaming text-xl">CREATE NEW WAGER</DialogTitle>
+          <DialogTitle className="font-gaming text-xl">CREATE NEW CHALLENGE</DialogTitle>
         </DialogHeader>
 
         <ResponsibleGamblingWarning 
@@ -254,7 +254,7 @@ export const CreateWagerModal = ({
           </div>
 
           <div>
-            <Label htmlFor="title">Wager Title</Label>
+            <Label htmlFor="title">Challenge Title</Label>
             <Input
               id="title"
               value={form.title}
@@ -346,7 +346,7 @@ export const CreateWagerModal = ({
               </Button>
               <Button type="submit" disabled={loading}>
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Create Wager
+                Create Challenge
               </Button>
             </div>
           </div>

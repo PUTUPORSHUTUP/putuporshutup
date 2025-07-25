@@ -203,12 +203,12 @@ const EnhancedGameSelector = ({ onGameSelect, selectedPlatform }: EnhancedGameSe
                   {games.find(g => g.id === selectedGameId)?.display_name} - {selectedMode.mode_name}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Ready to create wager for up to {selectedMode.max_players} players
+                  Ready to create challenge for up to {selectedMode.max_players} players
                 </p>
               </div>
               <Button size="sm" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                Create Wager
+                Create Challenge
               </Button>
             </div>
           </CardContent>

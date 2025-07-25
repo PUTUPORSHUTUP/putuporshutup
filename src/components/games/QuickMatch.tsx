@@ -403,7 +403,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
                 step={1}
               />
               <p className="text-sm text-muted-foreground">
-                Amount to wager for this match
+                Amount to challenge for this match
               </p>
             </div>
 

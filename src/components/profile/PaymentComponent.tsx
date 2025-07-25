@@ -20,6 +20,7 @@ import {
   Info
 } from 'lucide-react';
 import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
+import { TilledBadge } from '@/components/ui/tilled-badge';
 
 const TILLED_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU"; // Will be replaced with actual Tilled key
 
@@ -359,9 +360,12 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
               </div>
             </details>
 
-            <p className="text-xs text-muted-foreground">
-              Secure payments powered by Stripe. Minimum $1.00
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Minimum $1.00
+              </p>
+              <TilledBadge variant="compact" />
+            </div>
           </div>
 
           {/* Withdrawal Section */}
