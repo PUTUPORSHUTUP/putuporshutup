@@ -6,6 +6,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// CHARGE ENTRY FEE — SANDBOX TEST MODE
+const chargeEntryFee = async ({ amountInCents, paymentMethodId, userId, challengeId }) => {
+  const TILLED_SECRET_KEY = Deno.env.get("TILLED_SECRET_KEY");
+  
+  const response = await fetch('https://api-sandbox.tilled.com/v1/charges', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${TILLED_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      amount: amountInCents,        // Example: 1000 = $10.00
+      currency: 'usd',
+      payment_method: paymentMethodId,  // From Tilled Elements (card form)
+      capture: true,
+      metadata: {
+        user_id: userId,
+        challenge_id: challengeId
+      }
+    })
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -40,7 +66,7 @@ serve(async (req) => {
     console.log("Processing Tilled payment for user:", user.email);
 
     // Get request body
-    const { amount, totalCharge, platformFee, paymentMethodId, challengeId, type = "wallet_deposit" } = await req.json();
+    const { amount, totalCharge, platformFee, challengeId, type = "wallet_deposit" } = await req.json();
     
     if (!amount || amount < 1) {
       throw new Error("Invalid amount");
@@ -50,41 +76,34 @@ serve(async (req) => {
       throw new Error("Invalid total charge");
     }
 
-    // Convert to cents for Tilled
+    // Convert to cents for Tilled (use totalCharge which includes platform fee)
     const amountInCents = Math.round(totalCharge * 100);
 
-    console.log("Charging amount in cents:", amountInCents);
+    // Use mock payment method for sandbox testing
+    const mockPaymentMethodId = 'pm_test_card_visa'; // Tilled's sandbox test card
 
-    // Charge entry fee using Tilled API
-    const chargeResponse = await fetch('https://api-sandbox.tilled.com/v1/charges', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${tilledSecretKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: amountInCents,
-        currency: 'usd',
-        payment_method: paymentMethodId,
-        capture: true,
-        metadata: {
-          user_id: user.id,
-          challenge_id: challengeId || 'wallet_deposit',
-          type: type,
-          original_amount: amount.toString(),
-          platform_fee: (platformFee || 0).toString()
-        }
-      })
+    console.log("Charging entry fee:", {
+      amountInCents,
+      userId: user.id,
+      challengeId: challengeId || 'wallet_deposit',
+      paymentMethodId: mockPaymentMethodId
     });
 
-    const chargeData = await chargeResponse.json();
-    console.log("Tilled charge response:", chargeData);
+    // Charge entry fee using the exact function from your ChatGPT conversation
+    const chargeResult = await chargeEntryFee({
+      amountInCents,
+      paymentMethodId: mockPaymentMethodId,
+      userId: user.id,
+      challengeId: challengeId || 'wallet_deposit'
+    });
 
-    if (!chargeResponse.ok) {
-      throw new Error(`Tilled charge failed: ${chargeData.message || 'Unknown error'}`);
+    console.log("Tilled charge result:", chargeResult);
+
+    if (chargeResult.error) {
+      throw new Error(`Tilled charge failed: ${chargeResult.error.message || 'Unknown error'}`);
     }
 
-    // Log transaction
+    // Log transaction using Supabase service role
     const supabaseService = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -95,8 +114,9 @@ serve(async (req) => {
       user_id: user.id,
       type: type,
       amount: amount,
-      status: chargeData.status === 'succeeded' ? 'completed' : 'pending',
-      stripe_payment_intent: chargeData.id, // Using same field for Tilled charge ID
+      status: chargeResult.status === 'succeeded' ? 'completed' : 'pending',
+      stripe_payment_intent: chargeResult.id, // Using same field for Tilled charge ID
+      description: `${type === 'challenge_entry' ? 'Challenge Entry Fee' : 'Wallet Deposit'} - Tilled Sandbox`,
       created_at: new Date().toISOString()
     });
 
@@ -105,7 +125,8 @@ serve(async (req) => {
     }
 
     // If charge succeeded and it's a wallet deposit, update wallet balance
-    if (chargeData.status === 'succeeded' && type === 'wallet_deposit') {
+    // For challenge entries, funds are held in escrow
+    if (chargeResult.status === 'succeeded' && type === 'wallet_deposit') {
       const { error: balanceError } = await supabaseService
         .from("profiles")
         .update({ 
@@ -118,11 +139,15 @@ serve(async (req) => {
       }
     }
 
+    // TODO: More endpoints (payouts, webhooks) coming next
+    
     return new Response(JSON.stringify({ 
       success: true,
-      charge: chargeData,
+      charge: chargeResult,
       amount: amount,
-      totalCharge: totalCharge
+      totalCharge: totalCharge,
+      type: type,
+      escrowHold: type === 'challenge_entry' ? true : false
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

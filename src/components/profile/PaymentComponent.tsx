@@ -96,13 +96,13 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
 
     setProcessingDeposit(true);
     try {
-      // For now using Tilled direct charge - will integrate Tilled Elements later
+      // Using Tilled sandbox integration with dynamic amount and mock payment method
       const { data, error } = await supabase.functions.invoke('create-tilled-payment', {
         body: { 
           amount: feeCalculation.amountToWallet,
           totalCharge: feeCalculation.totalCharge,
           platformFee: feeCalculation.platformFee,
-          paymentMethodId: 'pm_test_card', // Mock payment method for testing
+          challengeId: 'wallet_deposit', // Dynamic challenge ID will be added later
           type: 'wallet_deposit'
         }
       });
