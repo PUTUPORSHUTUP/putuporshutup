@@ -178,8 +178,8 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
       }
 
       toast({
-        title: "Instant Withdrawal Complete!",
-        description: `$${amount} has been withdrawn instantly to your account.`,
+        title: "⚡ Instant Withdrawal Complete!",
+        description: `⚡ Instant withdrawal complete! $${amount} sent to your account immediately.`,
       });
 
       setWithdrawAmount('');
@@ -398,9 +398,12 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
                 )}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              ⚡ Instant withdrawal to your bank account. Minimum $1.00
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Minimum $1.00
+              </p>
+              <TilledBadge variant="compact" />
+            </div>
           </div>
         </CardContent>
       </Card>

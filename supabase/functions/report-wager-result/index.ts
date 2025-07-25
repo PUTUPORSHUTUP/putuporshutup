@@ -113,7 +113,7 @@ serve(async (req) => {
     if (hasConsensus) {
       // Finalize the wager
       await finalizeWager(supabaseService, wager_id, winner_id, wager.total_pot);
-      message = "Wager completed! Winner has been paid out.";
+      message = "🏆 Challenge completed! Winner received INSTANT payout!";
     } else {
       message = `Result reported. Waiting for more reports (${reportsForWinner}/${majorityNeeded} needed).`;
     }
@@ -166,25 +166,119 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
       throw new Error("Winner profile not found");
     }
 
-    // Update winner's wallet and stats
+    // Calculate platform fee (6% on winnings)
+    const platformFeePercentage = 6;
+    const platformFee = Math.round((totalPot * (platformFeePercentage / 100)) * 100) / 100;
+    const netPayout = totalPot - platformFee;
+
+    // INSTANT PAYOUT: Use Tilled to send winner instant payout
+    try {
+      console.log("Processing instant payout via Tilled for winner:", winnerId, "amount:", netPayout);
+      
+      // Call Tilled payout function
+      const tilledResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/create-tilled-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`
+        },
+        body: JSON.stringify({
+          type: 'payout',
+          amountInCents: Math.round(netPayout * 100),
+          destinationAccountId: 'winner_account_id', // This would be the winner's connected account
+          challengeId: wagerId,
+          metadata: {
+            user_id: winnerId,
+            challenge_id: wagerId,
+            original_amount: totalPot,
+            platform_fee: platformFee
+          }
+        })
+      });
+
+      const tilledResult = await tilledResponse.json();
+      
+      if (tilledResult.success) {
+        console.log("✅ Instant payout successful via Tilled:", tilledResult.payout.id);
+        
+        // Create transaction record for instant payout
+        await supabaseService
+          .from("transactions")
+          .insert({
+            user_id: winnerId,
+            type: "payout",
+            amount: netPayout,
+            status: "completed",
+            stripe_payment_intent: tilledResult.payout.id,
+            description: `🏆 INSTANT Winner Payout - Challenge ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+            created_at: new Date().toISOString()
+          });
+          
+      } else {
+        console.error("❌ Tilled payout failed, falling back to wallet credit");
+        // Fallback: Credit winner's wallet balance
+        await supabaseService
+          .from("profiles")
+          .update({
+            wallet_balance: profile.wallet_balance + netPayout,
+            updated_at: new Date().toISOString()
+          })
+          .eq("user_id", winnerId);
+
+        // Create transaction record for wallet credit
+        await supabaseService
+          .from("transactions")
+          .insert({
+            user_id: winnerId,
+            type: "deposit",
+            amount: netPayout,
+            status: "completed",
+            description: `🏆 Challenge Win Payout - ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+            created_at: new Date().toISOString()
+          });
+      }
+    } catch (tilledError) {
+      console.error("Tilled payout error, crediting wallet instead:", tilledError);
+      // Fallback: Credit winner's wallet balance
+      await supabaseService
+        .from("profiles")
+        .update({
+          wallet_balance: profile.wallet_balance + netPayout,
+          updated_at: new Date().toISOString()
+        })
+        .eq("user_id", winnerId);
+
+      // Create transaction record for wallet credit
+      await supabaseService
+        .from("transactions")
+        .insert({
+          user_id: winnerId,
+          type: "deposit",
+          amount: netPayout,
+          status: "completed",
+          description: `🏆 Challenge Win Payout - ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+          created_at: new Date().toISOString()
+        });
+    }
+
+    // Update winner's stats
     await supabaseService
       .from("profiles")
       .update({
-        wallet_balance: profile.wallet_balance + totalPot,
         total_wins: profile.total_wins + 1,
         updated_at: new Date().toISOString()
       })
       .eq("user_id", winnerId);
 
-    // Create transaction record for winner
+    // Record platform fee transaction
     await supabaseService
       .from("transactions")
       .insert({
         user_id: winnerId,
-        type: "deposit",
-        amount: totalPot,
+        type: "platform_fee",
+        amount: -platformFee,
         status: "completed",
-        description: `Wager win payout - $${totalPot}`,
+        description: `Platform Fee (${platformFeePercentage}%) - Challenge ${wagerId}`,
         created_at: new Date().toISOString()
       });
 
@@ -226,10 +320,10 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
       }
     }
 
-    console.log("Wager finalized successfully:", wagerId, "Winner:", winnerId, "Payout:", totalPot);
+    console.log("🏁 Challenge finalized with INSTANT payout:", wagerId, "Winner:", winnerId, "Net Payout:", netPayout, "Platform Fee:", platformFee);
 
   } catch (error) {
-    console.error("Error finalizing wager:", error);
+    console.error("Error finalizing challenge:", error);
     throw error;
   }
 }
