@@ -288,6 +288,20 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Disclaimer Section */}
+      <section className="py-8 px-4 bg-muted/30 border-t border-muted-foreground/20">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center">
+            <h3 className="font-orbitron font-semibold text-lg mb-3 text-foreground">
+              Disclaimer:
+            </h3>
+            <p className="font-orbitron text-muted-foreground leading-relaxed">
+              Put Up or Shut Up is a skill-based video game competition platform. This service does not offer gambling, fantasy sports, or games of chance. All matches are based solely on user performance.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-8 px-4 text-center text-muted-foreground">
         <div className="container mx-auto">
