@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
 
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51RjSrZQ29zUP69L93G4LjSsPrbpuREzy2zfy4vwBB7a7ycqCBkPRcPb4lBL4fpLO1DH7JNGoDfmLiznqMlqExpo600extcImi0";
+const STRIPE_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU";
 
 interface Transaction {
   id: string;
