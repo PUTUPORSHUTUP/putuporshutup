@@ -39,6 +39,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Maintenance Notice */}
+      <div className="bg-red-600 text-white py-3 text-center">
+        <p className="font-orbitron text-sm sm:text-base font-semibold">
+          🚧 TEMPORARY MAINTENANCE - We're upgrading our payment system and will be back online around August 1st. Thanks for your patience!
+        </p>
+      </div>
+
       {/* Header Navigation */}
       <header className="bg-neon-green text-black py-6 text-center">
         <h1 className="font-orbitron text-2xl sm:text-4xl font-semibold tracking-wider">
