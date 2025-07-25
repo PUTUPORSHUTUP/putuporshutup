@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Trophy, Users, AlertTriangle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PayoutDisclaimerModal } from './PayoutDisclaimerModal';
 
 interface WagerParticipant {
   user_id: string;
@@ -32,6 +33,7 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
   const [open, setOpen] = useState(false);
   const [selectedWinner, setSelectedWinner] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const { toast } = useToast();
 
   // Get all participants including the creator
@@ -47,7 +49,7 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
     return null;
   }
 
-  const handleSubmitResult = async () => {
+  const handleInitialSubmit = () => {
     if (!selectedWinner) {
       toast({
         title: "Select Winner",
@@ -56,7 +58,12 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
       });
       return;
     }
+    
+    setShowDisclaimer(true);
+  };
 
+  const handleConfirmResult = async () => {
+    setShowDisclaimer(false);
     setIsSubmitting(true);
 
     try {
@@ -86,6 +93,10 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancelDisclaimer = () => {
+    setShowDisclaimer(false);
   };
 
   return (
@@ -181,7 +192,7 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
           </div>
 
           <Button 
-            onClick={handleSubmitResult}
+            onClick={handleInitialSubmit}
             disabled={!selectedWinner || isSubmitting}
             className="w-full"
           >
@@ -198,7 +209,14 @@ export const ReportResultModal = ({ wager, currentUserId, onResultReported }: Re
             )}
           </Button>
         </div>
+
       </DialogContent>
+      
+      <PayoutDisclaimerModal
+        open={showDisclaimer}
+        onConfirm={handleConfirmResult}
+        onCancel={handleCancelDisclaimer}
+      />
     </Dialog>
   );
 };
