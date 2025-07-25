@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
 
-const STRIPE_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU";
+const TILLED_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU"; // Will be replaced with actual Tilled key
 
 interface Transaction {
   id: string;
@@ -96,12 +96,14 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
 
     setProcessingDeposit(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-payment-session', {
+      // For now using Tilled direct charge - will integrate Tilled Elements later
+      const { data, error } = await supabase.functions.invoke('create-tilled-payment', {
         body: { 
           amount: feeCalculation.amountToWallet,
           totalCharge: feeCalculation.totalCharge,
           platformFee: feeCalculation.platformFee,
-          isPremium: isPremiumUser
+          paymentMethodId: 'pm_test_card', // Mock payment method for testing
+          type: 'wallet_deposit'
         }
       });
 
@@ -114,14 +116,15 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
         return;
       }
 
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.open(data.url, '_blank');
+      // Handle Tilled payment response
+      if (data.success) {
         setDepositAmount('');
+        onBalanceUpdate();
+        loadTransactions();
         
         toast({
-          title: "Redirecting to Payment",
-          description: "Complete your payment in the new tab to add funds.",
+          title: "Payment Successful!",
+          description: `$${feeCalculation.amountToWallet.toFixed(2)} has been added to your wallet.`,
         });
       }
     } catch (error) {
