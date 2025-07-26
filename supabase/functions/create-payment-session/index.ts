@@ -14,13 +14,13 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Stripe with live secret key for real payments
-    const stripeKey = Deno.env.get("STRIPE_LIVE_SECRET_KEY");
+    // Initialize Stripe with either live or test secret key
+    const stripeKey = Deno.env.get("STRIPE_LIVE_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY");
     console.log("Stripe key found:", stripeKey ? "YES" : "NO");
-    console.log("Stripe key starts with sk_live_:", stripeKey?.startsWith("sk_live_") ? "YES" : "NO");
+    console.log("Stripe key type:", stripeKey?.startsWith("sk_live_") ? "LIVE" : stripeKey?.startsWith("sk_test_") ? "TEST" : "UNKNOWN");
     
-    if (!stripeKey || !stripeKey.startsWith("sk_live_")) {
-      throw new Error("STRIPE_LIVE_SECRET_KEY not found or not a live key");
+    if (!stripeKey) {
+      throw new Error("No Stripe secret key found. Please set STRIPE_LIVE_SECRET_KEY or STRIPE_SECRET_KEY");
     }
     
     const stripe = new Stripe(stripeKey, {
