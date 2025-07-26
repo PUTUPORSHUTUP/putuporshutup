@@ -100,12 +100,6 @@ const Index = () => {
                            </Button>
                          </Link>
                        )}
-                       <Link to="/moderator">
-                         <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                           <Shield className="w-4 h-4" />
-                           Moderator
-                         </Button>
-                       </Link>
                      </div>
                     <Button
                       variant="outline" 
