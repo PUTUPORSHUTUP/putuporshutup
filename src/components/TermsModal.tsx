@@ -85,7 +85,7 @@ export const TermsModal = ({ open, onAccept }: TermsModalProps) => {
 
                 <div className="flex gap-3">
                   <span className="text-primary font-semibold">5.</span>
-                  <p>Internet disconnections, console crashes, and lag are not valid excuses unless verified with proof.</p>
+                  <p>PUOSU is not responsible for poor connection, lag, power outages, or other technical issues that may affect gameplay.</p>
                 </div>
 
                 <div className="flex gap-3">
