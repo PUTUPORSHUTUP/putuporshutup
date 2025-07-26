@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, GamepadIcon } from 'lucide-react';
+import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
+import { validatePasswordStrength, checkPasswordBreach } from '@/lib/passwordSecurity';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -86,6 +88,28 @@ const Auth = () => {
       toast({
         title: "Signup Failed",
         description: "Invalid submission detected.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Password strength validation
+    const passwordValidation = validatePasswordStrength(signupForm.password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Password Too Weak",
+        description: passwordValidation.issues[0],
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check for password breaches
+    const breachCheck = await checkPasswordBreach(signupForm.password);
+    if (breachCheck.isCompromised) {
+      toast({
+        title: "Compromised Password",
+        description: `This password has been found in ${breachCheck.occurrences?.toLocaleString()} data breaches. Please choose a different password.`,
         variant: "destructive",
       });
       return;
@@ -232,6 +256,10 @@ const Auth = () => {
                     value={signupForm.password}
                     onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                     required
+                  />
+                  <PasswordStrengthIndicator 
+                    password={signupForm.password}
+                    showBreachCheck={true}
                   />
                 </div>
                 <div className="space-y-2">
