@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { modRecommendation, submitModeratorAction } from '@/lib/moderatorApi';
 import { 
   Flag, 
   Eye, 
@@ -81,18 +81,12 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
   const handleUpdate = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
-        .from('flagged_matches')
-        .update({
-          mod_notes: modNotes,
-          mod_recommendation: recommendation,
-          status: status,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: (await supabase.auth.getUser()).data.user?.id
-        })
-        .eq('id', match.id);
-
-      if (error) throw error;
+      // Use the new moderator API
+      await modRecommendation({
+        matchId: match.id,
+        recommendation: recommendation,
+        notes: modNotes
+      });
 
       toast({
         title: "Match Updated",
@@ -104,11 +98,31 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
       console.error('Error updating flagged match:', error);
       toast({
         title: "Error",
-        description: "Failed to update match. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update match. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleFlagUser = async () => {
+    try {
+      await submitModeratorAction(match.id, 'flag_user', 'User flagged for suspicious activity');
+      
+      toast({
+        title: "User Flagged",
+        description: "User has been flagged for review.",
+      });
+
+      onUpdate();
+    } catch (error) {
+      console.error('Error flagging user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to flag user. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -209,7 +223,11 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
             {isUpdating ? 'Updating...' : 'Update Case'}
           </Button>
           
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleFlagUser}
+          >
             <User className="h-4 w-4" />
             Flag User
           </Button>
