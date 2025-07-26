@@ -36,6 +36,8 @@ interface FlaggedMatch {
   mod_recommendation?: string;
   created_at: string;
   flagged_by: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
   profiles?: {
     display_name?: string;
     username?: string;
@@ -43,11 +45,23 @@ interface FlaggedMatch {
   wagers?: {
     title: string;
     stake_amount: number;
+    result_proof_url?: string;
+    creator_id: string;
     game?: {
       display_name: string;
     };
+    wager_participants?: Array<{
+      user_id: string;
+      profiles?: {
+        display_name?: string;
+        username?: string;
+      };
+    }>;
   };
   tournament_matches?: {
+    player1_id?: string;
+    player2_id?: string;
+    result_proof_url?: string;
     tournament?: {
       title: string;
     };
@@ -112,7 +126,7 @@ const Moderator = () => {
         return;
       }
 
-      // Get wager data for matches that have wager_id
+      // Get wager data with participants for matches that have wager_id
       const wagerIds = flaggedMatches
         .filter(m => m.wager_id)
         .map(m => m.wager_id)
@@ -122,7 +136,18 @@ const Moderator = () => {
       if (wagerIds.length > 0) {
         const { data } = await supabase
           .from('wagers')
-          .select('id, title, stake_amount, games (display_name)')
+          .select(`
+            id, 
+            title, 
+            stake_amount, 
+            result_proof_url,
+            creator_id,
+            games (display_name),
+            wager_participants (
+              user_id,
+              profiles (display_name, username)
+            )
+          `)
           .in('id', wagerIds);
         wagersData = data || [];
       }
@@ -137,7 +162,13 @@ const Moderator = () => {
       if (tournamentMatchIds.length > 0) {
         const { data } = await supabase
           .from('tournament_matches')
-          .select('id, tournaments (title)')
+          .select(`
+            id, 
+            player1_id, 
+            player2_id, 
+            result_proof_url,
+            tournaments (title)
+          `)
           .in('id', tournamentMatchIds);
         tournamentData = data || [];
       }
@@ -279,46 +310,66 @@ const Moderator = () => {
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* Real-time Status Filters */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Filters
+              Filters & Search
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <Input
-                  placeholder="Search matches, reasons..."
+                  placeholder="Search by match ID, reason, game, or player..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
+                <SelectTrigger className="w-full md:w-[200px] bg-background border">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border z-50">
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="under_review">Under Review</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="dismissed">Dismissed</SelectItem>
+                  <SelectItem value="pending">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-orange-500" />
+                      Pending
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="under_review">
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-blue-500" />
+                      Under Review
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="resolved">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Resolved
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dismissed">
+                    <div className="flex items-center gap-2">
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      Dismissed
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
+                <SelectTrigger className="w-full md:w-[200px] bg-background border">
                   <SelectValue placeholder="Filter by priority" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border z-50">
                   <SelectItem value="all">All Priority</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="urgent">🔴 Urgent</SelectItem>
+                  <SelectItem value="high">🟠 High</SelectItem>
+                  <SelectItem value="medium">🟡 Medium</SelectItem>
+                  <SelectItem value="low">🟢 Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>

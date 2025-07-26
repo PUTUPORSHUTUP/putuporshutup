@@ -28,6 +28,8 @@ interface FlaggedMatch {
   mod_recommendation?: string;
   created_at: string;
   flagged_by: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
   profiles?: {
     display_name?: string;
     username?: string;
@@ -35,11 +37,23 @@ interface FlaggedMatch {
   wagers?: {
     title: string;
     stake_amount: number;
+    result_proof_url?: string;
+    creator_id: string;
     game?: {
       display_name: string;
     };
+    wager_participants?: Array<{
+      user_id: string;
+      profiles?: {
+        display_name?: string;
+        username?: string;
+      };
+    }>;
   };
   tournament_matches?: {
+    player1_id?: string;
+    player2_id?: string;
+    result_proof_url?: string;
     tournament?: {
       title: string;
     };
@@ -129,6 +143,18 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
   const matchTitle = match.wagers?.title || match.tournament_matches?.tournament?.title || 'Unknown Match';
   const gameTitle = match.wagers?.game?.display_name || 'Unknown Game';
   const flaggedByName = match.profiles?.display_name || match.profiles?.username || 'Unknown User';
+  const stakeAmount = match.wagers?.stake_amount;
+  const proofLink = match.wagers?.result_proof_url || match.tournament_matches?.result_proof_url;
+  
+  // Get player information
+  const getPlayerNames = () => {
+    if (match.wagers?.wager_participants) {
+      return match.wagers.wager_participants
+        .map(p => p.profiles?.display_name || p.profiles?.username || 'Unknown Player')
+        .join(' vs ');
+    }
+    return 'Players information not available';
+  };
 
   return (
     <Card className="border-l-4 border-l-primary">
@@ -148,13 +174,35 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
             </Badge>
           </div>
         </div>
-        <div className="text-sm text-muted-foreground">
-          <p>Game: {gameTitle}</p>
-          <p>Flagged by: {flaggedByName}</p>
-          <p>Date: {new Date(match.created_at).toLocaleDateString()}</p>
-          {match.wagers?.stake_amount && (
-            <p>Stake: ${match.wagers.stake_amount}</p>
-          )}
+        
+        {/* Match Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground mt-4">
+          <div className="space-y-2">
+            <p><span className="font-medium">Match ID:</span> {match.id.slice(0, 8)}...</p>
+            <p><span className="font-medium">Game:</span> {gameTitle}</p>
+            <p><span className="font-medium">Players:</span> {getPlayerNames()}</p>
+            {stakeAmount && <p><span className="font-medium">Stake:</span> ${stakeAmount}</p>}
+          </div>
+          <div className="space-y-2">
+            <p><span className="font-medium">Flagged by:</span> {flaggedByName}</p>
+            <p><span className="font-medium">Timestamp:</span> {new Date(match.created_at).toLocaleString()}</p>
+            {match.reviewed_at && (
+              <p><span className="font-medium">Reviewed:</span> {new Date(match.reviewed_at).toLocaleString()}</p>
+            )}
+            {proofLink && (
+              <p>
+                <span className="font-medium">Proof:</span>{' '}
+                <a 
+                  href={proofLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  View Proof
+                </a>
+              </p>
+            )}
+          </div>
         </div>
       </CardHeader>
 
@@ -167,13 +215,24 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
           <p className="text-sm bg-muted p-3 rounded">{match.flag_reason}</p>
         </div>
 
+        {/* Existing Notes Display */}
+        {match.mod_notes && (
+          <div>
+            <h4 className="font-semibold flex items-center gap-2 mb-2">
+              <MessageSquare className="h-4 w-4" />
+              Existing Notes
+            </h4>
+            <p className="text-sm bg-muted/50 p-3 rounded border">{match.mod_notes}</p>
+          </div>
+        )}
+
         <div>
           <label className="text-sm font-medium mb-2 block">Status</label>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-background border">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border z-50">
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="under_review">Under Review</SelectItem>
               <SelectItem value="resolved">Resolved</SelectItem>
@@ -185,26 +244,26 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
         <div>
           <label className="text-sm font-medium mb-2 block flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Moderator Notes
+            Add Moderator Notes
           </label>
           <Textarea
             value={modNotes}
             onChange={(e) => setModNotes(e.target.value)}
-            placeholder="Add internal notes about this case..."
-            className="min-h-[80px]"
+            placeholder="Add your notes about this case..."
+            className="min-h-[80px] bg-background border"
           />
         </div>
 
         <div>
           <label className="text-sm font-medium mb-2 block flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
-            Recommendation
+            Moderator Recommendation
           </label>
           <Select value={recommendation} onValueChange={setRecommendation}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select recommendation..." />
+            <SelectTrigger className="bg-background border">
+              <SelectValue placeholder="Select your recommendation..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border z-50">
               <SelectItem value="payout_winner">Payout to Winner</SelectItem>
               <SelectItem value="refund_all">Refund All Players</SelectItem>
               <SelectItem value="escalate_admin">Escalate to Admin</SelectItem>
@@ -217,10 +276,11 @@ export const FlaggedMatchCard = ({ match, onUpdate }: FlaggedMatchCardProps) => 
         <div className="flex gap-2 pt-4">
           <Button 
             onClick={handleUpdate}
-            disabled={isUpdating}
+            disabled={isUpdating || !recommendation}
             className="flex-1"
+            size="lg"
           >
-            {isUpdating ? 'Updating...' : 'Update Case'}
+            {isUpdating ? 'Submitting...' : 'Submit Recommendation'}
           </Button>
           
           <Button 
