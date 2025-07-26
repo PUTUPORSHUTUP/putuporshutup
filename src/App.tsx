@@ -11,6 +11,7 @@ import Tournaments from "./pages/Tournaments";
 import Leaderboards from "./pages/Leaderboards";
 import Social from "./pages/Social";
 import Auth from "./pages/Auth";
+import Moderator from "./pages/Moderator";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -53,6 +54,11 @@ const App = () => {
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/moderator" element={
+                <ProtectedRoute>
+                  <Moderator />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

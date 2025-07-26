@@ -170,6 +170,54 @@ export type Database = {
           },
         ]
       }
+      flagged_matches: {
+        Row: {
+          created_at: string
+          flag_reason: string
+          flagged_by: string
+          id: string
+          mod_notes: string | null
+          mod_recommendation: string | null
+          priority: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tournament_match_id: string | null
+          updated_at: string
+          wager_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          flag_reason: string
+          flagged_by: string
+          id?: string
+          mod_notes?: string | null
+          mod_recommendation?: string | null
+          priority?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tournament_match_id?: string | null
+          updated_at?: string
+          wager_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          flag_reason?: string
+          flagged_by?: string
+          id?: string
+          mod_notes?: string | null
+          mod_recommendation?: string | null
+          priority?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tournament_match_id?: string | null
+          updated_at?: string
+          wager_id?: string | null
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           created_at: string
@@ -937,6 +985,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wager_participants: {
         Row: {
           id: string
@@ -1113,6 +1188,10 @@ export type Database = {
           new_users_this_week: number
         }[]
       }
+      get_user_role: {
+        Args: { user_uuid?: string }
+        Returns: string
+      }
       get_visit_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1131,6 +1210,10 @@ export type Database = {
         Returns: boolean
       }
       is_user_excluded: {
+        Args: { user_uuid?: string }
+        Returns: boolean
+      }
+      is_user_moderator: {
         Args: { user_uuid?: string }
         Returns: boolean
       }

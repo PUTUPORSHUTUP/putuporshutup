@@ -48,6 +48,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { MatchManagement } from '@/components/admin/MatchManagement';
+import { RoleManagement } from '@/components/admin/RoleManagement';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -363,10 +364,11 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 max-w-3xl">
+          <TabsList className="grid w-full grid-cols-7 max-w-4xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -580,6 +582,11 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Roles Tab */}
+          <TabsContent value="roles" className="space-y-6">
+            <RoleManagement />
           </TabsContent>
 
           {/* Tournaments Tab */}

@@ -92,15 +92,21 @@ const Index = () => {
                           Leaderboards
                         </Button>
                       </Link>
-                      {profile?.is_admin && (
-                        <Link to="/admin">
-                          <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                            <Shield className="w-4 h-4" />
-                            Admin
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
+                       {profile?.is_admin && (
+                         <Link to="/admin">
+                           <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                             <Shield className="w-4 h-4" />
+                             Admin
+                           </Button>
+                         </Link>
+                       )}
+                       <Link to="/moderator">
+                         <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                           <Shield className="w-4 h-4" />
+                           Moderator
+                         </Button>
+                       </Link>
+                     </div>
                     <Button
                       variant="outline" 
                       className="border-white text-white hover:bg-white hover:text-black"
