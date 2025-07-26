@@ -24,7 +24,9 @@ import {
   MessageSquare,
   Trash2,
   UserX,
-  Loader2
+  Loader2,
+  Lightbulb,
+  Image
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -107,11 +109,30 @@ interface Dispute {
   } | null;
 }
 
+interface GameSuggestion {
+  id: string;
+  game_name: string;
+  display_name: string;
+  description: string | null;
+  platform: string[];
+  image_url: string | null;
+  status: string;
+  created_at: string;
+  user_id: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  profiles: {
+    username: string;
+    display_name: string;
+  } | null;
+}
+
 const AdminDashboard = () => {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [disputes, setDisputes] = useState<Dispute[]>([]);
+  const [gameSuggestions, setGameSuggestions] = useState<GameSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
@@ -226,6 +247,43 @@ const AdminDashboard = () => {
         setDisputes([]);
       }
 
+      // Load game suggestions
+      const { data: suggestionsData } = await supabase
+        .from('game_suggestions')
+        .select(`
+          id,
+          game_name,
+          display_name,
+          description,
+          platform,
+          image_url,
+          status,
+          created_at,
+          user_id,
+          reviewed_by,
+          reviewed_at
+        `)
+        .order('created_at', { ascending: false });
+
+      // Get user profiles for suggestions
+      if (suggestionsData && suggestionsData.length > 0) {
+        const suggestionUserIds = suggestionsData.map(s => s.user_id);
+        const { data: suggestionProfilesData } = await supabase
+          .from('profiles')
+          .select('user_id, username, display_name')
+          .in('user_id', suggestionUserIds);
+
+        // Merge profiles with suggestions
+        const suggestionsWithProfiles = suggestionsData.map(suggestion => ({
+          ...suggestion,
+          profiles: suggestionProfilesData?.find(p => p.user_id === suggestion.user_id) || null
+        }));
+        
+        setGameSuggestions(suggestionsWithProfiles as GameSuggestion[]);
+      } else {
+        setGameSuggestions([]);
+      }
+
       setAnalytics(analyticsData);
       setUsers(usersData || []);
       setTournaments(tournamentsData || []);
@@ -305,6 +363,36 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSuggestion = async (suggestionId: string, action: 'approved' | 'rejected') => {
+    try {
+      const { error } = await supabase
+        .from('game_suggestions')
+        .update({
+          status: action,
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', suggestionId);
+
+      if (error) throw error;
+
+      // Refresh data
+      await loadDashboardData();
+      
+      toast({
+        title: "Suggestion Updated",
+        description: `Game suggestion has been ${action}.`,
+      });
+    } catch (error) {
+      console.error('Error updating suggestion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update game suggestion.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -364,13 +452,14 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7 max-w-4xl">
+          <TabsList className="grid w-full grid-cols-8 max-w-5xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
+            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -627,6 +716,97 @@ const AdminDashboard = () => {
           {/* Disputes Tab */}
           <TabsContent value="disputes" className="space-y-6">
             <DisputeManagement />
+          </TabsContent>
+
+          {/* Suggestions Tab */}
+          <TabsContent value="suggestions" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5" />
+                  Game Suggestions Management
+                  <Badge variant="secondary">{gameSuggestions.filter(s => s.status === 'pending').length} pending</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {gameSuggestions.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No game suggestions found</p>
+                    </div>
+                  ) : (
+                    gameSuggestions.map((suggestion) => (
+                      <div key={suggestion.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-medium">{suggestion.display_name}</h4>
+                              <Badge 
+                                variant="outline" 
+                                className={getStatusColor(suggestion.status)}
+                              >
+                                {getStatusIcon(suggestion.status)}
+                                <span className="ml-1">{suggestion.status}</span>
+                              </Badge>
+                            </div>
+                            
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <p><strong>Game Name:</strong> {suggestion.game_name}</p>
+                              {suggestion.description && (
+                                <p><strong>Description:</strong> {suggestion.description}</p>
+                              )}
+                              <p><strong>Platforms:</strong> {suggestion.platform.join(', ')}</p>
+                              <p><strong>Suggested by:</strong> {suggestion.profiles?.display_name || suggestion.profiles?.username || 'Unknown User'}</p>
+                              <p><strong>Date:</strong> {new Date(suggestion.created_at).toLocaleDateString()}</p>
+                            </div>
+
+                            {suggestion.image_url && (
+                              <div className="mt-2">
+                                <img 
+                                  src={suggestion.image_url} 
+                                  alt={suggestion.display_name}
+                                  className="w-20 h-20 object-cover rounded border"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {suggestion.status === 'pending' && (
+                            <div className="flex gap-2 ml-4">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                                onClick={() => handleSuggestion(suggestion.id, 'approved')}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-1" />
+                                Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="text-red-600 border-red-600 hover:bg-red-50"
+                                onClick={() => handleSuggestion(suggestion.id, 'rejected')}
+                              >
+                                <XCircle className="w-4 h-4 mr-1" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {suggestion.reviewed_at && (
+                          <div className="pt-2 border-t text-xs text-muted-foreground">
+                            Reviewed on {new Date(suggestion.reviewed_at).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}
