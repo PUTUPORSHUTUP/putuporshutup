@@ -15,6 +15,14 @@ export const TermsModal = ({ open, onAccept, actionText = "Accept Challenge" }: 
   const [hasReadTerms, setHasReadTerms] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
+  // Reset states when modal opens
+  useEffect(() => {
+    if (open) {
+      setHasReadTerms(false);
+      setAcceptedTerms(false);
+    }
+  }, [open]);
+
   // Check if user has scrolled to bottom
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
