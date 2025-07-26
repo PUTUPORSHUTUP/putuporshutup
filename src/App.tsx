@@ -17,6 +17,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { NotificationProvider } from '@/components/notifications/NotificationProvider';
+import { AppHeader } from '@/components/layout/AppHeader';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => {
                 <Toaster />
                 <Sonner />
           <BrowserRouter>
+            <AppHeader />
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
