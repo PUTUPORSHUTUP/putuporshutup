@@ -182,7 +182,7 @@ export const RoleManagement = () => {
               <SelectTrigger>
                 <SelectValue placeholder="Select user..." />
               </SelectTrigger>
-              <SelectContent className="max-h-[200px] overflow-y-auto">
+              <SelectContent className="max-h-[150px] overflow-y-auto z-50">
                 {availableUsers.map((user) => (
                   <SelectItem key={user.user_id} value={user.user_id}>
                     {user.display_name || user.username || 'Unknown User'}
