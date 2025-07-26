@@ -84,10 +84,10 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
     if (!user || !depositAmount) return;
     
     const amount = parseFloat(depositAmount);
-    if (amount < 1) {
+    if (amount < 5) {
       toast({
         title: "Invalid Amount",
-        description: "Minimum deposit is $1.00",
+        description: "Minimum deposit is $5.00",
         variant: "destructive",
       });
       return;
@@ -287,7 +287,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
               <Input
                 type="number"
                 step="0.01"
-                min="1"
+                min="5"
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
                 placeholder="25.00"
@@ -362,7 +362,7 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
 
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
-                Minimum $1.00
+                Minimum $5.00
               </p>
               <TilledBadge variant="compact" />
             </div>

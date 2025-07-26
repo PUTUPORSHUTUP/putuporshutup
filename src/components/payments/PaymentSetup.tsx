@@ -80,7 +80,7 @@ const PaymentSetup = () => {
     }
   };
 
-  const quickDepositAmounts = [10, 25, 50, 100, 250];
+  const quickDepositAmounts = [5, 10, 25, 50, 100];
 
   return (
     <div className="space-y-6">
@@ -182,14 +182,14 @@ const PaymentSetup = () => {
 
             <Button
               onClick={handleDeposit}
-              disabled={!depositAmount || parseFloat(depositAmount) < 1 || loading}
+              disabled={!depositAmount || parseFloat(depositAmount) < 5 || loading}
               className="w-full"
             >
               {loading ? "Processing..." : `Deposit $${depositAmount || "0.00"}`}
             </Button>
 
             <div className="text-xs text-muted-foreground">
-              <p>• Minimum deposit: $1.00</p>
+              <p>• Minimum deposit: $5.00</p>
               <p>• Maximum deposit: $10,000.00</p>
               <p>• Processing fee: 2.9% + $0.30</p>
             </div>
