@@ -32,7 +32,17 @@ const Index = () => {
         .select('is_admin')
         .eq('user_id', user?.id)
         .single();
-      setProfile(data);
+      
+      // Check if user has moderator role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user?.id)
+        .in('role', ['mod', 'admin']);
+      
+      const isModerator = roleData && roleData.length > 0;
+      
+      setProfile({ ...data, is_moderator: isModerator });
     } catch (error) {
       console.error('Error loading profile:', error);
     }
@@ -97,6 +107,14 @@ const Index = () => {
                            <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
                              <Shield className="w-4 h-4" />
                              Admin
+                           </Button>
+                         </Link>
+                       )}
+                       {profile?.is_moderator && (
+                         <Link to="/moderator">
+                           <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                             <Shield className="w-4 h-4" />
+                             Moderator
                            </Button>
                          </Link>
                        )}
