@@ -170,6 +170,89 @@ export type Database = {
           },
         ]
       }
+      escrow_accounts: {
+        Row: {
+          amount: number
+          created_at: string
+          dispute_reason: string | null
+          held_at: string
+          id: string
+          released_at: string | null
+          released_to: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          wager_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          dispute_reason?: string | null
+          held_at?: string
+          id?: string
+          released_at?: string | null
+          released_to?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          wager_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          dispute_reason?: string | null
+          held_at?: string
+          id?: string
+          released_at?: string | null
+          released_to?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          wager_id?: string
+        }
+        Relationships: []
+      }
+      escrow_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          escrow_account_id: string
+          id: string
+          metadata: Json | null
+          processed_by: string | null
+          reason: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          escrow_account_id: string
+          id?: string
+          metadata?: Json | null
+          processed_by?: string | null
+          reason?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          escrow_account_id?: string
+          id?: string
+          metadata?: Json | null
+          processed_by?: string | null
+          reason?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transactions_escrow_account_id_fkey"
+            columns: ["escrow_account_id"]
+            isOneToOne: false
+            referencedRelation: "escrow_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flagged_matches: {
         Row: {
           created_at: string
@@ -358,6 +441,54 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           platform?: string[] | null
+        }
+        Relationships: []
+      }
+      manual_payment_requests: {
+        Row: {
+          account_details: string | null
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          id: string
+          payment_method: string | null
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+          user_notes: string | null
+        }
+        Insert: {
+          account_details?: string | null
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+          user_notes?: string | null
+        }
+        Update: {
+          account_details?: string | null
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          user_notes?: string | null
         }
         Relationships: []
       }
