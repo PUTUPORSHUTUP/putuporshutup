@@ -42,6 +42,7 @@ interface Profile {
   total_wagered: number;
   is_premium: boolean;
   premium_expires_at: string;
+  payoneer_email: string;
 }
 
 interface WagerHistory {
@@ -216,6 +217,7 @@ const Profile = () => {
           gamer_tag_xbox: profile.gamer_tag_xbox,
           gamer_tag_psn: profile.gamer_tag_psn,
           gamer_tag_steam: profile.gamer_tag_steam,
+          payoneer_email: profile.payoneer_email,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', user.id);
@@ -404,6 +406,17 @@ const Profile = () => {
                 />
               </div>
 
+              <div>
+                <Label htmlFor="payoneer_email">Payoneer Email (for payouts)</Label>
+                <Input
+                  id="payoneer_email"
+                  type="email"
+                  value={profile.payoneer_email || ''}
+                  onChange={(e) => setProfile({ ...profile, payoneer_email: e.target.value })}
+                  placeholder="Enter your Payoneer email for payouts"
+                />
+              </div>
+
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Gamer Tags</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -505,6 +518,7 @@ const Profile = () => {
             balance={profile.wallet_balance} 
             onBalanceUpdate={loadProfile}
             isPremiumUser={profile.is_premium}
+            payoneerEmail={profile.payoneer_email}
           />
         </TabsContent>
 

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
 import { TilledBadge } from '@/components/ui/tilled-badge';
+import { PayoneerPayoutModal } from '@/components/payments/PayoneerPayoutModal';
 
 const TILLED_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU"; // Will be replaced with actual Tilled key
 
@@ -37,9 +38,10 @@ interface PaymentComponentProps {
   balance: number;
   onBalanceUpdate: () => void;
   isPremiumUser?: boolean;
+  payoneerEmail?: string;
 }
 
-export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = false }: PaymentComponentProps) => {
+export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = false, payoneerEmail }: PaymentComponentProps) => {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [processingDeposit, setProcessingDeposit] = useState(false);
@@ -403,6 +405,18 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
                 Minimum $1.00
               </p>
               <TilledBadge variant="compact" />
+            </div>
+            
+            {/* Payoneer Payout Option */}
+            <div className="pt-3 border-t">
+              <PayoneerPayoutModal 
+                balance={balance}
+                payoneerEmail={payoneerEmail}
+                onPayoutRequested={() => {
+                  onBalanceUpdate();
+                  loadTransactions();
+                }}
+              />
             </div>
           </div>
         </CardContent>

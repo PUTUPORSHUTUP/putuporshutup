@@ -711,6 +711,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          payoneer_email: string
+          processed_at: string | null
+          processed_by: string | null
+          requested_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payoneer_email: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payoneer_email?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_reviews: {
         Row: {
           comment: string | null
@@ -753,6 +795,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_premium: boolean | null
+          payoneer_email: string | null
           premium_expires_at: string | null
           total_losses: number | null
           total_wagered: number | null
@@ -773,6 +816,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
           total_wagered?: number | null
@@ -793,6 +837,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
           total_wagered?: number | null
