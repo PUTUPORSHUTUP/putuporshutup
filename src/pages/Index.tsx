@@ -13,6 +13,7 @@ import { NotificationCenter } from '@/components/notifications/NotificationCente
 import { ShareButton } from '@/components/ui/share-button';
 import { RealTimeStats } from '@/components/ui/real-time-stats';
 import { VisitorCounter } from '@/components/ui/visitor-counter';
+import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -274,6 +275,11 @@ const Index = () => {
           </div>
           
           <RealTimeStats />
+          
+          {/* Live Gaming Trends */}
+          <div className="mt-16 flex justify-center">
+            <LiveGamingTrends />
+          </div>
           
           {/* Visitor Counter */}
           <div className="mt-16">
