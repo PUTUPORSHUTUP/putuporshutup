@@ -8,9 +8,10 @@ import { AlertTriangle, Shield } from 'lucide-react';
 interface TermsModalProps {
   open: boolean;
   onAccept: () => void;
+  actionText?: string;
 }
 
-export const TermsModal = ({ open, onAccept }: TermsModalProps) => {
+export const TermsModal = ({ open, onAccept, actionText = "Accept Challenge" }: TermsModalProps) => {
   const [hasReadTerms, setHasReadTerms] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -147,7 +148,7 @@ export const TermsModal = ({ open, onAccept }: TermsModalProps) => {
           >
             {!hasReadTerms ? 'Please scroll to read all terms' : 
              !acceptedTerms ? 'Please check the agreement box' : 
-             'Accept Terms & Continue'}
+             actionText}
           </Button>
         </div>
       </DialogContent>
