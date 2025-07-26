@@ -158,8 +158,8 @@ export function generateOTP(length: number = 6): string {
  * OTP configuration settings
  */
 export const OTP_CONFIG = {
-  // Recommended: 5 minutes for security
-  expiryMinutes: 5,
+  // Recommended: 3 minutes for improved security
+  expiryMinutes: 3,
   length: 6,
   maxAttempts: 3,
   cooldownMinutes: 15, // After max attempts reached
