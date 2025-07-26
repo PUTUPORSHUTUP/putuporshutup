@@ -535,6 +535,51 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_verifications: {
+        Row: {
+          attempts: number
+          created_at: string
+          email: string | null
+          expires_at: string
+          id: string
+          max_attempts: number
+          otp_code: string
+          phone: string | null
+          purpose: string
+          updated_at: string
+          user_id: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          email?: string | null
+          expires_at: string
+          id?: string
+          max_attempts?: number
+          otp_code: string
+          phone?: string | null
+          purpose: string
+          updated_at?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          max_attempts?: number
+          otp_code?: string
+          phone?: string | null
+          purpose?: string
+          updated_at?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       player_reviews: {
         Row: {
           comment: string | null
@@ -625,6 +670,57 @@ export type Database = {
           user_id?: string
           username?: string | null
           wallet_balance?: number | null
+        }
+        Relationships: []
+      }
+      security_settings: {
+        Row: {
+          account_locked_until: string | null
+          created_at: string
+          failed_login_attempts: number
+          id: string
+          last_failed_login: string | null
+          last_password_change: string | null
+          lockout_duration_minutes: number
+          max_login_attempts: number
+          otp_expiry_minutes: number
+          otp_method: string | null
+          password_change_required: boolean
+          two_factor_enabled: boolean
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          account_locked_until?: string | null
+          created_at?: string
+          failed_login_attempts?: number
+          id?: string
+          last_failed_login?: string | null
+          last_password_change?: string | null
+          lockout_duration_minutes?: number
+          max_login_attempts?: number
+          otp_expiry_minutes?: number
+          otp_method?: string | null
+          password_change_required?: boolean
+          two_factor_enabled?: boolean
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          account_locked_until?: string | null
+          created_at?: string
+          failed_login_attempts?: number
+          id?: string
+          last_failed_login?: string | null
+          last_password_change?: string | null
+          lockout_duration_minutes?: number
+          max_login_attempts?: number
+          otp_expiry_minutes?: number
+          otp_method?: string | null
+          password_change_required?: boolean
+          two_factor_enabled?: boolean
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1170,9 +1266,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_otp: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_expired_queue_entries: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_otp: {
+        Args: {
+          p_user_id: string
+          p_purpose: string
+          p_email?: string
+          p_phone?: string
+          p_expiry_minutes?: number
+        }
+        Returns: {
+          otp_code: string
+          expires_at: string
+        }[]
       }
       get_admin_analytics: {
         Args: Record<PropertyKey, never>
@@ -1215,6 +1328,10 @@ export type Database = {
       }
       is_user_moderator: {
         Args: { user_uuid?: string }
+        Returns: boolean
+      }
+      verify_otp: {
+        Args: { p_user_id: string; p_otp_code: string; p_purpose: string }
         Returns: boolean
       }
     }
