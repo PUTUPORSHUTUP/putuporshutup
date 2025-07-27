@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { ChallengeTypeSelector } from '@/components/games/ChallengeTypeSelector';
+import { ChallengeType } from '@/types/wager';
 import { 
   Target, 
   Clock, 
@@ -36,6 +38,7 @@ interface QueueEntry {
   stake_amount: number;
   game_id: string;
   platform: string;
+  challenge_type?: ChallengeType;
   queue_status: string;
   queued_at: string;
   expires_at: string;
@@ -60,6 +63,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
   // Form state
   const [selectedGame, setSelectedGame] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
+  const [challengeType, setChallengeType] = useState<ChallengeType>('1v1');
   const [stakeAmount, setStakeAmount] = useState(25);
 
   useEffect(() => {
@@ -183,10 +187,10 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
   };
 
   const joinQueue = async () => {
-    if (!user || !selectedGame || !selectedPlatform) {
+    if (!user || !selectedGame || !selectedPlatform || !challengeType) {
       toast({
         title: "Missing Information",
-        description: "Please select a game and platform",
+        description: "Please select a game, platform, and challenge type",
         variant: "destructive"
       });
       return;
@@ -220,6 +224,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
           stake_amount: stakeAmount,
           game_id: selectedGame,
           platform: selectedPlatform,
+          challenge_type: challengeType,
           expires_at: expiresAt.toISOString()
         })
         .select(`
@@ -315,7 +320,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-primary">${currentQueue.stake_amount}</p>
                 <p className="text-sm text-muted-foreground">Stake Amount</p>
@@ -327,6 +332,10 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
               <div>
                 <p className="text-lg font-medium">{currentQueue.platform}</p>
                 <p className="text-sm text-muted-foreground">Platform</p>
+              </div>
+              <div>
+                <p className="text-lg font-medium">{currentQueue.challenge_type?.replace('_', ' ') || '1v1'}</p>
+                <p className="text-sm text-muted-foreground">Type</p>
               </div>
             </div>
 
@@ -352,7 +361,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
           </div>
         ) : (
           // Join Queue Form
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="game-select">Game</Label>
               <Select value={selectedGame} onValueChange={setSelectedGame}>
@@ -391,6 +400,11 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
               </Select>
             </div>
 
+            <ChallengeTypeSelector 
+              selectedType={challengeType}
+              onTypeChange={setChallengeType}
+            />
+
             <div className="space-y-2">
               <Label htmlFor="stake-amount">Stake Amount ($)</Label>
               <Input
@@ -419,7 +433,7 @@ export const QuickMatch = ({ onMatchFound }: QuickMatchProps) => {
 
             <Button 
               onClick={joinQueue} 
-              disabled={loading || !selectedGame || !selectedPlatform}
+              disabled={loading || !selectedGame || !selectedPlatform || !challengeType}
               className="w-full"
             >
               <Zap className="h-4 w-4 mr-2" />
