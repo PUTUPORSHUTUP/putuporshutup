@@ -201,7 +201,8 @@ export const CreateTournamentModal = ({
     const baseEntryFee = parseFloat(form.entryFee || '0');
     if (isSponsored) {
       const sponsorCost = sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0;
-      // For premium members who paid $19.99 with "no fees ever" - honor that promise
+      // Entry fees are separate from sponsorship - everyone pays entry fees
+      // Premium "no fees ever" was for platform fees, not tournament entries
       return baseEntryFee + sponsorCost;
     }
     return baseEntryFee;
@@ -651,8 +652,8 @@ export const CreateTournamentModal = ({
                         <span>Sponsor Contribution:</span>
                         <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
                       </div>
-                      <div className="text-xs text-yellow-600 mt-2">
-                        * Premium members with "no fees ever" membership are protected from additional fees
+                      <div className="text-xs text-blue-600 mt-2">
+                        * Tournament entry fees apply to all players regardless of membership status
                       </div>
                     </div>
                   )}
