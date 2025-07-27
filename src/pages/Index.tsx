@@ -196,13 +196,13 @@ const Index = () => {
             )}
           </div>
           
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
+          {/* Action Buttons - Moved higher for better mobile visibility */}
+          <div className="mt-6 mb-4 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
             <Button
               variant="outline" 
               size="lg"
               onClick={() => setRulesModalOpen(true)}
-              className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 font-orbitron font-semibold"
+              className="w-full sm:w-auto border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 font-orbitron font-semibold bg-black/60 backdrop-blur-sm"
             >
               <BookOpen className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
               Rules of Engagement
@@ -210,7 +210,7 @@ const Index = () => {
             <ShareButton 
               variant="outline" 
               size="lg"
-              className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+              className="w-full sm:w-auto border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-black/60 backdrop-blur-sm"
             />
           </div>
         </div>
@@ -294,8 +294,13 @@ const Index = () => {
           
           {/* Visitor Counter */}
           <div className="mt-16">
-            <h3 className="text-2xl font-orbitron font-bold mb-8 text-center">Site Traffic</h3>
+            <h3 className="text-2xl font-orbitron font-bold mb-8 text-center">Live Stats & Traffic</h3>
             <VisitorCounter />
+            <div className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground font-orbitron">
+                📊 Real-time stat tracking coming soon! Challenge results will be automatically tracked and displayed live.
+              </p>
+            </div>
           </div>
         </div>
       </section>
