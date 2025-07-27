@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut, Shield } from 'lucide-react';
+import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut, Shield, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,11 +14,13 @@ import { ShareButton } from '@/components/ui/share-button';
 import { RealTimeStats } from '@/components/ui/real-time-stats';
 import { VisitorCounter } from '@/components/ui/visitor-counter';
 import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
+import { RulesOfEngagementModal } from '@/components/games/RulesOfEngagementModal';
 
 const Index = () => {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
   const [profile, setProfile] = useState<any>(null);
+  const [rulesModalOpen, setRulesModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -194,12 +196,21 @@ const Index = () => {
             )}
           </div>
           
-          {/* Share Button */}
-          <div className="mt-8 flex justify-center">
+          {/* Action Buttons */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
+            <Button
+              variant="outline" 
+              size="lg"
+              onClick={() => setRulesModalOpen(true)}
+              className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 font-orbitron font-semibold"
+            >
+              <BookOpen className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
+              Rules of Engagement
+            </Button>
             <ShareButton 
               variant="outline" 
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+              className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
             />
           </div>
         </div>
@@ -348,6 +359,12 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      {/* Rules of Engagement Modal */}
+      <RulesOfEngagementModal 
+        open={rulesModalOpen}
+        onOpenChange={setRulesModalOpen}
+      />
     </div>
   );
 };

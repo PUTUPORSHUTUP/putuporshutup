@@ -18,6 +18,7 @@ import { ChallengeTypeSelector } from './ChallengeTypeSelector';
 import { StatCriteriaBuilder } from './StatCriteriaBuilder';
 import { TeamFormationInterface } from './TeamFormationInterface';
 import { LobbyLinkingSystem } from './LobbyLinkingSystem';
+import { LobbyStatChallengeConfig } from './LobbyStatChallengeConfig';
 import { ChallengeType, VerificationMethod, StatCriteria, ChallengeTeam } from '@/types/wager';
 
 interface Game {
@@ -60,6 +61,7 @@ export const CreateChallengeModal = ({
   const [statCriteria, setStatCriteria] = useState<StatCriteria[]>([]);
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('manual');
   const [teams, setTeams] = useState<ChallengeTeam[]>([]);
+  const [teamPreference, setTeamPreference] = useState<'same' | 'opposite' | 'any'>('any');
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -217,6 +219,7 @@ export const CreateChallengeModal = ({
       setStatCriteria([]);
       setVerificationMethod('manual');
       setTeams([]);
+      setTeamPreference('any');
 
       onChallengeCreated();
     } catch (error) {
@@ -386,6 +389,17 @@ export const CreateChallengeModal = ({
               teams={teams}
               onTeamsChange={setTeams}
               stakePerPerson={parseFloat(form.stakeAmount) || 0}
+            />
+          )}
+
+          {challengeType === '1v1_lobby' && (
+            <LobbyStatChallengeConfig
+              lobbyId={lobbyId}
+              onLobbyIdChange={setLobbyId}
+              statCriteria={statCriteria}
+              onStatCriteriaChange={setStatCriteria}
+              teamPreference={teamPreference}
+              onTeamPreferenceChange={setTeamPreference}
             />
           )}
 

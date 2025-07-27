@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
-import { Users, Target, Trophy, Gamepad2 } from 'lucide-react';
+import { Users, Target, Trophy, Gamepad2, Link } from 'lucide-react';
 import { ChallengeType } from '@/types/wager';
 
 interface ChallengeTypeSelectorProps {
@@ -20,6 +20,14 @@ export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeT
       icon: <Gamepad2 className="w-5 h-5" />,
       badge: 'Classic',
       features: ['Direct competition', 'Quick setup', 'Instant results']
+    },
+    {
+      id: '1v1_lobby' as ChallengeType,
+      title: '1v1 Lobby Challenge',
+      description: 'Compete on stats in same lobby/match',
+      icon: <Link className="w-5 h-5" />,
+      badge: 'NEW',
+      features: ['Same lobby', 'Stat-based', 'Same or opposite teams']
     },
     {
       id: 'team_vs_team' as ChallengeType,
