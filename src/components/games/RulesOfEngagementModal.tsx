@@ -28,8 +28,8 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
         'Winner takes the entire pot (minus platform fee)',
         'Loser forfeits their stake',
         'Both players must have equal stakes',
-        'Results verified through screenshots or video',
-        'Disputes handled by moderators within 24 hours'
+        'Results verified through mutual confirmation or proof submission',
+        'If loser refuses to confirm, winner provides proof and wins automatically'
       ]
     },
     {
@@ -49,8 +49,8 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
         'Players compete on individual stats (kills, deaths, score, etc.)',
         'Can be on same team or opposite teams',
         'Lobby ID must match for both players',
-        'Stats automatically tracked and verified',
-        'Winner determined by pre-set criteria (most kills, least deaths, etc.)'
+        'Results verified through mutual confirmation or proof submission',
+        'Stats automatically tracked when possible for verification'
       ]
     },
     {
@@ -70,8 +70,8 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
         'Each team member contributes equal stake',
         'Winning team splits the pot equally',
         'Team captain manages the challenge',
-        'All team members must confirm participation',
-        'Substitutions allowed before match starts'
+        'Results verified through mutual confirmation or proof submission',
+        'All team members must confirm participation'
       ]
     },
     {
@@ -91,7 +91,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
         'All participants join the same lobby/match',
         'Individual performance determines ranking',
         'Top performer(s) win based on criteria',
-        'Can have multiple winners (top 3, etc.)',
+        'Results verified through mutual confirmation or proof submission',
         'Pot distributed based on performance ranking'
       ]
     },
@@ -112,40 +112,41 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
         'You vs your own goal (or vs others)',
         'Custom criteria: kills, score, time, etc.',
         'Time-bound challenges (single match, daily, weekly)',
-        'Progress tracked automatically where possible',
-        'Can be individual or group challenges'
+        'Results verified through mutual confirmation or proof submission',
+        'Progress tracked automatically where possible'
       ]
     }
   ];
 
   const universalRules = [
     {
-      title: 'Stake Requirements',
+      title: 'Result Verification Process',
+      icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
+      rules: [
+        'Stage 1: Both players confirm results (Winner clicks "I Won", Loser clicks "I Lost")',
+        'If both confirm: Pot automatically transfers to winner',
+        'Stage 2: If loser refuses to confirm, winner submits proof (screenshot/video)',
+        'Winner automatically receives pot when proof is submitted',
+        'Disputes reviewed by moderators only if proof is clearly invalid'
+      ]
+    },
+    {
+      title: 'Stakes & Payments',
       icon: <CheckCircle className="w-5 h-5 text-green-500" />,
       rules: [
         'Minimum stake: $1.00',
         'All participants must contribute equal amounts',
-        'Stakes held in escrow until completion',
+        'Stakes held in escrow until match completion',
         'No refunds once match begins'
       ]
     },
     {
-      title: 'Verification & Disputes',
-      icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
-      rules: [
-        'Results must be submitted within 2 hours of completion',
-        'Screenshot or video proof required',
-        'Disputes reviewed by moderators within 24 hours',
-        'False reporting results in account penalties'
-      ]
-    },
-    {
-      title: 'Forfeit & Penalties',
+      title: 'Penalties & Fair Play',
       icon: <XCircle className="w-5 h-5 text-red-500" />,
       rules: [
         'No-show after 15 minutes = automatic forfeit',
-        'Cheating results in immediate disqualification',
-        'Repeated violations may result in account suspension',
+        'Refusing to confirm obvious loss = stake forfeiture',
+        'Submitting false proof = account suspension',
         'Platform fee applies to all completed challenges'
       ]
     }
