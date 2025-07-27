@@ -49,6 +49,12 @@ interface Wager {
   participant_count: number;
   user_participated?: boolean;
   wager_participants: WagerParticipant[];
+  // Enhanced fields
+  wager_type?: string;
+  team_size?: number;
+  lobby_id?: string;
+  stat_criteria?: any;
+  verification_method?: string;
 }
 
 const Games = () => {
