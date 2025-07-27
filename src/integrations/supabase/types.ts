@@ -1520,6 +1520,7 @@ export type Database = {
           created_at: string
           creator_id: string
           current_participants: number | null
+          custom_rules: string | null
           description: string | null
           entry_fee: number
           game_id: string
@@ -1527,9 +1528,13 @@ export type Database = {
           max_participants: number
           platform: string
           prize_pool: number | null
+          sponsor_cost: number | null
+          sponsored: boolean | null
+          sponsorship_tier: string | null
           start_time: string | null
           status: string
           title: string
+          tournament_type: string | null
           updated_at: string
           winner_id: string | null
         }
@@ -1537,6 +1542,7 @@ export type Database = {
           created_at?: string
           creator_id: string
           current_participants?: number | null
+          custom_rules?: string | null
           description?: string | null
           entry_fee: number
           game_id: string
@@ -1544,9 +1550,13 @@ export type Database = {
           max_participants: number
           platform: string
           prize_pool?: number | null
+          sponsor_cost?: number | null
+          sponsored?: boolean | null
+          sponsorship_tier?: string | null
           start_time?: string | null
           status?: string
           title: string
+          tournament_type?: string | null
           updated_at?: string
           winner_id?: string | null
         }
@@ -1554,6 +1564,7 @@ export type Database = {
           created_at?: string
           creator_id?: string
           current_participants?: number | null
+          custom_rules?: string | null
           description?: string | null
           entry_fee?: number
           game_id?: string
@@ -1561,9 +1572,13 @@ export type Database = {
           max_participants?: number
           platform?: string
           prize_pool?: number | null
+          sponsor_cost?: number | null
+          sponsored?: boolean | null
+          sponsorship_tier?: string | null
           start_time?: string | null
           status?: string
           title?: string
+          tournament_type?: string | null
           updated_at?: string
           winner_id?: string | null
         }
