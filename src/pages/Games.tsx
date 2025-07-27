@@ -11,6 +11,10 @@ import { AddGameModal } from '@/components/games/AddGameModal';
 import { MatchingPreferences } from '@/components/games/MatchingPreferences';
 import { QuickMatch } from '@/components/games/QuickMatch';
 import { MatchNotifications } from '@/components/games/MatchNotifications';
+import { WagerTypeFilter } from '@/components/games/WagerTypeFilter';
+import { VerificationWorkflow } from '@/components/games/VerificationWorkflow';
+import { TeamManagementInterface } from '@/components/games/TeamManagementInterface';
+import { LobbyManagementInterface } from '@/components/games/LobbyManagementInterface';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,6 +64,7 @@ interface Wager {
 const Games = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [wagers, setWagers] = useState<Wager[]>([]);
+  const [filteredWagers, setFilteredWagers] = useState<Wager[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
   const [leaving, setLeaving] = useState<string | null>(null);
@@ -68,6 +73,7 @@ const Games = () => {
   const [activeTab, setActiveTab] = useState('browse');
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [addGameModalOpen, setAddGameModalOpen] = useState(false);
+  const [selectedWagerType, setSelectedWagerType] = useState('all');
   const [userBalance, setUserBalance] = useState(0);
   const [showTermsModal, setShowTermsModal] = useState(false);
   
@@ -111,6 +117,30 @@ const Games = () => {
       supabase.removeChannel(wagerChannel);
     };
   }, []);
+
+  // Filter wagers by type
+  useEffect(() => {
+    if (selectedWagerType === 'all') {
+      setFilteredWagers(wagers);
+    } else {
+      const filtered = wagers.filter(wager => 
+        (wager.wager_type || '1v1') === selectedWagerType
+      );
+      setFilteredWagers(filtered);
+    }
+  }, [wagers, selectedWagerType]);
+
+  // Calculate wager counts by type
+  const getWagerCounts = () => {
+    const counts: Record<string, number> = {
+      all: wagers.length,
+      '1v1': wagers.filter(w => !w.wager_type || w.wager_type === '1v1').length,
+      'team_vs_team': wagers.filter(w => w.wager_type === 'team_vs_team').length,
+      'lobby_competition': wagers.filter(w => w.wager_type === 'lobby_competition').length,
+      'stat_based': wagers.filter(w => w.wager_type === 'stat_based').length
+    };
+    return counts;
+  };
 
   const loadUserBalance = async () => {
     if (!user) return;
@@ -185,6 +215,7 @@ const Games = () => {
       console.log('Wagers with participation status:', wagersWithCount);
 
       setWagers(wagersWithCount as Wager[]);
+      setFilteredWagers(wagersWithCount as Wager[]);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -550,28 +581,40 @@ const Games = () => {
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
+            {/* Wager Type Filter */}
+            <WagerTypeFilter
+              selectedType={selectedWagerType}
+              onTypeChange={setSelectedWagerType}
+              wagerCounts={getWagerCounts()}
+            />
+            
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
                 ))}
               </div>
-            ) : wagers.length === 0 ? (
+            ) : filteredWagers.length === 0 ? (
               <Card className="p-12 text-center">
                 <CardContent>
                   <Trophy className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No Active Wagers</h3>
+                  <h3 className="text-xl font-bold mb-2">
+                    {selectedWagerType === 'all' ? 'No Active Wagers' : `No ${selectedWagerType.replace('_', ' ')} Wagers`}
+                  </h3>
                   <p className="text-muted-foreground mb-4">
-                    Be the first to create a challenge and start earning!
+                    {selectedWagerType === 'all' 
+                      ? 'Be the first to create a challenge and start earning!'
+                      : `No ${selectedWagerType.replace('_', ' ')} wagers available right now.`
+                    }
                   </p>
                   <Button onClick={() => setCreateModalOpen(true)}>
-                    Create First Wager
+                    Create Wager
                   </Button>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {wagers.map((wager) => (
+                {filteredWagers.map((wager) => (
                   <WagerCard 
                     key={wager.id} 
                     wager={wager} 

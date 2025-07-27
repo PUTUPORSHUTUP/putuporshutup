@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play } from 'lucide-react';
+import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play, Target, Link, UserCheck } from 'lucide-react';
 import { ReportResultModal } from './ReportResultModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -42,6 +42,12 @@ interface Wager {
   participant_count: number;
   user_participated?: boolean;
   wager_participants?: WagerParticipant[];
+  // Enhanced fields
+  wager_type?: string;
+  team_size?: number;
+  lobby_id?: string;
+  stat_criteria?: any;
+  verification_method?: string;
 }
 
 interface WagerCardProps {
@@ -100,6 +106,28 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
     }
   };
 
+  const getWagerTypeInfo = () => {
+    switch (wager.wager_type) {
+      case 'team_vs_team':
+        return { icon: UserCheck, label: 'Team vs Team', color: 'text-blue-600' };
+      case 'lobby_competition':
+        return { icon: Link, label: 'Lobby Competition', color: 'text-purple-600' };
+      case 'stat_based':
+        return { icon: Target, label: 'Stat Challenge', color: 'text-orange-600' };
+      default:
+        return { icon: Gamepad2, label: '1 vs 1', color: 'text-primary' };
+    }
+  };
+
+  const getVerificationBadge = () => {
+    switch (wager.verification_method) {
+      case 'screenshot': return { label: 'Screenshot Required', color: 'bg-blue-100 text-blue-800' };
+      case 'video': return { label: 'Video Required', color: 'bg-purple-100 text-purple-800' };
+      case 'api': return { label: 'Auto-Verified', color: 'bg-green-100 text-green-800' };
+      default: return { label: 'Manual Report', color: 'bg-gray-100 text-gray-800' };
+    }
+  };
+
   return (
     <Card className="hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3 sm:pb-4">
@@ -112,6 +140,17 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
               <Badge variant="outline" className="text-xs shrink-0">
                 {wager.platform}
               </Badge>
+              {/* Wager Type Badge */}
+              {(() => {
+                const typeInfo = getWagerTypeInfo();
+                const TypeIcon = typeInfo.icon;
+                return (
+                  <Badge variant="outline" className={`text-xs shrink-0 ${typeInfo.color}`}>
+                    <TypeIcon className="w-3 h-3 mr-1" />
+                    {typeInfo.label}
+                  </Badge>
+                );
+              })()}
               <div className={`w-2 h-2 rounded-full ${getStatusColor()} shrink-0`} />
             </div>
             <CardTitle className="text-base sm:text-lg leading-tight">{wager.title}</CardTitle>
@@ -170,6 +209,56 @@ export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUse
               <p className="text-xs text-muted-foreground">Mode</p>
             </div>
           </div>
+        </div>
+
+        {/* Enhanced Information */}
+        <div className="space-y-2">
+          {/* Verification Method */}
+          {(() => {
+            const verificationInfo = getVerificationBadge();
+            return (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Verification:</span>
+                <Badge className={`text-xs ${verificationInfo.color}`}>
+                  {verificationInfo.label}
+                </Badge>
+              </div>
+            );
+          })()}
+
+          {/* Team Size for Team vs Team */}
+          {wager.wager_type === 'team_vs_team' && wager.team_size && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Team Size:</span>
+              <Badge variant="outline" className="text-xs">
+                {wager.team_size} per team
+              </Badge>
+            </div>
+          )}
+
+          {/* Lobby ID for Lobby Competition */}
+          {wager.wager_type === 'lobby_competition' && wager.lobby_id && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Lobby ID:</span>
+              <Badge variant="outline" className="text-xs font-mono">
+                {wager.lobby_id}
+              </Badge>
+            </div>
+          )}
+
+          {/* Stat Criteria for Stat-Based */}
+          {wager.wager_type === 'stat_based' && wager.stat_criteria && (
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">Target Goals:</span>
+              <div className="flex flex-wrap gap-1">
+                {JSON.parse(wager.stat_criteria as string).slice(0, 2).map((criteria: any, index: number) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {criteria.type}: {criteria.target_value || 'Best'}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Description */}
