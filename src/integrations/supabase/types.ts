@@ -444,6 +444,89 @@ export type Database = {
         }
         Relationships: []
       }
+      lobby_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          lobby_session_id: string
+          user_id: string
+          wager_id: string | null
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          lobby_session_id: string
+          user_id: string
+          wager_id?: string | null
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          lobby_session_id?: string
+          user_id?: string
+          wager_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lobby_participants_lobby_session_id_fkey"
+            columns: ["lobby_session_id"]
+            isOneToOne: false
+            referencedRelation: "lobby_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lobby_participants_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lobby_sessions: {
+        Row: {
+          created_by: string
+          game_id: string
+          id: string
+          lobby_id: string
+          max_participants: number
+          platform: string
+          session_end: string | null
+          session_start: string
+          status: string | null
+        }
+        Insert: {
+          created_by: string
+          game_id: string
+          id?: string
+          lobby_id: string
+          max_participants: number
+          platform: string
+          session_end?: string | null
+          session_start?: string
+          status?: string | null
+        }
+        Update: {
+          created_by?: string
+          game_id?: string
+          id?: string
+          lobby_id?: string
+          max_participants?: number
+          platform?: string
+          session_end?: string | null
+          session_start?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lobby_sessions_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manual_payment_requests: {
         Row: {
           account_details: string | null
@@ -1351,6 +1434,144 @@ export type Database = {
           },
         ]
       }
+      wager_stats: {
+        Row: {
+          assists: number | null
+          created_at: string
+          custom_stats: Json | null
+          damage_dealt: number | null
+          deaths: number | null
+          id: string
+          kills: number | null
+          placement: number | null
+          proof_url: string | null
+          score: number | null
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+          verified_by: string | null
+          wager_id: string
+        }
+        Insert: {
+          assists?: number | null
+          created_at?: string
+          custom_stats?: Json | null
+          damage_dealt?: number | null
+          deaths?: number | null
+          id?: string
+          kills?: number | null
+          placement?: number | null
+          proof_url?: string | null
+          score?: number | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+          verified_by?: string | null
+          wager_id: string
+        }
+        Update: {
+          assists?: number | null
+          created_at?: string
+          custom_stats?: Json | null
+          damage_dealt?: number | null
+          deaths?: number | null
+          id?: string
+          kills?: number | null
+          placement?: number | null
+          proof_url?: string | null
+          score?: number | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+          verified_by?: string | null
+          wager_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_stats_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          stake_paid: number
+          status: string | null
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          stake_paid?: number
+          status?: string | null
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          stake_paid?: number
+          status?: string | null
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "wager_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wager_teams: {
+        Row: {
+          captain_id: string
+          created_at: string
+          id: string
+          team_name: string
+          team_number: number
+          total_stake: number
+          updated_at: string
+          wager_id: string
+        }
+        Insert: {
+          captain_id: string
+          created_at?: string
+          id?: string
+          team_name: string
+          team_number: number
+          total_stake?: number
+          updated_at?: string
+          wager_id: string
+        }
+        Update: {
+          captain_id?: string
+          created_at?: string
+          id?: string
+          team_name?: string
+          team_number?: number
+          total_stake?: number
+          updated_at?: string
+          wager_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wager_teams_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "wagers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wagers: {
         Row: {
           admin_actioned_by: string | null
@@ -1365,16 +1586,21 @@ export type Database = {
           game_mode: string | null
           id: string
           last_admin_action_at: string | null
+          lobby_id: string | null
           max_participants: number | null
           override_reason: string | null
           platform: string
           result_proof_url: string | null
           stake_amount: number
           start_time: string | null
+          stat_criteria: Json | null
           status: string | null
+          team_size: number | null
           title: string
           total_pot: number | null
           updated_at: string | null
+          verification_method: string | null
+          wager_type: string | null
           winner_id: string | null
         }
         Insert: {
@@ -1390,16 +1616,21 @@ export type Database = {
           game_mode?: string | null
           id?: string
           last_admin_action_at?: string | null
+          lobby_id?: string | null
           max_participants?: number | null
           override_reason?: string | null
           platform: string
           result_proof_url?: string | null
           stake_amount: number
           start_time?: string | null
+          stat_criteria?: Json | null
           status?: string | null
+          team_size?: number | null
           title: string
           total_pot?: number | null
           updated_at?: string | null
+          verification_method?: string | null
+          wager_type?: string | null
           winner_id?: string | null
         }
         Update: {
@@ -1415,16 +1646,21 @@ export type Database = {
           game_mode?: string | null
           id?: string
           last_admin_action_at?: string | null
+          lobby_id?: string | null
           max_participants?: number | null
           override_reason?: string | null
           platform?: string
           result_proof_url?: string | null
           stake_amount?: number
           start_time?: string | null
+          stat_criteria?: Json | null
           status?: string | null
+          team_size?: number | null
           title?: string
           total_pot?: number | null
           updated_at?: string | null
+          verification_method?: string | null
+          wager_type?: string | null
           winner_id?: string | null
         }
         Relationships: [

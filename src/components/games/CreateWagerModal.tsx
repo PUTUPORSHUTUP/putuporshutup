@@ -14,6 +14,11 @@ import { useResponsibleGambling } from '@/hooks/useResponsibleGambling';
 import { ResponsibleGamblingWarning } from './ResponsibleGamblingWarning';
 import { ShareButton } from '@/components/ui/share-button';
 import { Loader2, DollarSign, UserPlus } from 'lucide-react';
+import { WagerTypeSelector } from './WagerTypeSelector';
+import { StatCriteriaBuilder } from './StatCriteriaBuilder';
+import { TeamFormationInterface } from './TeamFormationInterface';
+import { LobbyLinkingSystem } from './LobbyLinkingSystem';
+import { WagerType, VerificationMethod, StatCriteria, WagerTeam } from '@/types/wager';
 
 interface Game {
   id: string;
@@ -47,6 +52,14 @@ export const CreateWagerModal = ({
     platform: '',
     gameMode: ''
   });
+
+  // Enhanced wager state
+  const [wagerType, setWagerType] = useState<WagerType>('1v1');
+  const [teamSize, setTeamSize] = useState(2);
+  const [lobbyId, setLobbyId] = useState('');
+  const [statCriteria, setStatCriteria] = useState<StatCriteria[]>([]);
+  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('manual');
+  const [teams, setTeams] = useState<WagerTeam[]>([]);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -141,7 +154,13 @@ export const CreateWagerModal = ({
           max_participants: parseInt(form.maxParticipants),
           platform: form.platform,
           game_mode: form.gameMode,
-          total_pot: stakeAmount
+          total_pot: stakeAmount,
+          // Enhanced fields
+          wager_type: wagerType,
+          team_size: wagerType === 'team_vs_team' ? teamSize : null,
+          lobby_id: wagerType === 'lobby_competition' ? lobbyId : null,
+          stat_criteria: statCriteria.length > 0 ? JSON.stringify(statCriteria) : null,
+          verification_method: verificationMethod
         })
         .select()
         .single();
@@ -191,6 +210,14 @@ export const CreateWagerModal = ({
         gameMode: ''
       });
 
+      // Reset enhanced fields
+      setWagerType('1v1');
+      setTeamSize(2);
+      setLobbyId('');
+      setStatCriteria([]);
+      setVerificationMethod('manual');
+      setTeams([]);
+
       onWagerCreated();
     } catch (error) {
       console.error('Error creating challenge:', error);
@@ -208,7 +235,7 @@ export const CreateWagerModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-gaming text-xl">CREATE NEW CHALLENGE</DialogTitle>
         </DialogHeader>
@@ -219,6 +246,11 @@ export const CreateWagerModal = ({
         />
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Wager Type Selection */}
+          <WagerTypeSelector 
+            selectedType={wagerType}
+            onTypeChange={setWagerType}
+          />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="game">Game</Label>
@@ -323,6 +355,67 @@ export const CreateWagerModal = ({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Enhanced Configuration based on Wager Type */}
+          {wagerType === 'team_vs_team' && (
+            <div>
+              <Label htmlFor="teamSize">Team Size</Label>
+              <Select value={teamSize.toString()} onValueChange={(value) => setTeamSize(parseInt(value))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[2, 3, 4, 5, 6].map(size => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size} players per team
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {wagerType === 'team_vs_team' && (
+            <TeamFormationInterface
+              teamSize={teamSize}
+              teams={teams}
+              onTeamsChange={setTeams}
+              stakePerPerson={parseFloat(form.stakeAmount) || 0}
+            />
+          )}
+
+          {wagerType === 'lobby_competition' && (
+            <LobbyLinkingSystem
+              lobbyId={lobbyId}
+              onLobbyIdChange={setLobbyId}
+              gameId={form.gameId}
+              platform={form.platform}
+              maxParticipants={parseInt(form.maxParticipants)}
+            />
+          )}
+
+          {wagerType === 'stat_based' && (
+            <StatCriteriaBuilder
+              criteria={statCriteria}
+              onCriteriaChange={setStatCriteria}
+            />
+          )}
+
+          {/* Verification Method */}
+          <div>
+            <Label htmlFor="verification">Result Verification</Label>
+            <Select value={verificationMethod} onValueChange={(value: VerificationMethod) => setVerificationMethod(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manual">Manual Reporting</SelectItem>
+                <SelectItem value="screenshot">Screenshot Proof</SelectItem>
+                <SelectItem value="video">Video Proof</SelectItem>
+                <SelectItem value="api">API Integration (if available)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-between items-center">
