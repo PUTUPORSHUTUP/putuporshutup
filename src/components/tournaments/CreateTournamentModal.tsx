@@ -125,7 +125,7 @@ export const CreateTournamentModal = ({
       name: 'Bronze Sponsor',
       cost: 50,
       multiplier: 1.5,
-      features: ['1.5x Prize Pool', 'Sponsor Badge', 'Featured Listing'],
+      features: ['+$50 Prize Pool', 'Sponsor Badge', 'Featured Listing'],
       color: 'from-amber-500 to-amber-600'
     },
     {
@@ -133,7 +133,7 @@ export const CreateTournamentModal = ({
       name: 'Silver Sponsor',
       cost: 100,
       multiplier: 2.0,
-      features: ['2x Prize Pool', 'Premium Badge', 'Top Placement', 'Chat Highlights'],
+      features: ['+$100 Prize Pool', 'Premium Badge', 'Top Placement', 'Chat Highlights'],
       color: 'from-gray-400 to-gray-500'
     },
     {
@@ -141,7 +141,7 @@ export const CreateTournamentModal = ({
       name: 'Gold Sponsor',
       cost: 250,
       multiplier: 3.0,
-      features: ['3x Prize Pool', 'Gold Badge', 'Homepage Feature', 'Stream Priority'],
+      features: ['+$250 Prize Pool', 'Gold Badge', 'Homepage Feature', 'Stream Priority'],
       color: 'from-yellow-400 to-yellow-500'
     },
     {
@@ -149,7 +149,7 @@ export const CreateTournamentModal = ({
       name: 'Platinum Sponsor',
       cost: 500,
       multiplier: 5.0,
-      features: ['5x Prize Pool', 'Platinum Badge', 'Dedicated Page', 'Live Commentary'],
+      features: ['+$500 Prize Pool', 'Platinum Badge', 'Dedicated Page', 'Live Commentary'],
       color: 'from-purple-400 to-purple-500'
     }
   ];
@@ -182,7 +182,9 @@ export const CreateTournamentModal = ({
     const basePrize = parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants);
     if (isSponsored) {
       const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
-      return basePrize * (tier?.multiplier || 1);
+      const sponsorContribution = tier?.cost || 0;
+      // Sponsor fee gets added to the prize pool, NOT multiplied
+      return basePrize + sponsorContribution;
     }
     return basePrize;
   };
