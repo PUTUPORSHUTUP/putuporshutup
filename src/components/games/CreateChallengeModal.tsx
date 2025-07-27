@@ -336,7 +336,11 @@ export const CreateChallengeModal = ({
                   <SelectItem value="2">2 Players</SelectItem>
                   <SelectItem value="4">4 Players</SelectItem>
                   <SelectItem value="8">8 Players</SelectItem>
+                  <SelectItem value="12">12 Players (6v6)</SelectItem>
                   <SelectItem value="16">16 Players</SelectItem>
+                  <SelectItem value="20">20 Players (10v10)</SelectItem>
+                  <SelectItem value="24">24 Players</SelectItem>
+                  <SelectItem value="32">32 Players</SelectItem>
                 </SelectContent>
               </Select>
             </div>
