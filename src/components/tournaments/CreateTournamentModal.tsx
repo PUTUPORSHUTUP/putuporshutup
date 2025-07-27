@@ -125,7 +125,7 @@ export const CreateTournamentModal = ({
       name: 'Bronze Sponsor',
       cost: 50,
       multiplier: 1.5,
-      entryFeeMultiplier: 1.0, // Keep normal entry fee
+      entryFeeMultiplier: 1.0, // Premium members pay normal fee
       features: ['+$50 Prize Pool', 'Sponsor Badge', 'Featured Listing'],
       color: 'from-amber-500 to-amber-600'
     },
@@ -134,8 +134,8 @@ export const CreateTournamentModal = ({
       name: 'Silver Sponsor',
       cost: 100,
       multiplier: 2.0,
-      entryFeeMultiplier: 1.2, // 20% higher entry fee
-      features: ['+$100 Prize Pool', 'Premium Badge', 'Top Placement', 'Chat Highlights'],
+      entryFeeMultiplier: 1.0, // Simplified - no extra fees
+      features: ['+$100 Prize Pool', 'Premium Badge', 'Top Placement'],
       color: 'from-gray-400 to-gray-500'
     },
     {
@@ -143,8 +143,8 @@ export const CreateTournamentModal = ({
       name: 'Gold Sponsor',
       cost: 250,
       multiplier: 3.0,
-      entryFeeMultiplier: 1.5, // 50% higher entry fee
-      features: ['+$250 Prize Pool', 'Gold Badge', 'Homepage Feature', 'Stream Priority'],
+      entryFeeMultiplier: 1.0, // Simplified - no extra fees
+      features: ['+$250 Prize Pool', 'Gold Badge', 'Homepage Feature'],
       color: 'from-yellow-400 to-yellow-500'
     },
     {
@@ -152,8 +152,8 @@ export const CreateTournamentModal = ({
       name: 'Platinum Sponsor',
       cost: 500,
       multiplier: 5.0,
-      entryFeeMultiplier: 2.0, // 100% higher entry fee (double)
-      features: ['+$500 Prize Pool', 'Platinum Badge', 'Dedicated Page', 'Live Commentary'],
+      entryFeeMultiplier: 1.0, // Simplified - no extra fees
+      features: ['+$500 Prize Pool', 'Platinum Badge', 'Dedicated Tournament Page'],
       color: 'from-purple-400 to-purple-500'
     }
   ];
@@ -200,10 +200,9 @@ export const CreateTournamentModal = ({
   const getTotalCost = () => {
     const baseEntryFee = parseFloat(form.entryFee || '0');
     if (isSponsored) {
-      const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
-      const multipliedEntryFee = baseEntryFee * (tier?.entryFeeMultiplier || 1);
-      const sponsorCost = tier?.cost || 0;
-      return multipliedEntryFee + sponsorCost;
+      const sponsorCost = sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0;
+      // For premium members who paid $19.99 with "no fees ever" - honor that promise
+      return baseEntryFee + sponsorCost;
     }
     return baseEntryFee;
   };
@@ -556,7 +555,8 @@ export const CreateTournamentModal = ({
               />
             </div>
 
-            {tournamentType === 'custom' && (
+          {tournamentType === 'custom' && (
+            <div className="space-y-4">
               <div>
                 <Label htmlFor="customRules">Custom Rules & Format</Label>
                 <Textarea
@@ -565,9 +565,17 @@ export const CreateTournamentModal = ({
                   onChange={(e) => setForm(prev => ({ ...prev, customRules: e.target.value }))}
                   placeholder="Describe your custom tournament format, special rules, scoring system..."
                   rows={4}
+                  required
                 />
               </div>
-            )}
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Custom tournaments require detailed rules and format description for participants to understand how to compete.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
           </div>
 
           {/* Tournament Settings */}
@@ -633,23 +641,18 @@ export const CreateTournamentModal = ({
                     </Badge>
                   </div>
                   
-                   {isSponsored && (
+                  {isSponsored && (
                     <div className="text-sm text-muted-foreground space-y-1">
                       <div className="flex justify-between">
-                        <span>Base Entry Fee (per player):</span>
-                        <span>${parseFloat(form.entryFee || '0').toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Adjusted Entry Fee ({(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1)}x):</span>
-                        <span>${(parseFloat(form.entryFee || '0') * (sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1)).toFixed(2)} per player</span>
-                      </div>
-                      <div className="flex justify-between">
                         <span>Entry Fees Total:</span>
-                        <span>${(parseFloat(form.entryFee || '0') * (sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1) * parseInt(form.maxParticipants)).toFixed(2)}</span>
+                        <span>${(parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants)).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between font-semibold text-green-600">
                         <span>Sponsor Contribution:</span>
                         <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="text-xs text-yellow-600 mt-2">
+                        * Premium members with "no fees ever" membership are protected from additional fees
                       </div>
                     </div>
                   )}
