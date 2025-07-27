@@ -684,6 +684,39 @@ export type Database = {
           },
         ]
       }
+      game_matrix: {
+        Row: {
+          api_access: boolean
+          challenge_type: string
+          created_at: string
+          game: string
+          id: string
+          platforms: string
+          proof_method: string
+          updated_at: string
+        }
+        Insert: {
+          api_access?: boolean
+          challenge_type: string
+          created_at?: string
+          game: string
+          id?: string
+          platforms: string
+          proof_method?: string
+          updated_at?: string
+        }
+        Update: {
+          api_access?: boolean
+          challenge_type?: string
+          created_at?: string
+          game?: string
+          id?: string
+          platforms?: string
+          proof_method?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_modes: {
         Row: {
           created_at: string | null
