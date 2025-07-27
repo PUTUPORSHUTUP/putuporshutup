@@ -135,7 +135,7 @@ const Moderator = () => {
       let wagersData: any[] = [];
       if (wagerIds.length > 0) {
         const { data } = await supabase
-          .from('wagers')
+          .from('challenges')
           .select(`
             id, 
             title, 

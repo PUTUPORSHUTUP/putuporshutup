@@ -123,7 +123,7 @@ const Profile = () => {
     try {
       // Get wagers where user was creator or participant
       const { data: createdWagers } = await supabase
-        .from('wagers')
+        .from('challenges')
         .select(`
           id, title, stake_amount, status, winner_id, created_at,
           game:games(display_name)
@@ -133,9 +133,9 @@ const Profile = () => {
         .limit(10);
 
       const { data: participatedWagers } = await supabase
-        .from('wager_participants')
+        .from('challenge_participants')
         .select(`
-          wager:wagers(
+          challenge:challenges(
             id, title, stake_amount, status, winner_id, created_at,
             game:games(display_name)
           )
@@ -146,7 +146,7 @@ const Profile = () => {
 
       const allWagers = [
         ...(createdWagers || []),
-        ...(participatedWagers?.map(p => p.wager).filter(Boolean) || [])
+        ...(participatedWagers?.map(p => p.challenge).filter(Boolean) || [])
       ];
 
       // Remove duplicates and sort by date

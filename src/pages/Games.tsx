@@ -177,12 +177,12 @@ const Games = () => {
     try {
       // Get all wagers with participant data
       const { data: allWagers, error: wagersError } = await supabase
-        .from('wagers')
+        .from('challenges')
         .select(`
           *,
           game:games(*),
-          participant_count:wager_participants(count),
-          wager_participants(user_id, stake_paid, joined_at)
+          participant_count:challenge_participants(count),
+          challenge_participants(user_id, stake_paid, joined_at)
         `)
         .in('status', ['open', 'in_progress', 'completed'])
         .order('created_at', { ascending: false });
@@ -196,11 +196,11 @@ const Games = () => {
       let userParticipations: string[] = [];
       if (user) {
         const { data: participations } = await supabase
-          .from('wager_participants')
-          .select('wager_id')
+        .from('challenge_participants')
+          .select('challenge_id')
           .eq('user_id', user.id);
         
-        userParticipations = participations?.map(p => p.wager_id) || [];
+        userParticipations = participations?.map(p => p.challenge_id) || [];
       }
 
       const wagersWithCount = (allWagers as any)?.map((wager: any) => ({
@@ -208,7 +208,7 @@ const Games = () => {
         participant_count: wager.participant_count?.[0]?.count || 0,
         user_participated: userParticipations.includes(wager.id),
         status: wager.status as 'open' | 'in_progress' | 'completed' | 'cancelled',
-        wager_participants: wager.wager_participants || []
+        challenge_participants: wager.challenge_participants || []
       })) || [];
 
       console.log('User participations:', userParticipations);
@@ -262,9 +262,9 @@ const Games = () => {
 
       // Check if already joined
       const { data: existing } = await supabase
-        .from('wager_participants')
+        .from('challenge_participants')
         .select('id')
-        .eq('wager_id', wagerId)
+        .eq('challenge_id', wagerId)
         .eq('user_id', user.id)
         .single();
 
@@ -279,9 +279,9 @@ const Games = () => {
 
       // Join the wager
       const { error: joinError } = await supabase
-        .from('wager_participants')
+        .from('challenge_participants')
         .insert({
-          wager_id: wagerId,
+          challenge_id: wagerId,
           user_id: user.id,
           stake_paid: stakeAmount
         });
@@ -582,10 +582,10 @@ const Games = () => {
 
           <TabsContent value="browse" className="space-y-6">
             {/* Wager Type Filter */}
-            <WagerTypeFilter
+            <ChallengeTypeFilter
               selectedType={selectedWagerType}
               onTypeChange={setSelectedWagerType}
-              wagerCounts={getWagerCounts()}
+              challengeCounts={getWagerCounts()}
             />
             
             {loading ? (
@@ -615,7 +615,7 @@ const Games = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredWagers.map((wager) => (
-                  <WagerCard 
+                  <ChallengeCard 
                     key={wager.id} 
                     wager={wager} 
                     onJoin={handleJoinWager}
@@ -704,11 +704,11 @@ const Games = () => {
       </div>
 
       {/* Modals */}
-      <CreateWagerModal
+      <CreateChallengeModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         selectedGame={selectedGame}
-        onWagerCreated={handleWagerCreated}
+        onChallengeCreated={handleWagerCreated}
       />
       
       <SuggestGameModal

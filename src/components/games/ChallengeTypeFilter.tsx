@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Gamepad2, UserCheck, Link, Target, Filter } from 'lucide-react';
 
-interface WagerTypeFilterProps {
+interface ChallengeTypeFilterProps {
   selectedType: string;
   onTypeChange: (type: string) => void;
-  wagerCounts: Record<string, number>;
+  challengeCounts: Record<string, number>;
 }
 
-export const WagerTypeFilter = ({ selectedType, onTypeChange, wagerCounts }: WagerTypeFilterProps) => {
-  const wagerTypes = [
-    { id: 'all', label: 'All Wagers', icon: Filter, color: 'text-primary' },
+export const ChallengeTypeFilter = ({ selectedType, onTypeChange, challengeCounts }: ChallengeTypeFilterProps) => {
+  const challengeTypes = [
+    { id: 'all', label: 'All Challenges', icon: Filter, color: 'text-primary' },
     { id: '1v1', label: '1 vs 1', icon: Gamepad2, color: 'text-primary' },
     { id: 'team_vs_team', label: 'Team vs Team', icon: UserCheck, color: 'text-blue-600' },
     { id: 'lobby_competition', label: 'Lobby Competition', icon: Link, color: 'text-purple-600' },
@@ -31,9 +31,9 @@ export const WagerTypeFilter = ({ selectedType, onTypeChange, wagerCounts }: Wag
       <CardContent>
         {/* Desktop Filter Buttons */}
         <div className="hidden md:flex flex-wrap gap-2">
-          {wagerTypes.map((type) => {
+          {challengeTypes.map((type) => {
             const Icon = type.icon;
-            const count = wagerCounts[type.id] || 0;
+            const count = challengeCounts[type.id] || 0;
             const isSelected = selectedType === type.id;
             
             return (
@@ -61,9 +61,9 @@ export const WagerTypeFilter = ({ selectedType, onTypeChange, wagerCounts }: Wag
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {wagerTypes.map((type) => {
+              {challengeTypes.map((type) => {
                 const Icon = type.icon;
-                const count = wagerCounts[type.id] || 0;
+                const count = challengeCounts[type.id] || 0;
                 
                 return (
                   <SelectItem key={type.id} value={type.id}>

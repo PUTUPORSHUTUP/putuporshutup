@@ -60,7 +60,7 @@ interface WagerCardProps {
   isLeaving?: boolean;
 }
 
-export const WagerCard = ({ wager, onJoin, onLeave, onResultReported, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
+export const ChallengeCard = ({ wager, onJoin, onLeave, onResultReported, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
   const [isStarting, setIsStarting] = useState(false);
   const { toast } = useToast();
   

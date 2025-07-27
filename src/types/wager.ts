@@ -53,6 +53,18 @@ export interface ChallengeStats {
   updated_at: string;
 }
 
+export interface LobbySession {
+  id: string;
+  lobby_id: string;
+  game_id: string;
+  platform: string;
+  max_participants: number;
+  status: string;
+  created_by: string;
+  session_start: string;
+  session_end?: string;
+}
+
 export interface LobbyParticipant {
   id: string;
   lobby_session_id: string;
