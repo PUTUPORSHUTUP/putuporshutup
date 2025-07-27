@@ -87,7 +87,11 @@ export const PopularChallengeSelector = ({ selectedType, onTypeChange }: Popular
                 htmlFor={type.id}
                 className="cursor-pointer block w-full"
               >
-                <Card className="transition-all hover:shadow-md hover:scale-[1.02] peer-checked:ring-2 peer-checked:ring-primary peer-checked:border-primary peer-checked:shadow-lg hover:bg-accent/50 cursor-pointer">
+                <Card className={`transition-all hover:shadow-md hover:scale-[1.02] cursor-pointer ${
+                  selectedType === type.id 
+                    ? 'ring-2 ring-primary border-primary bg-primary/10 shadow-lg' 
+                    : 'hover:bg-accent/50 border-border'
+                }`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -134,7 +138,11 @@ export const PopularChallengeSelector = ({ selectedType, onTypeChange }: Popular
             htmlFor="custom"
             className="cursor-pointer block w-full"
           >
-            <Card className="transition-all hover:shadow-md hover:scale-[1.01] peer-checked:ring-2 peer-checked:ring-primary peer-checked:border-primary peer-checked:shadow-lg border-dashed hover:bg-accent/50 cursor-pointer">
+            <Card className={`transition-all hover:shadow-md hover:scale-[1.01] cursor-pointer border-dashed ${
+              selectedType === 'custom' 
+                ? 'ring-2 ring-primary border-primary bg-primary/10 shadow-lg' 
+                : 'hover:bg-accent/50 border-border'
+            }`}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
