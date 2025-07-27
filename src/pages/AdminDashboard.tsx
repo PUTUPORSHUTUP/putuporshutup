@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
+import { GameManagement } from '@/components/admin/GameManagement';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -462,7 +463,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
             <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-            <TabsTrigger value="games">Games</TabsTrigger>
+            <TabsTrigger value="games">Game Management</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -815,6 +816,7 @@ const AdminDashboard = () => {
           {/* Games Tab */}
           <TabsContent value="games" className="space-y-6">
             <div className="grid grid-cols-1 gap-8">
+              <GameManagement />
               <AutomatedGameOptimization />
               <GamePerformanceAnalytics />
             </div>
