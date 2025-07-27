@@ -125,6 +125,7 @@ export const CreateTournamentModal = ({
       name: 'Bronze Sponsor',
       cost: 50,
       multiplier: 1.5,
+      entryFeeMultiplier: 1.0, // Keep normal entry fee
       features: ['+$50 Prize Pool', 'Sponsor Badge', 'Featured Listing'],
       color: 'from-amber-500 to-amber-600'
     },
@@ -133,6 +134,7 @@ export const CreateTournamentModal = ({
       name: 'Silver Sponsor',
       cost: 100,
       multiplier: 2.0,
+      entryFeeMultiplier: 1.2, // 20% higher entry fee
       features: ['+$100 Prize Pool', 'Premium Badge', 'Top Placement', 'Chat Highlights'],
       color: 'from-gray-400 to-gray-500'
     },
@@ -141,6 +143,7 @@ export const CreateTournamentModal = ({
       name: 'Gold Sponsor',
       cost: 250,
       multiplier: 3.0,
+      entryFeeMultiplier: 1.5, // 50% higher entry fee
       features: ['+$250 Prize Pool', 'Gold Badge', 'Homepage Feature', 'Stream Priority'],
       color: 'from-yellow-400 to-yellow-500'
     },
@@ -149,6 +152,7 @@ export const CreateTournamentModal = ({
       name: 'Platinum Sponsor',
       cost: 500,
       multiplier: 5.0,
+      entryFeeMultiplier: 2.0, // 100% higher entry fee (double)
       features: ['+$500 Prize Pool', 'Platinum Badge', 'Dedicated Page', 'Live Commentary'],
       color: 'from-purple-400 to-purple-500'
     }
@@ -179,20 +183,29 @@ export const CreateTournamentModal = ({
   };
 
   const calculatePrizePool = () => {
-    const basePrize = parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants);
+    const baseEntryFee = parseFloat(form.entryFee || '0');
+    const participants = parseInt(form.maxParticipants);
+    
     if (isSponsored) {
       const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
+      const multipliedEntryFee = baseEntryFee * (tier?.entryFeeMultiplier || 1);
+      const basePrize = multipliedEntryFee * participants;
       const sponsorContribution = tier?.cost || 0;
-      // Sponsor fee goes entirely to prize pool - platform revenue comes from entry fee cuts
       return basePrize + sponsorContribution;
     }
-    return basePrize;
+    
+    return baseEntryFee * participants;
   };
 
   const getTotalCost = () => {
-    const entryFee = parseFloat(form.entryFee || '0');
-    const sponsorCost = isSponsored ? (sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0) : 0;
-    return entryFee + sponsorCost;
+    const baseEntryFee = parseFloat(form.entryFee || '0');
+    if (isSponsored) {
+      const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
+      const multipliedEntryFee = baseEntryFee * (tier?.entryFeeMultiplier || 1);
+      const sponsorCost = tier?.cost || 0;
+      return multipliedEntryFee + sponsorCost;
+    }
+    return baseEntryFee;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -620,15 +633,23 @@ export const CreateTournamentModal = ({
                     </Badge>
                   </div>
                   
-                  {isSponsored && (
+                   {isSponsored && (
                     <div className="text-sm text-muted-foreground space-y-1">
                       <div className="flex justify-between">
-                        <span>Base Prize Pool:</span>
-                        <span>${(parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants)).toFixed(2)}</span>
+                        <span>Base Entry Fee (per player):</span>
+                        <span>${parseFloat(form.entryFee || '0').toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Adjusted Entry Fee ({(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1)}x):</span>
+                        <span>${(parseFloat(form.entryFee || '0') * (sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1)).toFixed(2)} per player</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Entry Fees Total:</span>
+                        <span>${(parseFloat(form.entryFee || '0') * (sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFeeMultiplier || 1) * parseInt(form.maxParticipants)).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between font-semibold text-green-600">
-                        <span>Sponsorship Bonus ({sponsorshipTiers.find(t => t.id === sponsorshipTier)?.multiplier}x):</span>
-                        <span>+${(calculatePrizePool() - (parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants))).toFixed(2)}</span>
+                        <span>Sponsor Contribution:</span>
+                        <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
                       </div>
                     </div>
                   )}
