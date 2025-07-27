@@ -4,17 +4,17 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Users, Target, Trophy, Gamepad2 } from 'lucide-react';
-import { WagerType } from '@/types/wager';
+import { ChallengeType } from '@/types/wager';
 
-interface WagerTypeSelectorProps {
-  selectedType: WagerType;
-  onTypeChange: (type: WagerType) => void;
+interface ChallengeTypeSelectorProps {
+  selectedType: ChallengeType;
+  onTypeChange: (type: ChallengeType) => void;
 }
 
-export const WagerTypeSelector = ({ selectedType, onTypeChange }: WagerTypeSelectorProps) => {
-  const wagerTypes = [
+export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeTypeSelectorProps) => {
+  const challengeTypes = [
     {
-      id: '1v1' as WagerType,
+      id: '1v1' as ChallengeType,
       title: '1 vs 1',
       description: 'Classic head-to-head competition',
       icon: <Gamepad2 className="w-5 h-5" />,
@@ -22,7 +22,7 @@ export const WagerTypeSelector = ({ selectedType, onTypeChange }: WagerTypeSelec
       features: ['Direct competition', 'Quick setup', 'Instant results']
     },
     {
-      id: 'team_vs_team' as WagerType,
+      id: 'team_vs_team' as ChallengeType,
       title: 'Team vs Team',
       description: 'Groups compete against each other',
       icon: <Users className="w-5 h-5" />,
@@ -30,7 +30,7 @@ export const WagerTypeSelector = ({ selectedType, onTypeChange }: WagerTypeSelec
       features: ['Team coordination', 'Higher stakes', 'Group rewards']
     },
     {
-      id: 'lobby_competition' as WagerType,
+      id: 'lobby_competition' as ChallengeType,
       title: 'Lobby Competition',
       description: 'Individual performance in shared lobby',
       icon: <Trophy className="w-5 h-5" />,
@@ -38,7 +38,7 @@ export const WagerTypeSelector = ({ selectedType, onTypeChange }: WagerTypeSelec
       features: ['Same lobby/match', 'Individual stats', 'Performance based']
     },
     {
-      id: 'stat_based' as WagerType,
+      id: 'stat_based' as ChallengeType,
       title: 'Stat Challenge',
       description: 'Bet on achieving specific performance goals',
       icon: <Target className="w-5 h-5" />,
@@ -50,12 +50,12 @@ export const WagerTypeSelector = ({ selectedType, onTypeChange }: WagerTypeSelec
   return (
     <div className="space-y-4">
       <div>
-        <Label className="text-base font-semibold">Wager Type</Label>
+        <Label className="text-base font-semibold">Challenge Type</Label>
         <p className="text-sm text-muted-foreground">Choose how players will compete</p>
       </div>
       
       <RadioGroup value={selectedType} onValueChange={onTypeChange} className="space-y-3">
-        {wagerTypes.map((type) => (
+        {challengeTypes.map((type) => (
           <div key={type.id} className="relative">
             <RadioGroupItem
               value={type.id}

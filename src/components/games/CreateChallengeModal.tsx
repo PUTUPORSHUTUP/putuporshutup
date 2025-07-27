@@ -14,11 +14,11 @@ import { useResponsibleGambling } from '@/hooks/useResponsibleGambling';
 import { ResponsibleGamblingWarning } from './ResponsibleGamblingWarning';
 import { ShareButton } from '@/components/ui/share-button';
 import { Loader2, DollarSign, UserPlus } from 'lucide-react';
-import { WagerTypeSelector } from './WagerTypeSelector';
+import { ChallengeTypeSelector } from './ChallengeTypeSelector';
 import { StatCriteriaBuilder } from './StatCriteriaBuilder';
 import { TeamFormationInterface } from './TeamFormationInterface';
 import { LobbyLinkingSystem } from './LobbyLinkingSystem';
-import { WagerType, VerificationMethod, StatCriteria, WagerTeam } from '@/types/wager';
+import { ChallengeType, VerificationMethod, StatCriteria, ChallengeTeam } from '@/types/wager';
 
 interface Game {
   id: string;
@@ -28,19 +28,19 @@ interface Game {
   platform: string[];
 }
 
-interface CreateWagerModalProps {
+interface CreateChallengeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedGame: Game | null;
-  onWagerCreated: () => void;
+  onChallengeCreated: () => void;
 }
 
-export const CreateWagerModal = ({ 
+export const CreateChallengeModal = ({ 
   open, 
   onOpenChange, 
   selectedGame, 
-  onWagerCreated 
-}: CreateWagerModalProps) => {
+  onChallengeCreated 
+}: CreateChallengeModalProps) => {
   const [loading, setLoading] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const [form, setForm] = useState({
@@ -53,13 +53,13 @@ export const CreateWagerModal = ({
     gameMode: ''
   });
 
-  // Enhanced wager state
-  const [wagerType, setWagerType] = useState<WagerType>('1v1');
+  // Enhanced challenge state
+  const [challengeType, setChallengeType] = useState<ChallengeType>('1v1');
   const [teamSize, setTeamSize] = useState(2);
   const [lobbyId, setLobbyId] = useState('');
   const [statCriteria, setStatCriteria] = useState<StatCriteria[]>([]);
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('manual');
-  const [teams, setTeams] = useState<WagerTeam[]>([]);
+  const [teams, setTeams] = useState<ChallengeTeam[]>([]);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -142,9 +142,9 @@ export const CreateWagerModal = ({
         return;
       }
 
-      // Create the wager
-      const { data: wager, error: wagerError } = await supabase
-        .from('wagers')
+      // Create the challenge
+      const { data: challenge, error: challengeError } = await supabase
+        .from('challenges')
         .insert({
           creator_id: user.id,
           game_id: form.gameId,
@@ -156,19 +156,19 @@ export const CreateWagerModal = ({
           game_mode: form.gameMode,
           total_pot: stakeAmount,
           // Enhanced fields
-          wager_type: wagerType,
-          team_size: wagerType === 'team_vs_team' ? teamSize : null,
-          lobby_id: wagerType === 'lobby_competition' ? lobbyId : null,
+          challenge_type: challengeType,
+          team_size: challengeType === 'team_vs_team' ? teamSize : null,
+          lobby_id: challengeType === 'lobby_competition' ? lobbyId : null,
           stat_criteria: statCriteria.length > 0 ? JSON.stringify(statCriteria) : null,
           verification_method: verificationMethod
         })
         .select()
         .single();
 
-      if (wagerError) {
+      if (challengeError) {
         toast({
           title: "Error creating challenge",
-          description: wagerError.message,
+          description: challengeError.message,
           variant: "destructive",
         });
         return;
@@ -176,9 +176,9 @@ export const CreateWagerModal = ({
 
       // Add creator as first participant
       const { error: participantError } = await supabase
-        .from('wager_participants')
+        .from('challenge_participants')
         .insert({
-          wager_id: wager.id,
+          challenge_id: challenge.id,
           user_id: user.id,
           stake_paid: stakeAmount
         });
@@ -211,14 +211,14 @@ export const CreateWagerModal = ({
       });
 
       // Reset enhanced fields
-      setWagerType('1v1');
+      setChallengeType('1v1');
       setTeamSize(2);
       setLobbyId('');
       setStatCriteria([]);
       setVerificationMethod('manual');
       setTeams([]);
 
-      onWagerCreated();
+      onChallengeCreated();
     } catch (error) {
       console.error('Error creating challenge:', error);
       toast({
@@ -246,10 +246,10 @@ export const CreateWagerModal = ({
         />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Wager Type Selection */}
-          <WagerTypeSelector 
-            selectedType={wagerType}
-            onTypeChange={setWagerType}
+          {/* Challenge Type Selection */}
+          <ChallengeTypeSelector 
+            selectedType={challengeType}
+            onTypeChange={setChallengeType}
           />
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -357,8 +357,8 @@ export const CreateWagerModal = ({
             </div>
           </div>
 
-          {/* Enhanced Configuration based on Wager Type */}
-          {wagerType === 'team_vs_team' && (
+          {/* Enhanced Configuration based on Challenge Type */}
+          {challengeType === 'team_vs_team' && (
             <div>
               <Label htmlFor="teamSize">Team Size</Label>
               <Select value={teamSize.toString()} onValueChange={(value) => setTeamSize(parseInt(value))}>
@@ -376,7 +376,7 @@ export const CreateWagerModal = ({
             </div>
           )}
 
-          {wagerType === 'team_vs_team' && (
+          {challengeType === 'team_vs_team' && (
             <TeamFormationInterface
               teamSize={teamSize}
               teams={teams}
@@ -385,7 +385,7 @@ export const CreateWagerModal = ({
             />
           )}
 
-          {wagerType === 'lobby_competition' && (
+          {challengeType === 'lobby_competition' && (
             <LobbyLinkingSystem
               lobbyId={lobbyId}
               onLobbyIdChange={setLobbyId}
@@ -395,7 +395,7 @@ export const CreateWagerModal = ({
             />
           )}
 
-          {wagerType === 'stat_based' && (
+          {challengeType === 'stat_based' && (
             <StatCriteriaBuilder
               criteria={statCriteria}
               onCriteriaChange={setStatCriteria}

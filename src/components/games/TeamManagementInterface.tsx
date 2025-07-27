@@ -81,7 +81,7 @@ export const TeamManagementInterface = ({ wagerId, currentUserId, teams, onTeams
 
     try {
       const { error } = await supabase
-        .from('wager_team_members')
+        .from('challenge_team_members')
         .update({ status: 'removed' })
         .eq('id', memberId);
 

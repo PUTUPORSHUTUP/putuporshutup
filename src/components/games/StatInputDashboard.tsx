@@ -115,9 +115,9 @@ export const StatInputDashboard = ({
     setSubmitting(true);
     try {
       const { error } = await supabase
-        .from('wager_stats')
+        .from('challenge_stats')
         .insert({
-          wager_id: wagerId,
+          challenge_id: wagerId,
           user_id: currentUserId,
           kills: stats.kills,
           deaths: stats.deaths,

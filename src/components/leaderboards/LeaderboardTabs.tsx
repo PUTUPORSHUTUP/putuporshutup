@@ -173,16 +173,16 @@ export const LeaderboardTabs = () => {
   };
 
   const loadRecentWinners = async () => {
-    const { data: wagers, error } = await supabase
-      .from('wagers')
+    const { data: challenges, error } = await supabase
+      .from('challenges')
       .select('winner_id, total_pot, end_time')
       .not('winner_id', 'is', null)
       .not('end_time', 'is', null)
       .order('end_time', { ascending: false })
       .limit(10);
 
-    if (!error && wagers) {
-      const winnerIds = wagers.map(w => w.winner_id).filter(Boolean);
+    if (!error && challenges) {
+      const winnerIds = challenges.map(w => w.winner_id).filter(Boolean);
       
       const { data: profiles } = await supabase
         .from('profiles')
@@ -191,15 +191,15 @@ export const LeaderboardTabs = () => {
 
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
 
-      setRecentWinners(wagers.map((wager, index) => {
-        const profile = profileMap.get(wager.winner_id!);
+      setRecentWinners(challenges.map((challenge, index) => {
+        const profile = profileMap.get(challenge.winner_id!);
         return {
           rank: index + 1,
-          user_id: wager.winner_id!,
+          user_id: challenge.winner_id!,
           username: profile?.username || '',
           display_name: profile?.display_name,
           avatar_url: profile?.avatar_url,
-          value: wager.total_pot || 0,
+          value: challenge.total_pot || 0,
           is_premium: profile?.is_premium
         };
       }));

@@ -22,17 +22,17 @@ export const RealTimeStats = () => {
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
-      // Get total winnings from completed wagers
-      const { data: completedWagers } = await supabase
-        .from('wagers')
+      // Get total winnings from completed challenges
+      const { data: completedChallenges } = await supabase
+        .from('challenges')
         .select('total_pot')
         .eq('status', 'completed');
 
-      const totalWinnings = completedWagers?.reduce((sum, wager) => sum + Number(wager.total_pot), 0) || 0;
+      const totalWinnings = completedChallenges?.reduce((sum, challenge) => sum + Number(challenge.total_pot), 0) || 0;
 
-      // Get matches played (completed wagers + completed tournament matches)
-      const { count: completedWagersCount } = await supabase
-        .from('wagers')
+      // Get matches played (completed challenges + completed tournament matches)
+      const { count: completedChallengesCount } = await supabase
+        .from('challenges')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed');
 
@@ -41,7 +41,7 @@ export const RealTimeStats = () => {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed');
 
-      const matchesPlayed = (completedWagersCount || 0) + (completedTournamentMatches || 0);
+      const matchesPlayed = (completedChallengesCount || 0) + (completedTournamentMatches || 0);
 
       setStats({
         activePlayers: playersCount || 0,
@@ -67,10 +67,10 @@ export const RealTimeStats = () => {
       )
       .subscribe();
 
-    const wagersChannel = supabase
-      .channel('wagers-changes')
+    const challengesChannel = supabase
+      .channel('challenges-changes')
       .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'wagers' }, 
+        { event: '*', schema: 'public', table: 'challenges' }, 
         () => fetchStats()
       )
       .subscribe();
@@ -85,7 +85,7 @@ export const RealTimeStats = () => {
 
     return () => {
       supabase.removeChannel(profilesChannel);
-      supabase.removeChannel(wagersChannel);
+      supabase.removeChannel(challengesChannel);
       supabase.removeChannel(matchesChannel);
     };
   }, []);

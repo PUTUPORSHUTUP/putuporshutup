@@ -128,17 +128,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           console.log('Wager participant change:', payload);
           const participant = payload.new as any;
           
-          // Get wager details
-          const { data: wager } = await supabase
-            .from('wagers')
+          // Get challenge details
+          const { data: challenge } = await supabase
+            .from('challenges')
             .select('title, creator_id')
-            .eq('id', participant.wager_id)
+            .eq('id', participant.challenge_id)
             .single();
 
-          if (wager && wager.creator_id === user.id && participant.user_id !== user.id) {
+          if (challenge && challenge.creator_id === user.id && participant.user_id !== user.id) {
             addNotification({
-              title: 'Someone Joined Your Wager',
-              message: `A player joined "${wager.title}"`,
+              title: 'Someone Joined Your Challenge',
+              message: `A player joined "${challenge.title}"`,
               type: 'wager',
               actionUrl: '/games',
               icon: <Users className="h-4 w-4" />,

@@ -9,13 +9,13 @@ import { Users, UserPlus, Crown, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { WagerTeam, WagerTeamMember } from '@/types/wager';
+import { ChallengeTeam, ChallengeTeamMember } from '@/types/wager';
 
 interface TeamFormationInterfaceProps {
   teamSize: number;
-  teams: WagerTeam[];
-  onTeamsChange: (teams: WagerTeam[]) => void;
-  wagerId?: string;
+  teams: ChallengeTeam[];
+  onTeamsChange: (teams: ChallengeTeam[]) => void;
+  challengeId?: string;
   stakePerPerson: number;
 }
 
@@ -23,7 +23,7 @@ export const TeamFormationInterface = ({
   teamSize, 
   teams, 
   onTeamsChange, 
-  wagerId,
+  challengeId,
   stakePerPerson 
 }: TeamFormationInterfaceProps) => {
   const { user } = useAuth();
@@ -34,9 +34,9 @@ export const TeamFormationInterface = ({
   const createTeam = async (teamNumber: number, teamName: string) => {
     if (!user) return;
 
-    const newTeam: WagerTeam = {
+    const newTeam: ChallengeTeam = {
       id: crypto.randomUUID(),
-      wager_id: wagerId || '',
+      challenge_id: challengeId || '',
       team_name: teamName,
       team_number: teamNumber,
       captain_id: user.id,
@@ -105,7 +105,7 @@ export const TeamFormationInterface = ({
     onTeamsChange(updatedTeams);
   };
 
-  const getTeamSlots = (team: WagerTeam) => {
+  const getTeamSlots = (team: ChallengeTeam) => {
     const currentMembers = team.members?.length || 0;
     return Array.from({ length: teamSize }, (_, index) => {
       const member = team.members?.[index];

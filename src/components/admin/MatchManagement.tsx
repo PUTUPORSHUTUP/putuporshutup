@@ -121,7 +121,7 @@ export const MatchManagement = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'wagers'
+          table: 'challenges'
         },
         (payload) => {
           console.log('Match update:', payload);
@@ -138,9 +138,9 @@ export const MatchManagement = () => {
 
   const loadMatches = async () => {
     try {
-      // Load wagers (challenges) with related data
-      const { data: wagersData, error: wagersError } = await supabase
-        .from('wagers')
+      // Load challenges with related data
+      const { data: challengesData, error: challengesError } = await supabase
+        .from('challenges')
         .select(`
           *,
           game:game_id (
@@ -157,16 +157,16 @@ export const MatchManagement = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (wagersError) throw wagersError;
+      if (challengesError) throw challengesError;
 
-      if (wagersData && wagersData.length > 0) {
-        // Get participants for each wager
-        const wagerIds = wagersData.map(w => w.id);
+      if (challengesData && challengesData.length > 0) {
+        // Get participants for each challenge
+        const challengeIds = challengesData.map(w => w.id);
         const { data: participantsData } = await supabase
-          .from('wager_participants')
+          .from('challenge_participants')
           .select(`
             user_id,
-            wager_id,
+            challenge_id,
             stake_paid,
             status,
             profiles:user_id (
@@ -174,12 +174,12 @@ export const MatchManagement = () => {
               username
             )
           `)
-          .in('wager_id', wagerIds);
+          .in('challenge_id', challengeIds);
 
         // Combine data
-        const matchesWithParticipants = wagersData.map(wager => ({
-          ...wager,
-          participants: participantsData?.filter(p => p.wager_id === wager.id) || []
+        const matchesWithParticipants = challengesData.map(challenge => ({
+          ...challenge,
+          participants: participantsData?.filter(p => p.challenge_id === challenge.id) || []
         }));
 
         setMatches(matchesWithParticipants as any);
@@ -201,7 +201,7 @@ export const MatchManagement = () => {
   const loadStats = async () => {
     try {
       const { data, error } = await supabase
-        .from('wagers')
+        .from('challenges')
         .select('status, stake_amount, total_pot, dispute_status');
 
       if (error) throw error;
@@ -266,7 +266,7 @@ export const MatchManagement = () => {
       }
 
       const { error } = await supabase
-        .from('wagers')
+        .from('challenges')
         .update(updateData)
         .eq('id', matchId);
 

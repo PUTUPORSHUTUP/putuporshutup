@@ -33,7 +33,7 @@ interface Dispute {
   description: string;
   status: string;
   user_id: string;
-  wager_id?: string;
+  challenge_id?: string;
   tournament_match_id?: string;
   evidence_urls?: string[];
   admin_response?: string;
@@ -45,7 +45,7 @@ interface Dispute {
     display_name: string;
     username: string;
   };
-  wagers?: {
+  challenges?: {
     title: string;
     stake_amount: number;
     game: {
@@ -139,12 +139,12 @@ export const DisputeManagement = () => {
           .select('user_id, display_name, username')
           .in('user_id', userIds);
 
-        // Get wager data for disputes with wager_id
-        const wagerIds = disputesData.filter(d => d.wager_id).map(d => d.wager_id);
-        let wagersData: any[] = [];
-        if (wagerIds.length > 0) {
+        // Get challenge data for disputes with challenge_id
+        const challengeIds = disputesData.filter(d => d.wager_id).map(d => d.wager_id);
+        let challengesData: any[] = [];
+        if (challengeIds.length > 0) {
           const { data } = await supabase
-            .from('wagers')
+            .from('challenges')
             .select(`
               id,
               title,
@@ -153,15 +153,15 @@ export const DisputeManagement = () => {
                 display_name
               )
             `)
-            .in('id', wagerIds);
-          wagersData = data || [];
+            .in('id', challengeIds);
+          challengesData = data || [];
         }
 
         // Combine data
         const disputesWithData = disputesData.map(dispute => ({
           ...dispute,
           profiles: profilesData?.find(p => p.user_id === dispute.user_id),
-          wagers: dispute.wager_id ? wagersData.find(w => w.id === dispute.wager_id) : undefined
+          challenges: dispute.wager_id ? challengesData.find(w => w.id === dispute.wager_id) : undefined
         }));
 
         setDisputes(disputesWithData as any);
@@ -448,10 +448,10 @@ export const DisputeManagement = () => {
                           <Calendar className="h-3 w-3" />
                           {formatDistanceToNow(new Date(dispute.created_at), { addSuffix: true })}
                         </div>
-                        {dispute.wagers && (
+                        {dispute.challenges && (
                           <div className="flex items-center gap-1">
                             <FileText className="h-3 w-3" />
-                            ${dispute.wagers.stake_amount} {dispute.wagers.game?.display_name}
+                            ${dispute.challenges.stake_amount} {dispute.challenges.game?.display_name}
                           </div>
                         )}
                       </div>
