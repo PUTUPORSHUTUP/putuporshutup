@@ -72,9 +72,9 @@ export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeT
             />
             <Label
               htmlFor={type.id}
-              className="cursor-pointer"
+              className="cursor-pointer block w-full"
             >
-              <Card className="transition-all hover:shadow-md peer-checked:ring-2 peer-checked:ring-primary peer-checked:border-primary">
+              <Card className="transition-all hover:shadow-md peer-checked:ring-2 peer-checked:ring-primary peer-checked:border-primary hover:bg-accent/50 cursor-pointer">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
