@@ -100,20 +100,20 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       title: 'Stat Challenge',
       icon: <Target className="w-6 h-6" />,
       color: 'text-red-600',
-      howToWin: 'Achieve the specific stat goal you set',
-      howToLose: 'Fail to reach your target within time limit',
+      howToWin: 'Achieve better stats than your opponents',
+      howToLose: 'Opponents outperform you on the target statistics',
       waysToChallenge: [
-        'Set personal achievement goals',
         'Challenge others to beat your record',
         'Join stat-based competitions',
-        'Create recurring stat challenges'
+        'Create specific stat competitions',
+        'Compete on custom performance metrics'
       ],
       details: [
-        'You vs your own goal (or vs others)',
-        'Custom criteria: kills, score, time, etc.',
-        'Time-bound challenges (single match, daily, weekly)',
+        'Compete against other players on specific stats',
+        'Custom criteria: kills, score, damage, accuracy, etc.',
+        'All participants compete for the same stat goals',
         'Results verified through mutual confirmation or proof submission',
-        'Progress tracked automatically where possible'
+        'Winner determined by best performance on target metrics'
       ]
     }
   ];
