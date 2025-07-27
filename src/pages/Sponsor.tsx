@@ -33,7 +33,7 @@ const Sponsor = () => {
         "Sponsor mention in match intros",
         "Basic analytics report"
       ],
-      color: "border-orange-400 bg-orange-50 dark:bg-orange-950"
+      color: "border-orange-400 bg-orange-900/20 dark:bg-orange-950/50"
     },
     {
       name: "Silver", 
@@ -45,7 +45,7 @@ const Sponsor = () => {
         "Social media shoutouts",
         "Mid-tournament highlights"
       ],
-      color: "border-gray-400 bg-gray-50 dark:bg-gray-950"
+      color: "border-gray-400 bg-gray-900/20 dark:bg-gray-950/50"
     },
     {
       name: "Gold",
@@ -57,7 +57,7 @@ const Sponsor = () => {
         "Custom hashtag campaigns",
         "Priority tournament access"
       ],
-      color: "border-yellow-400 bg-yellow-50 dark:bg-yellow-950"
+      color: "border-yellow-400 bg-yellow-900/20 dark:bg-yellow-950/50"
     }
   ];
 
