@@ -1,4 +1,4 @@
-export type ChallengeType = '1v1' | '1v1_lobby' | 'team_vs_team' | 'lobby_competition' | 'stat_based';
+export type ChallengeType = '1v1' | '1v1_lobby' | 'team_vs_team' | 'lobby_competition' | 'stat_based' | 'custom';
 
 export type VerificationMethod = 'manual' | 'screenshot' | 'api' | 'video';
 

@@ -3,15 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
-import { Users, Target, Trophy, Gamepad2, Link } from 'lucide-react';
+import { Users, Target, Trophy, Gamepad2, Link, Settings, Shield } from 'lucide-react';
+import { SecureCustomChallengeConfig } from './SecureCustomChallengeConfig';
 import { ChallengeType } from '@/types/wager';
 
 interface ChallengeTypeSelectorProps {
   selectedType: ChallengeType;
   onTypeChange: (type: ChallengeType) => void;
+  onCustomConfig?: (config: any) => void;
 }
 
-export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeTypeSelectorProps) => {
+export const ChallengeTypeSelector = ({ selectedType, onTypeChange, onCustomConfig }: ChallengeTypeSelectorProps) => {
   const challengeTypes = [
     {
       id: '1v1' as ChallengeType,
@@ -52,6 +54,14 @@ export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeT
       icon: <Target className="w-5 h-5" />,
       badge: 'Skill',
       features: ['Custom goals', 'Personal targets', 'Skill demonstration']
+    },
+    {
+      id: 'custom' as ChallengeType,
+      title: 'Custom Challenge',
+      description: 'Create your own challenge with security protections',
+      icon: <Settings className="w-5 h-5" />,
+      badge: 'Secure',
+      features: ['Full customization', 'Anti-fraud protection', 'Moderator reviewed']
     }
   ];
 
@@ -105,6 +115,15 @@ export const ChallengeTypeSelector = ({ selectedType, onTypeChange }: ChallengeT
           </div>
         ))}
       </RadioGroup>
+      
+      {/* Custom Configuration Panel */}
+      {selectedType === 'custom' && onCustomConfig && (
+        <div className="mt-6">
+          <SecureCustomChallengeConfig
+            onConfigChange={onCustomConfig}
+          />
+        </div>
+      )}
     </div>
   );
 };
