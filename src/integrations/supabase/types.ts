@@ -1938,6 +1938,18 @@ export type Database = {
           expires_at: string
         }[]
       }
+      generate_secure_otp: {
+        Args: {
+          p_user_id: string
+          p_purpose: string
+          p_email?: string
+          p_phone?: string
+        }
+        Returns: {
+          otp_code: string
+          expires_at: string
+        }[]
+      }
       get_admin_analytics: {
         Args: Record<PropertyKey, never>
         Returns: {
