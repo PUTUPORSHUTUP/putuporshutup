@@ -55,14 +55,14 @@ interface Match {
   last_admin_action_at?: string;
   result_proof_url?: string;
   admin_notes?: string;
-  game?: {
+  games?: {
     display_name: string;
   };
-  creator?: {
+  creator_profile?: {
     display_name: string;
     username: string;
   };
-  winner?: {
+  winner_profile?: {
     display_name: string;
     username: string;
   };
@@ -143,14 +143,14 @@ export const MatchManagement = () => {
         .from('challenges')
         .select(`
           *,
-          game:game_id (
+          games!inner (
             display_name
           ),
-          creator:creator_id (
+          creator_profile:profiles!challenges_creator_id_fkey (
             display_name,
             username
           ),
-          winner:winner_id (
+          winner_profile:profiles!challenges_winner_id_fkey (
             display_name,
             username
           )
@@ -367,9 +367,9 @@ export const MatchManagement = () => {
     .filter(match => 
       searchTerm === '' || 
       match.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.creator?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.creator?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.game?.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      match.creator_profile?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      match.creator_profile?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      match.games?.display_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   if (loading) {
@@ -510,11 +510,11 @@ export const MatchManagement = () => {
                         </div>
                         <div className="flex items-center gap-1">
                           <User className="h-3 w-3" />
-                          Creator: {match.creator?.display_name || 'Unknown'}
+                          Creator: {match.creator_profile?.display_name || 'Unknown'}
                         </div>
                         <div className="flex items-center gap-1">
                           <GamepadIcon className="h-3 w-3" />
-                          Game: {match.game?.display_name || 'Unknown'}
+                          Game: {match.games?.display_name || 'Unknown'}
                         </div>
                         <div className="flex items-center gap-1">
                           <DollarSign className="h-3 w-3" />
@@ -587,7 +587,7 @@ export const MatchManagement = () => {
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Game</Label>
-                      <p className="text-sm text-muted-foreground">{selectedMatch.game?.display_name}</p>
+                      <p className="text-sm text-muted-foreground">{selectedMatch.games?.display_name}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Fee</Label>
@@ -599,7 +599,7 @@ export const MatchManagement = () => {
                     <Label className="text-sm font-medium">Players</Label>
                     <div className="mt-1 space-y-1">
                       <p className="text-sm text-muted-foreground">
-                        Creator: {selectedMatch.creator?.display_name || 'Unknown'}
+                        Creator: {selectedMatch.creator_profile?.display_name || 'Unknown'}
                       </p>
                       {selectedMatch.participants?.map((participant, index) => (
                         <p key={index} className="text-sm text-muted-foreground">

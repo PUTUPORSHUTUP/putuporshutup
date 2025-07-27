@@ -1346,6 +1346,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "proof_submissions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "proof_submissions_tournament_match_id_fkey"
             columns: ["tournament_match_id"]
             isOneToOne: false
@@ -1570,6 +1577,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tournament_matches"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suspicious_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
         ]
       }
