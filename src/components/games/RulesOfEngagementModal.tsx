@@ -19,7 +19,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       color: 'text-blue-600',
       howToWin: 'Beat your opponent in a head-to-head match',
       howToLose: 'Get defeated by your opponent or forfeit',
-      waysToChallenге: [
+      waysToChallenge: [
         'Create a new 1v1 challenge and set stakes',
         'Accept an existing 1v1 challenge',
         'Send direct challenge to specific player'
@@ -39,7 +39,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       color: 'text-green-600',
       howToWin: 'Outperform your opponent on specific stats in the same lobby',
       howToLose: 'Opponent achieves better stats or you fail to meet criteria',
-      waysToChallenгe: [
+      waysToChallenge: [
         'Create lobby challenge with specific stat criteria',
         'Both players join the same game lobby/match',
         'Challenge can be same team or opposite teams',
@@ -60,7 +60,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       color: 'text-purple-600',
       howToWin: 'Your team defeats the opposing team',
       howToLose: 'Opposing team wins or your team forfeits',
-      waysToChallenгe: [
+      waysToChallenge: [
         'Create team challenge and recruit teammates',
         'Join existing team looking for members',
         'Challenge another complete team',
@@ -81,7 +81,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       color: 'text-orange-600',
       howToWin: 'Achieve the best performance among all participants',
       howToLose: 'Other players outperform you in the lobby',
-      waysToChallenгe: [
+      waysToChallenge: [
         'Join open lobby competitions',
         'Create lobby with specific criteria',
         'Invite friends to compete in same match',
@@ -102,7 +102,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
       color: 'text-red-600',
       howToWin: 'Achieve the specific stat goal you set',
       howToLose: 'Fail to reach your target within time limit',
-      waysToChallenгe: [
+      waysToChallenge: [
         'Set personal achievement goals',
         'Challenge others to beat your record',
         'Join stat-based competitions',
@@ -195,7 +195,7 @@ export const RulesOfEngagementModal = ({ open, onOpenChange }: RulesOfEngagement
                     <div>
                       <h4 className="font-semibold mb-2">Ways to Challenge:</h4>
                       <ul className="space-y-1">
-                        {type.waysToChallenге.map((way, idx) => (
+                        {type.waysToChallenge.map((way, idx) => (
                           <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                             <span className="text-primary">•</span>
                             {way}
