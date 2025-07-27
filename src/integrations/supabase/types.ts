@@ -1475,6 +1475,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsors: {
+        Row: {
+          budget_range: string | null
+          company_name: string
+          contact_person: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          phone: string | null
+          selected_tier: string
+          status: string | null
+          tournament_preferences: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget_range?: string | null
+          company_name: string
+          contact_person: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          selected_tier: string
+          status?: string | null
+          tournament_preferences?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget_range?: string | null
+          company_name?: string
+          contact_person?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          selected_tier?: string
+          status?: string | null
+          tournament_preferences?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null

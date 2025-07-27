@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { SponsorSignupModal } from "@/components/sponsors/SponsorSignupModal";
 import { 
   Trophy, 
   Eye, 
@@ -17,10 +19,14 @@ import {
 
 const Sponsor = () => {
   const navigate = useNavigate();
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const handleSponsorSignup = () => {
-    // For now, redirect to contact or create a sponsor signup modal
-    window.open('mailto:sponsors@puosu.com?subject=Tournament Sponsorship Inquiry', '_blank');
+    setShowSignupModal(true);
+  };
+
+  const handleFullApplication = () => {
+    navigate('/sponsor-signup');
   };
 
   const sponsorshipTiers = [
@@ -293,15 +299,30 @@ const Sponsor = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Join the brands that power competitive gaming excellence
           </p>
-          <Button
-            onClick={handleSponsorSignup}
-            size="lg"
-            className="bg-neon-green text-black hover:bg-neon-green/80 font-gaming font-bold text-xl px-12 py-6"
-          >
-            <Trophy className="w-6 h-6 mr-3" />
-            Sponsor a Tournament Now
-          </Button>
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={handleSponsorSignup}
+              size="lg"
+              className="bg-neon-green text-black hover:bg-neon-green/80 font-gaming font-bold text-xl px-8 py-6"
+            >
+              <Trophy className="w-6 h-6 mr-3" />
+              Quick Apply
+            </Button>
+            <Button
+              onClick={handleFullApplication}
+              size="lg"
+              variant="outline"
+              className="font-gaming font-bold text-xl px-8 py-6"
+            >
+              Full Application
+            </Button>
+          </div>
         </div>
+
+        <SponsorSignupModal 
+          open={showSignupModal} 
+          onOpenChange={setShowSignupModal} 
+        />
       </div>
     </div>
   );
