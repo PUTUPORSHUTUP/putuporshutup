@@ -124,13 +124,13 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   };
 
   const basicFeatures = [
-    { icon: Zap, title: "50% Off All Fees", description: "Save on every deposit" },
+    { icon: Zap, title: "50% Off Platform Fees", description: "Save on deposits (tournament entries still apply)" },
     { icon: Star, title: "Priority Entry", description: "Skip the queue in tournaments" },
     { icon: Shield, title: "Basic Support", description: "Enhanced customer service" }
   ];
 
   const premiumFeatures = [
-    { icon: Zap, title: "No Fees Ever", description: "Zero fees on all deposits" },
+    { icon: Zap, title: "No Platform Fees", description: "Zero fees on deposits (tournament entries still apply)" },
     { icon: Trophy, title: "Exclusive Tournaments", description: "Premium-only competitions" },
     { icon: Star, title: "VIP Priority", description: "First access to everything" },
     { icon: Shield, title: "Premium Support", description: "24/7 priority customer service" },

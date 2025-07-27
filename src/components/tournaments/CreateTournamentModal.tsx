@@ -123,38 +123,38 @@ export const CreateTournamentModal = ({
     {
       id: 'bronze' as const,
       name: 'Bronze Sponsor',
-      cost: 50,
-      multiplier: 1.5,
-      entryFeeMultiplier: 1.0, // Premium members pay normal fee
-      features: ['+$50 Prize Pool', 'Sponsor Badge', 'Featured Listing'],
-      color: 'from-amber-500 to-amber-600'
+      cost: 100,
+      multiplier: 2.0,
+      features: ['2x Prize Multiplier', 'Sponsor Badge', 'Featured Listing'],
+      color: 'from-amber-500 to-amber-600',
+      description: '$50 to platform, $50 sponsor contribution'
     },
     {
       id: 'silver' as const,
-      name: 'Silver Sponsor',
-      cost: 100,
-      multiplier: 2.0,
-      entryFeeMultiplier: 1.0, // Simplified - no extra fees
-      features: ['+$100 Prize Pool', 'Premium Badge', 'Top Placement'],
-      color: 'from-gray-400 to-gray-500'
+      name: 'Silver Sponsor', 
+      cost: 200,
+      multiplier: 2.5,
+      features: ['2.5x Prize Multiplier', 'Premium Badge', 'Top Placement'],
+      color: 'from-gray-400 to-gray-500',
+      description: '$100 to platform, $100 sponsor contribution'
     },
     {
       id: 'gold' as const,
       name: 'Gold Sponsor',
-      cost: 250,
+      cost: 400,
       multiplier: 3.0,
-      entryFeeMultiplier: 1.0, // Simplified - no extra fees
-      features: ['+$250 Prize Pool', 'Gold Badge', 'Homepage Feature'],
-      color: 'from-yellow-400 to-yellow-500'
+      features: ['3x Prize Multiplier', 'Gold Badge', 'Homepage Feature'],
+      color: 'from-yellow-400 to-yellow-500',
+      description: '$200 to platform, $200 sponsor contribution'
     },
     {
       id: 'platinum' as const,
       name: 'Platinum Sponsor',
-      cost: 500,
-      multiplier: 5.0,
-      entryFeeMultiplier: 1.0, // Simplified - no extra fees
-      features: ['+$500 Prize Pool', 'Platinum Badge', 'Dedicated Tournament Page'],
-      color: 'from-purple-400 to-purple-500'
+      cost: 800,
+      multiplier: 4.0,
+      features: ['4x Prize Multiplier', 'Platinum Badge', 'Dedicated Tournament Page'],
+      color: 'from-purple-400 to-purple-500',
+      description: '$400 to platform, $400 sponsor contribution'
     }
   ];
 
@@ -185,24 +185,28 @@ export const CreateTournamentModal = ({
   const calculatePrizePool = () => {
     const baseEntryFee = parseFloat(form.entryFee || '0');
     const participants = parseInt(form.maxParticipants);
+    const basePrizePool = baseEntryFee * participants;
     
     if (isSponsored) {
       const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
-      const multipliedEntryFee = baseEntryFee * (tier?.entryFeeMultiplier || 1);
-      const basePrize = multipliedEntryFee * participants;
+      const multiplier = tier?.multiplier || 1;
       const sponsorContribution = tier?.cost || 0;
-      return basePrize + sponsorContribution;
+      
+      // Sponsor funds the entire multiplied prize pool
+      // Example: $200 base pool -> 2.5x = $500 total
+      // Sponsor pays $300 ($200 platform revenue + $100 additional prize)
+      return basePrizePool * multiplier;
     }
     
-    return baseEntryFee * participants;
+    return basePrizePool;
   };
 
   const getTotalCost = () => {
     const baseEntryFee = parseFloat(form.entryFee || '0');
     if (isSponsored) {
       const sponsorCost = sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0;
-      // Entry fees are separate from sponsorship - everyone pays entry fees
-      // Premium "no fees ever" was for platform fees, not tournament entries
+      // Tournament creator pays entry fee PLUS sponsor cost
+      // Entry fees apply to ALL players (including premium members)
       return baseEntryFee + sponsorCost;
     }
     return baseEntryFee;
@@ -470,6 +474,7 @@ export const CreateTournamentModal = ({
                               </div>
                               <div className="text-xl font-bold">${tier.cost}</div>
                               <div className="text-sm opacity-90">{tier.multiplier}x Prize Multiplier</div>
+                              <div className="text-xs opacity-75 mt-1">{tier.description}</div>
                             </div>
                             <div className="space-y-1">
                               {tier.features.map((feature, index) => (
@@ -489,8 +494,12 @@ export const CreateTournamentModal = ({
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
-                    Sponsorship multiplies the final prize pool and gives your tournament premium visibility. 
-                    Revenue from sponsorships helps us improve the platform and offer better features!
+                    <div className="space-y-2">
+                      <div>Sponsorship multiplies prize pools while generating platform revenue. Premium membership required.</div>
+                      <div className="text-sm font-semibold text-primary">
+                        Important: ALL players pay tournament entry fees regardless of membership status.
+                      </div>
+                    </div>
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -652,8 +661,10 @@ export const CreateTournamentModal = ({
                         <span>Sponsor Contribution:</span>
                         <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
                       </div>
-                      <div className="text-xs text-blue-600 mt-2">
-                        * Tournament entry fees apply to all players regardless of membership status
+                      <div className="text-xs text-blue-600 mt-2 space-y-1">
+                        <div>* Tournament entry fees apply to ALL players regardless of membership status</div>
+                        <div>* Sponsor funds the entire multiplied prize pool</div>
+                        <div>* Platform revenue: 50% of sponsor cost</div>
                       </div>
                     </div>
                   )}

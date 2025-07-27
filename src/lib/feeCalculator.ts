@@ -59,6 +59,15 @@ export const getFeeStructure = () => [
 export const BASIC_MONTHLY_COST = 9.99;
 export const PREMIUM_MONTHLY_COST = 19.99;
 
+// Tournament entry fees apply to ALL players - premium membership only affects platform fees, not tournament entries
+export const calculateTournamentEntryFee = (entryFee: number): { entryFee: number; platformFee: number } => {
+  // Tournament entry fees are fixed - no premium exemptions
+  return {
+    entryFee: entryFee,
+    platformFee: 0 // No additional platform fees for tournament entries
+  };
+};
+
 // Challenge fee calculation with 6% platform fee
 export const calculateChallengeFee = (challengeAmount: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): ChallengeFeeCalculation => {
   let feePercentage = 6; // 6% platform fee for challenges
