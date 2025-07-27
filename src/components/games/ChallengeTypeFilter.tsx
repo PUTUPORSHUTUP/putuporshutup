@@ -40,7 +40,7 @@ export const ChallengeTypeFilter = ({ selectedType, onTypeChange, challengeCount
       label: 'Lobby Competition', 
       icon: Link, 
       color: 'text-purple-600',
-      description: 'Multi-player lobbies where participants compete for prizes based on performance'
+      description: 'Multi-player lobbies where participants compete for the pot based on performance'
     },
     { 
       id: 'stat_based', 
