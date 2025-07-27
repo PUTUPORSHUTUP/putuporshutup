@@ -183,7 +183,7 @@ export const CreateTournamentModal = ({
     if (isSponsored) {
       const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
       const sponsorContribution = tier?.cost || 0;
-      // Sponsor fee gets added to the prize pool, NOT multiplied
+      // Sponsor fee goes entirely to prize pool - platform revenue comes from entry fee cuts
       return basePrize + sponsorContribution;
     }
     return basePrize;
