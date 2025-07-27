@@ -1,4 +1,4 @@
-export type WagerType = '1v1' | 'team_vs_team' | 'lobby_competition' | 'stat_based';
+export type ChallengeType = '1v1' | 'team_vs_team' | 'lobby_competition' | 'stat_based';
 
 export type VerificationMethod = 'manual' | 'screenshot' | 'api' | 'video';
 
@@ -9,19 +9,19 @@ export interface StatCriteria {
   description?: string;
 }
 
-export interface WagerTeam {
+export interface ChallengeTeam {
   id: string;
-  wager_id: string;
+  challenge_id: string;
   team_name: string;
   team_number: number;
   captain_id: string;
   total_stake: number;
   created_at: string;
   updated_at: string;
-  members?: WagerTeamMember[];
+  members?: ChallengeTeamMember[];
 }
 
-export interface WagerTeamMember {
+export interface ChallengeTeamMember {
   id: string;
   team_id: string;
   user_id: string;
@@ -35,9 +35,9 @@ export interface WagerTeamMember {
   };
 }
 
-export interface WagerStats {
+export interface ChallengeStats {
   id: string;
-  wager_id: string;
+  challenge_id: string;
   user_id: string;
   kills: number;
   deaths: number;
@@ -53,24 +53,11 @@ export interface WagerStats {
   updated_at: string;
 }
 
-export interface LobbySession {
-  id: string;
-  lobby_id: string;
-  game_id: string;
-  platform: string;
-  session_start: string;
-  session_end?: string;
-  max_participants: number;
-  created_by: string;
-  status: string;
-  participants?: LobbyParticipant[];
-}
-
 export interface LobbyParticipant {
   id: string;
   lobby_session_id: string;
   user_id: string;
-  wager_id?: string;
+  challenge_id?: string;
   joined_at: string;
   profile?: {
     display_name: string;
@@ -79,7 +66,7 @@ export interface LobbyParticipant {
   };
 }
 
-export interface EnhancedWager {
+export interface EnhancedChallenge {
   id: string;
   title: string;
   description?: string;
@@ -103,14 +90,14 @@ export interface EnhancedWager {
   };
   participant_count: number;
   user_participated?: boolean;
-  wager_participants?: any[];
+  challenge_participants?: any[];
   
   // Enhanced fields
-  wager_type: WagerType;
+  challenge_type: ChallengeType;
   team_size?: number;
   lobby_id?: string;
   stat_criteria?: StatCriteria[];
   verification_method: VerificationMethod;
-  teams?: WagerTeam[];
-  stats?: WagerStats[];
+  teams?: ChallengeTeam[];
+  stats?: ChallengeStats[];
 }
