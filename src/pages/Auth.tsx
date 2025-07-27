@@ -14,6 +14,7 @@ import { validatePasswordStrength, checkPasswordBreach } from '@/lib/passwordSec
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ 
     email: '', 
@@ -158,6 +159,47 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!loginForm.email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(loginForm.email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) {
+        toast({
+          title: "Reset Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Reset Email Sent",
+        description: "Check your email for password reset instructions.",
+      });
+    } catch (error) {
+      toast({
+        title: "Reset Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   if (user) {
     return null; // Will redirect via useEffect
   }
@@ -208,6 +250,16 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Login
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={handleForgotPassword}
+                  disabled={resetLoading}
+                  className="w-full"
+                >
+                  {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Forgot Password?
                 </Button>
               </form>
             </TabsContent>
