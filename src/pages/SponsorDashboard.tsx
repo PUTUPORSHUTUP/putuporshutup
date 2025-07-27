@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, BarChart, Trophy, Star } from "lucide-react";
+import { Download, BarChart, Trophy, Star, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useSponsor } from "@/hooks/useSponsor";
 
 interface SponsorPerformanceData {
+  tournament_id: string;
   tournament_name: string;
+  sponsor_name: string;
   tier: string;
   logo_impressions: number;
   clicks_to_site: number;
+  social_reach: number;
+  mentions_in_match: number;
+  winner_page_views: number;
+  hashtag_uses: number;
   report_link: string;
 }
 
@@ -19,6 +26,7 @@ export default function SponsorDashboard() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { canAccessSponsorDashboard, loading: sponsorLoading } = useSponsor();
 
   useEffect(() => {
     async function fetchSponsorData() {
@@ -55,7 +63,7 @@ export default function SponsorDashboard() {
     fetchSponsorData();
   }, [user, toast]);
 
-  if (loading) {
+  if (loading || sponsorLoading) {
     return (
       <div className="container mx-auto p-6">
         <div className="animate-pulse space-y-4">
@@ -66,6 +74,22 @@ export default function SponsorDashboard() {
             ))}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (!canAccessSponsorDashboard) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Lock className="w-12 h-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Access Restricted</h3>
+            <p className="text-muted-foreground text-center">
+              You need sponsor or admin privileges to access this dashboard.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -106,20 +130,26 @@ export default function SponsorDashboard() {
                       <Trophy className="w-6 h-6 text-yellow-500" />
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2">
-                        <BarChart className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm">
-                          <span className="font-medium">{sponsor.logo_impressions.toLocaleString()}</span> Logo Impressions
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Star className="w-4 h-4 text-green-500" />
-                        <span className="text-sm">
-                          <span className="font-medium">{sponsor.clicks_to_site.toLocaleString()}</span> Site Clicks
-                        </span>
-                      </div>
-                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                       <div className="flex items-center gap-2">
+                         <BarChart className="w-4 h-4 text-blue-500" />
+                         <span className="text-sm">
+                           <span className="font-medium">{sponsor.logo_impressions?.toLocaleString() || 0}</span> Logo Impressions
+                         </span>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <Star className="w-4 h-4 text-green-500" />
+                         <span className="text-sm">
+                           <span className="font-medium">{sponsor.clicks_to_site?.toLocaleString() || 0}</span> Site Clicks
+                         </span>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <BarChart className="w-4 h-4 text-purple-500" />
+                         <span className="text-sm">
+                           <span className="font-medium">{sponsor.social_reach?.toLocaleString() || 0}</span> Social Reach
+                         </span>
+                       </div>
+                     </div>
                     
                     <Button variant="outline" className="w-fit" asChild>
                       <a 

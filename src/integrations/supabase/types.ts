@@ -1508,6 +1508,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_performance: {
+        Row: {
+          clicks_to_site: number | null
+          hashtag_uses: number | null
+          logo_impressions: number | null
+          mentions_in_match: number | null
+          report_link: string | null
+          social_reach: number | null
+          sponsor_name: string | null
+          tier: string | null
+          tournament_id: string | null
+          tournament_name: string | null
+          winner_page_views: number | null
+        }
+        Insert: {
+          clicks_to_site?: number | null
+          hashtag_uses?: number | null
+          logo_impressions?: number | null
+          mentions_in_match?: number | null
+          report_link?: string | null
+          social_reach?: number | null
+          sponsor_name?: string | null
+          tier?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+          winner_page_views?: number | null
+        }
+        Update: {
+          clicks_to_site?: number | null
+          hashtag_uses?: number | null
+          logo_impressions?: number | null
+          mentions_in_match?: number | null
+          report_link?: string | null
+          social_reach?: number | null
+          sponsor_name?: string | null
+          tier?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+          winner_page_views?: number | null
+        }
+        Relationships: []
+      }
       sponsors: {
         Row: {
           budget_range: string | null
