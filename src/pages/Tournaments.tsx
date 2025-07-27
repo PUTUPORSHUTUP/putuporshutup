@@ -278,14 +278,25 @@ const Tournaments = () => {
             <h1 className="text-4xl font-gaming text-primary">TOURNAMENTS</h1>
             <p className="text-muted-foreground mt-2">Compete in bracket-style competitions</p>
           </div>
-          <Button 
-            onClick={() => setCreateModalOpen(true)}
-            className="bg-primary hover:bg-primary/90"
-            size="lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            CREATE TOURNAMENT
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => window.open('/sponsor', '_blank')}
+              variant="outline"
+              size="lg"
+              className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black"
+            >
+              <Trophy className="w-5 h-5 mr-2" />
+              BECOME A SPONSOR
+            </Button>
+            <Button 
+              onClick={() => setCreateModalOpen(true)}
+              className="bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              CREATE TOURNAMENT
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
