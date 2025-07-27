@@ -634,6 +634,56 @@ export type Database = {
         }
         Relationships: []
       }
+      game_api_integrations: {
+        Row: {
+          api_endpoint: string
+          api_key_required: boolean | null
+          created_at: string | null
+          game_id: string
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          platform: string
+          rate_limit_per_minute: number | null
+          stat_mappings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint: string
+          api_key_required?: boolean | null
+          created_at?: string | null
+          game_id: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          platform: string
+          rate_limit_per_minute?: number | null
+          stat_mappings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string
+          api_key_required?: boolean | null
+          created_at?: string | null
+          game_id?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          platform?: string
+          rate_limit_per_minute?: number | null
+          stat_mappings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_api_integrations_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_modes: {
         Row: {
           created_at: string | null
@@ -1238,6 +1288,72 @@ export type Database = {
         }
         Relationships: []
       }
+      proof_submissions: {
+        Row: {
+          ai_analysis_notes: string | null
+          ai_analysis_score: number | null
+          challenge_id: string | null
+          created_at: string | null
+          id: string
+          proof_type: string
+          proof_url: string
+          stats_claimed: Json | null
+          submitted_by: string
+          tournament_match_id: string | null
+          updated_at: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          ai_analysis_notes?: string | null
+          ai_analysis_score?: number | null
+          challenge_id?: string | null
+          created_at?: string | null
+          id?: string
+          proof_type: string
+          proof_url: string
+          stats_claimed?: Json | null
+          submitted_by: string
+          tournament_match_id?: string | null
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          ai_analysis_notes?: string | null
+          ai_analysis_score?: number | null
+          challenge_id?: string | null
+          created_at?: string | null
+          id?: string
+          proof_type?: string
+          proof_url?: string
+          stats_claimed?: Json | null
+          submitted_by?: string
+          tournament_match_id?: string | null
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proof_submissions_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proof_submissions_tournament_match_id_fkey"
+            columns: ["tournament_match_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_settings: {
         Row: {
           account_locked_until: string | null
@@ -1394,6 +1510,69 @@ export type Database = {
         }
         Relationships: []
       }
+      suspicious_activities: {
+        Row: {
+          activity_type: string
+          auto_detected: boolean | null
+          challenge_id: string | null
+          created_at: string | null
+          description: string
+          id: string
+          investigated_by: string | null
+          investigation_notes: string | null
+          severity: string | null
+          status: string | null
+          tournament_match_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          auto_detected?: boolean | null
+          challenge_id?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          investigated_by?: string | null
+          investigation_notes?: string | null
+          severity?: string | null
+          status?: string | null
+          tournament_match_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          auto_detected?: boolean | null
+          challenge_id?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          investigated_by?: string | null
+          investigation_notes?: string | null
+          severity?: string | null
+          status?: string | null
+          tournament_match_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suspicious_activities_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suspicious_activities_tournament_match_id_fkey"
+            columns: ["tournament_match_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_matches: {
         Row: {
           admin_actioned_by: string | null
@@ -1403,6 +1582,7 @@ export type Database = {
           confirmed_by_organizer: boolean | null
           created_at: string
           dispute_status: string | null
+          flagged_reason: string | null
           id: string
           last_admin_action_at: string | null
           match_number: number
@@ -1411,12 +1591,17 @@ export type Database = {
           player1_reported_winner: string | null
           player2_id: string | null
           player2_reported_winner: string | null
+          proof_urls: string[] | null
           result_disputed: boolean | null
           result_proof_url: string | null
           round_number: number
           scheduled_time: string | null
           status: string
           tournament_id: string
+          verification_score: number | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
           winner_id: string | null
         }
         Insert: {
@@ -1427,6 +1612,7 @@ export type Database = {
           confirmed_by_organizer?: boolean | null
           created_at?: string
           dispute_status?: string | null
+          flagged_reason?: string | null
           id?: string
           last_admin_action_at?: string | null
           match_number: number
@@ -1435,12 +1621,17 @@ export type Database = {
           player1_reported_winner?: string | null
           player2_id?: string | null
           player2_reported_winner?: string | null
+          proof_urls?: string[] | null
           result_disputed?: boolean | null
           result_proof_url?: string | null
           round_number: number
           scheduled_time?: string | null
           status?: string
           tournament_id: string
+          verification_score?: number | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           winner_id?: string | null
         }
         Update: {
@@ -1451,6 +1642,7 @@ export type Database = {
           confirmed_by_organizer?: boolean | null
           created_at?: string
           dispute_status?: string | null
+          flagged_reason?: string | null
           id?: string
           last_admin_action_at?: string | null
           match_number?: number
@@ -1459,12 +1651,17 @@ export type Database = {
           player1_reported_winner?: string | null
           player2_id?: string | null
           player2_reported_winner?: string | null
+          proof_urls?: string[] | null
           result_disputed?: boolean | null
           result_proof_url?: string | null
           round_number?: number
           scheduled_time?: string | null
           status?: string
           tournament_id?: string
+          verification_score?: number | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           winner_id?: string | null
         }
         Relationships: [
@@ -1517,6 +1714,7 @@ export type Database = {
       }
       tournaments: {
         Row: {
+          auto_verification: boolean | null
           created_at: string
           creator_id: string
           current_participants: number | null
@@ -1528,6 +1726,7 @@ export type Database = {
           max_participants: number
           platform: string
           prize_pool: number | null
+          proof_required: boolean | null
           sponsor_cost: number | null
           sponsored: boolean | null
           sponsorship_tier: string | null
@@ -1536,9 +1735,11 @@ export type Database = {
           title: string
           tournament_type: string | null
           updated_at: string
+          verification_threshold: number | null
           winner_id: string | null
         }
         Insert: {
+          auto_verification?: boolean | null
           created_at?: string
           creator_id: string
           current_participants?: number | null
@@ -1550,6 +1751,7 @@ export type Database = {
           max_participants: number
           platform: string
           prize_pool?: number | null
+          proof_required?: boolean | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
           sponsorship_tier?: string | null
@@ -1558,9 +1760,11 @@ export type Database = {
           title: string
           tournament_type?: string | null
           updated_at?: string
+          verification_threshold?: number | null
           winner_id?: string | null
         }
         Update: {
+          auto_verification?: boolean | null
           created_at?: string
           creator_id?: string
           current_participants?: number | null
@@ -1572,6 +1776,7 @@ export type Database = {
           max_participants?: number
           platform?: string
           prize_pool?: number | null
+          proof_required?: boolean | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
           sponsorship_tier?: string | null
@@ -1580,6 +1785,7 @@ export type Database = {
           title?: string
           tournament_type?: string | null
           updated_at?: string
+          verification_threshold?: number | null
           winner_id?: string | null
         }
         Relationships: [
@@ -1700,6 +1906,10 @@ export type Database = {
       cleanup_expired_queue_entries: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      detect_suspicious_stats: {
+        Args: { user_id_param: string; stats_data: Json; game_mode?: string }
+        Returns: boolean
       }
       generate_otp: {
         Args: {
