@@ -28,6 +28,8 @@ import {
   Lightbulb,
   Image
 } from 'lucide-react';
+import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
+import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -452,7 +454,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-8 max-w-5xl">
+          <TabsList className="grid w-full grid-cols-9 max-w-6xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -460,6 +462,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
             <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+            <TabsTrigger value="games">Games</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -807,6 +810,14 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Games Tab */}
+          <TabsContent value="games" className="space-y-6">
+            <div className="grid grid-cols-1 gap-8">
+              <AutomatedGameOptimization />
+              <GamePerformanceAnalytics />
+            </div>
           </TabsContent>
 
           {/* Analytics Tab */}
