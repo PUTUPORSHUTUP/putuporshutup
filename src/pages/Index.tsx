@@ -196,21 +196,22 @@ const Index = () => {
             )}
           </div>
           
-          {/* Action Buttons - Moved higher for better mobile visibility */}
-          <div className="mt-6 mb-4 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
+          {/* Rules of Engagement Button - Made prominent for mobile visibility */}
+          <div className="mt-8 flex flex-col gap-4 max-w-md mx-auto">
             <Button
               variant="outline" 
               size="lg"
               onClick={() => setRulesModalOpen(true)}
-              className="w-full sm:w-auto border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 font-orbitron font-semibold bg-black/60 backdrop-blur-sm"
+              className="w-full border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-lg py-6 font-orbitron font-bold bg-black/60 backdrop-blur-sm"
             >
-              <BookOpen className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
+              <BookOpen className="w-5 h-5 mr-2" />
               Rules of Engagement
             </Button>
+            
             <ShareButton 
               variant="outline" 
               size="lg"
-              className="w-full sm:w-auto border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-black/60 backdrop-blur-sm"
+              className="w-full border-white text-white hover:bg-white hover:text-black text-lg py-6"
             />
           </div>
         </div>
