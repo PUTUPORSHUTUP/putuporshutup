@@ -11,7 +11,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Target, Clock, DollarSign, Gamepad2, Monitor } from 'lucide-react';
+import { ChallengeType } from '@/types/wager';
+import { Settings, Target, Clock, DollarSign, Gamepad2, Monitor, Trophy } from 'lucide-react';
 
 interface MatchingPreferencesProps {
   onPreferencesUpdate?: () => void;
@@ -29,6 +30,7 @@ interface MatchPreferences {
   max_stake: number;
   preferred_games: string[];
   preferred_platforms: string[];
+  preferred_challenge_types: ChallengeType[];
   auto_match_enabled: boolean;
   max_queue_time_minutes: number;
 }
@@ -46,6 +48,7 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
     max_stake: 100,
     preferred_games: [],
     preferred_platforms: [],
+    preferred_challenge_types: [],
     auto_match_enabled: false,
     max_queue_time_minutes: 30
   });
@@ -93,6 +96,7 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
           max_stake: Number(data.max_stake),
           preferred_games: data.preferred_games || [],
           preferred_platforms: data.preferred_platforms || [],
+          preferred_challenge_types: (data as any).preferred_challenge_types || [],
           auto_match_enabled: data.auto_match_enabled,
           max_queue_time_minutes: data.max_queue_time_minutes
         });
@@ -122,6 +126,7 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
           max_stake: preferences.max_stake,
           preferred_games: preferences.preferred_games,
           preferred_platforms: preferences.preferred_platforms,
+          preferred_challenge_types: preferences.preferred_challenge_types,
           auto_match_enabled: preferences.auto_match_enabled,
           max_queue_time_minutes: preferences.max_queue_time_minutes,
           updated_at: new Date().toISOString()
@@ -170,6 +175,23 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
       preferred_platforms: checked 
         ? [...prev.preferred_platforms, platform]
         : prev.preferred_platforms.filter(p => p !== platform)
+    }));
+  };
+
+  const challengeTypes = [
+    { id: '1v1' as ChallengeType, label: '1 vs 1', icon: Gamepad2 },
+    { id: '1v1_lobby' as ChallengeType, label: '1v1 Lobby', icon: Target },
+    { id: 'team_vs_team' as ChallengeType, label: 'Team vs Team', icon: Trophy },
+    { id: 'lobby_competition' as ChallengeType, label: 'Lobby Competition', icon: Monitor },
+    { id: 'stat_based' as ChallengeType, label: 'Stat Challenge', icon: Target }
+  ];
+
+  const handleChallengeTypeToggle = (challengeType: ChallengeType, checked: boolean) => {
+    setPreferences(prev => ({
+      ...prev,
+      preferred_challenge_types: checked 
+        ? [...prev.preferred_challenge_types, challengeType]
+        : prev.preferred_challenge_types.filter(type => type !== challengeType)
     }));
   };
 
@@ -329,6 +351,50 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
                       {platform}
                     </Badge>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Preferred Challenge Types */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2 text-base font-medium">
+                <Trophy className="h-4 w-4" />
+                Preferred Challenge Types
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {challengeTypes.map((challengeType) => {
+                  const Icon = challengeType.icon;
+                  return (
+                    <div key={challengeType.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`challenge-type-${challengeType.id}`}
+                        checked={preferences.preferred_challenge_types.includes(challengeType.id)}
+                        onCheckedChange={(checked) => 
+                          handleChallengeTypeToggle(challengeType.id, checked as boolean)
+                        }
+                      />
+                      <Label 
+                        htmlFor={`challenge-type-${challengeType.id}`}
+                        className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                      >
+                        <Icon className="h-4 w-4" />
+                        {challengeType.label}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+              {preferences.preferred_challenge_types.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {preferences.preferred_challenge_types.map((challengeType) => {
+                    const type = challengeTypes.find(t => t.id === challengeType);
+                    return type ? (
+                      <Badge key={challengeType} variant="secondary" className="text-xs flex items-center gap-1">
+                        <type.icon className="h-3 w-3" />
+                        {type.label}
+                      </Badge>
+                    ) : null;
+                  })}
                 </div>
               )}
             </div>
