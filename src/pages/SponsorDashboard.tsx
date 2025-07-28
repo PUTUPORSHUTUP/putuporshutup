@@ -131,24 +131,42 @@ export default function SponsorDashboard() {
                     </div>
                     
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                       <div className="flex items-center gap-2">
+                       <button 
+                         className="flex items-center gap-2 p-2 rounded hover:bg-muted transition-colors cursor-pointer"
+                         onClick={() => toast({
+                           title: "Logo Impressions",
+                           description: `${sponsor.logo_impressions?.toLocaleString() || 0} total impressions for ${sponsor.tournament_name}`
+                         })}
+                       >
                          <BarChart className="w-4 h-4 text-blue-500" />
                          <span className="text-sm">
                            <span className="font-medium">{sponsor.logo_impressions?.toLocaleString() || 0}</span> Logo Impressions
                          </span>
-                       </div>
-                       <div className="flex items-center gap-2">
+                       </button>
+                       <button 
+                         className="flex items-center gap-2 p-2 rounded hover:bg-muted transition-colors cursor-pointer"
+                         onClick={() => toast({
+                           title: "Site Clicks", 
+                           description: `${sponsor.clicks_to_site?.toLocaleString() || 0} clicks generated for ${sponsor.tournament_name}`
+                         })}
+                       >
                          <Star className="w-4 h-4 text-green-500" />
                          <span className="text-sm">
                            <span className="font-medium">{sponsor.clicks_to_site?.toLocaleString() || 0}</span> Site Clicks
                          </span>
-                       </div>
-                       <div className="flex items-center gap-2">
+                       </button>
+                       <button 
+                         className="flex items-center gap-2 p-2 rounded hover:bg-muted transition-colors cursor-pointer"
+                         onClick={() => toast({
+                           title: "Social Reach",
+                           description: `${sponsor.social_reach?.toLocaleString() || 0} people reached through social media for ${sponsor.tournament_name}`
+                         })}
+                       >
                          <BarChart className="w-4 h-4 text-purple-500" />
                          <span className="text-sm">
                            <span className="font-medium">{sponsor.social_reach?.toLocaleString() || 0}</span> Social Reach
                          </span>
-                       </div>
+                       </button>
                      </div>
                     
                     <Button variant="outline" className="w-fit" asChild>
