@@ -89,6 +89,29 @@ export const SponsorSignupModal = ({ open, onOpenChange }: SponsorSignupModalPro
           </DialogTitle>
         </DialogHeader>
         
+        {/* Sponsor Benefits Section */}
+        <div className="mb-6 p-4 bg-accent/10 border border-accent/20 rounded-lg">
+          <h3 className="text-lg font-semibold mb-3 text-accent">🎯 Sponsor Benefits</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-accent">✨</span>
+              <span>Automatic carousel placement</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-accent">📊</span>
+              <span>Real-time analytics dashboard</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-accent">🎮</span>
+              <span>Tournament logo integration</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-accent">📈</span>
+              <span>Increased brand visibility</span>
+            </div>
+          </div>
+        </div>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
