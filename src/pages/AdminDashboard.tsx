@@ -456,17 +456,17 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-10 max-w-7xl">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="matches">Matches</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="roles">Roles</TabsTrigger>
-            <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
-            <TabsTrigger value="disputes">Disputes</TabsTrigger>
-            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-            <TabsTrigger value="games">Game Management</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="sponsor-hub">🎯 Sponsor Hub</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 max-w-7xl gap-1 h-auto">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
+            <TabsTrigger value="roles" className="text-xs sm:text-sm">Roles</TabsTrigger>
+            <TabsTrigger value="tournaments" className="text-xs sm:text-sm">Tournaments</TabsTrigger>
+            <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
+            <TabsTrigger value="suggestions" className="text-xs sm:text-sm">Suggestions</TabsTrigger>
+            <TabsTrigger value="games" className="text-xs sm:text-sm">Games</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
+            <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
