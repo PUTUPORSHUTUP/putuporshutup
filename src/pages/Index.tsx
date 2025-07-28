@@ -15,6 +15,7 @@ import { RealTimeStats } from '@/components/ui/real-time-stats';
 import { VisitorCounter } from '@/components/ui/visitor-counter';
 import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
 import { RulesOfEngagementModal } from '@/components/games/RulesOfEngagementModal';
+import { SponsorCarousel } from '@/components/ui/sponsor-carousel';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -303,6 +304,19 @@ const Index = () => {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Sponsor Carousel Section */}
+      <section className="py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-orbitron font-bold mb-4">Our Partners</h2>
+            <p className="text-lg text-muted-foreground font-orbitron">
+              Trusted by leading gaming brands
+            </p>
+          </div>
+          <SponsorCarousel />
         </div>
       </section>
 

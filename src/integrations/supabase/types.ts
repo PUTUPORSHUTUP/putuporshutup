@@ -1508,6 +1508,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_logos: {
+        Row: {
+          created_at: string | null
+          id: number
+          is_active: boolean | null
+          logo_url: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          is_active?: boolean | null
+          logo_url: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          is_active?: boolean | null
+          logo_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
       sponsor_performance: {
         Row: {
           clicks_to_site: number | null
