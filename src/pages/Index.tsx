@@ -69,87 +69,85 @@ const Index = () => {
       </header>
 
       {/* Navigation Bar */}
-      <nav className="bg-black/20 backdrop-blur-sm border-b border-neon-green/20">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-2 sm:gap-4">
-            {isMobile ? (
+      <nav className="bg-black/80 backdrop-blur-md border-b border-neon-green/20">
+        <div className="container mx-auto px-4 py-4">
+          {isMobile ? (
+            <div className="flex justify-end">
               <MobileNavigation profile={profile} />
-            ) : (
-              <>
-                {user ? (
-                  <>
-                    <div className="flex items-center gap-4">
-                      <ThemeToggle />
-                      <NotificationCenter />
-                      <Link to="/games">
-                        <Button variant="ghost" className="text-white hover:bg-white/20">
-                          Games
-                        </Button>
-                      </Link>
-                      <Link to="/tournaments">
-                        <Button variant="ghost" className="text-white hover:bg-white/20">
-                          Tournaments
-                        </Button>
-                      </Link>
-                      <Link to="/profile">
-                        <Button variant="ghost" className="text-white hover:bg-white/20">
-                          Profile
-                        </Button>
-                      </Link>
-                      <Link to="/social">
-                        <Button variant="ghost" className="text-white hover:bg-white/20">
-                          Social
-                        </Button>
-                      </Link>
-                      <Link to="/leaderboards">
-                        <Button variant="ghost" className="text-white hover:bg-white/20">
-                          Leaderboards
-                        </Button>
-                      </Link>
-                       {profile?.is_admin && (
-                         <Link to="/admin">
-                           <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                             <Shield className="w-4 h-4" />
-                             Admin
-                           </Button>
-                         </Link>
-                       )}
-                       {profile?.is_moderator && (
-                         <Link to="/moderator">
-                           <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                             <Shield className="w-4 h-4" />
-                             Moderator
-                           </Button>
-                         </Link>
-                       )}
-                     </div>
-                    <Button
-                      variant="outline" 
-                      className="border-white text-white hover:bg-white hover:text-black"
-                      onClick={signOut}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
+            </div>
+          ) : (
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <ThemeToggle />
+                <NotificationCenter />
+                <Link to="/games">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Games
+                  </Button>
+                </Link>
+                <Link to="/tournaments">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Tournaments
+                  </Button>
+                </Link>
+                <Link to="/profile">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Profile
+                  </Button>
+                </Link>
+                <Link to="/social">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Social
+                  </Button>
+                </Link>
+                <Link to="/leaderboards">
+                  <Button variant="ghost" className="text-white hover:bg-white/20">
+                    Leaderboards
+                  </Button>
+                </Link>
+                {profile?.is_admin && (
+                  <Link to="/admin">
+                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Admin
                     </Button>
-                  </>
-                ) : (
-                  <>
-                    <ThemeToggle />
-                    <Link to="/auth">
-                      <Button variant="ghost" className="text-white hover:bg-white/20">
-                        Login
-                      </Button>
-                    </Link>
-                    <Link to="/auth">
-                      <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </>
+                  </Link>
                 )}
-              </>
-            )}
-          </div>
+                {profile?.is_moderator && (
+                  <Link to="/moderator">
+                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Moderator
+                    </Button>
+                  </Link>
+                )}
+              </div>
+              
+              {user ? (
+                <Button
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-black"
+                  onClick={signOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link to="/auth">
+                    <Button variant="ghost" className="text-white hover:bg-white/20">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </nav>
       {/* Hero Section */}
