@@ -54,6 +54,7 @@ import {
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { MatchManagement } from '@/components/admin/MatchManagement';
 import { RoleManagement } from '@/components/admin/RoleManagement';
+import SponsorDashboard from './SponsorDashboard';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -455,7 +456,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-9 max-w-6xl">
+          <TabsList className="grid w-full grid-cols-10 max-w-7xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="matches">Matches</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -465,6 +466,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
             <TabsTrigger value="games">Game Management</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="sponsor-hub">🎯 Sponsor Hub</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -871,6 +873,11 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Sponsor Hub Tab */}
+          <TabsContent value="sponsor-hub" className="space-y-6">
+            <SponsorDashboard />
           </TabsContent>
         </Tabs>
       </div>
