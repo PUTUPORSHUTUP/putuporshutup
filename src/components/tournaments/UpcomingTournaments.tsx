@@ -111,120 +111,110 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tournaments.map((tournament, index) => (
-          <Card 
-            key={tournament.id} 
-            className={`hover:shadow-lg transition-shadow ${
-              index === 0 ? 'border-2 border-primary bg-gradient-to-br from-primary/5 to-transparent' : ''
-            }`}
-          >
-            {/* Featured Tournament Image */}
-            {index === 0 && (
-              <div className="relative h-32 overflow-hidden rounded-t-lg">
-                <img 
-                  src={sundayShowdownImage}
-                  alt="Sunday Showdown Tournament"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Fallback to a gradient background if image fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    target.parentElement!.className = 'relative h-32 overflow-hidden rounded-t-lg bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center';
-                    target.parentElement!.innerHTML = '<div class="text-white font-bold text-lg">SUNDAY SHOWDOWN</div>';
-                  }}
-                />
-                <div className="absolute top-2 right-2">
-                  <Badge className="bg-primary text-primary-foreground font-bold">
-                    FEATURED
-                  </Badge>
-                </div>
-              </div>
-            )}
-            
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      {tournament.game.display_name}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {tournament.platform}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-lg leading-tight">{tournament.title}</CardTitle>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              {/* Tournament Details */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                  <div>
-                    <p className="font-bold text-green-600">${tournament.entry_fee}</p>
-                    <p className="text-xs text-muted-foreground">Entry Fee</p>
+        {tournaments.map((tournament, index) => 
+          index === 0 ? (
+            // Featured Sunday Showdown Tournament - Clean poster only
+            <div key={tournament.id} className="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity">
+              <img 
+                src={sundayShowdownImage}
+                alt="Sunday Showdown Championship"
+                className="w-full h-64 object-cover rounded-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+            </div>
+          ) : (
+            <Card 
+              key={tournament.id} 
+              className="hover:shadow-lg transition-shadow"
+            >
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="text-xs">
+                        {tournament.game.display_name}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {tournament.platform}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-lg leading-tight">{tournament.title}</CardTitle>
                   </div>
                 </div>
+              </CardHeader>
 
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-yellow-600" />
-                  <div>
-                    <p className="font-bold text-yellow-600">${tournament.prize_pool}</p>
-                    <p className="text-xs text-muted-foreground">Prize Pool</p>
+              <CardContent className="space-y-4">
+                {/* Tournament Details */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-green-600" />
+                    <div>
+                      <p className="font-bold text-green-600">${tournament.entry_fee}</p>
+                      <p className="text-xs text-muted-foreground">Entry Fee</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-yellow-600" />
+                    <div>
+                      <p className="font-bold text-yellow-600">${tournament.prize_pool}</p>
+                      <p className="text-xs text-muted-foreground">Prize Pool</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <div>
+                      <p className="font-bold">
+                        {tournament.current_participants}/{tournament.max_participants}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Players</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-orange-600" />
+                    <div>
+                      <p className="font-bold">Open</p>
+                      <p className="text-xs text-muted-foreground">Status</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-600" />
-                  <div>
-                    <p className="font-bold">
-                      {tournament.current_participants}/{tournament.max_participants}
+                {/* Start Time */}
+                {tournament.start_time && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span>Starts: {new Date(tournament.start_time).toLocaleDateString()}</span>
+                  </div>
+                )}
+
+                {/* Description */}
+                {tournament.description && (
+                  <div className="pt-2 border-t">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {tournament.description}
                     </p>
-                    <p className="text-xs text-muted-foreground">Players</p>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-orange-600" />
-                  <div>
-                    <p className="font-bold">Open</p>
-                    <p className="text-xs text-muted-foreground">Status</p>
-                  </div>
+                {/* Action Button */}
+                <div className="pt-2">
+                  <Link to="/tournaments">
+                    <Button variant="outline" className="w-full">
+                      <Trophy className="w-4 h-4 mr-2" />
+                      View Tournament
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
                 </div>
-              </div>
-
-              {/* Start Time */}
-              {tournament.start_time && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>Starts: {new Date(tournament.start_time).toLocaleDateString()}</span>
-                </div>
-              )}
-
-              {/* Description */}
-              {tournament.description && (
-                <div className="pt-2 border-t">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {tournament.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Action Button */}
-              <div className="pt-2">
-                <Link to="/tournaments">
-                  <Button variant="outline" className="w-full">
-                    <Trophy className="w-4 h-4 mr-2" />
-                    View Tournament
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        )}
       </div>
 
       {!showAll && tournaments.length >= maxItems && (
