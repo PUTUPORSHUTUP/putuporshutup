@@ -690,6 +690,7 @@ export type Database = {
           api_access: boolean
           auto_forfeit_minutes: number | null
           auto_forfeit_timer_minutes: number | null
+          automated_score_detection: boolean | null
           challenge_type: string
           created_at: string
           cross_platform_supported: boolean | null
@@ -697,12 +698,14 @@ export type Database = {
           dispute_handler: boolean | null
           game: string
           game_modes: Json | null
+          host_verification_method: string | null
           id: string
           match_type: Json | null
           max_players: number | null
           platforms: string
           proof_method: string
           proof_type: string | null
+          requires_host_verification: boolean | null
           result_options: Json | null
           result_submission: boolean | null
           result_types: string[] | null
@@ -710,6 +713,7 @@ export type Database = {
           setup_instructions: string | null
           show_timer: boolean | null
           timeout_failsafe: boolean | null
+          trend_score: number | null
           updated_at: string
         }
         Insert: {
@@ -717,6 +721,7 @@ export type Database = {
           api_access?: boolean
           auto_forfeit_minutes?: number | null
           auto_forfeit_timer_minutes?: number | null
+          automated_score_detection?: boolean | null
           challenge_type: string
           created_at?: string
           cross_platform_supported?: boolean | null
@@ -724,12 +729,14 @@ export type Database = {
           dispute_handler?: boolean | null
           game: string
           game_modes?: Json | null
+          host_verification_method?: string | null
           id?: string
           match_type?: Json | null
           max_players?: number | null
           platforms: string
           proof_method?: string
           proof_type?: string | null
+          requires_host_verification?: boolean | null
           result_options?: Json | null
           result_submission?: boolean | null
           result_types?: string[] | null
@@ -737,6 +744,7 @@ export type Database = {
           setup_instructions?: string | null
           show_timer?: boolean | null
           timeout_failsafe?: boolean | null
+          trend_score?: number | null
           updated_at?: string
         }
         Update: {
@@ -744,6 +752,7 @@ export type Database = {
           api_access?: boolean
           auto_forfeit_minutes?: number | null
           auto_forfeit_timer_minutes?: number | null
+          automated_score_detection?: boolean | null
           challenge_type?: string
           created_at?: string
           cross_platform_supported?: boolean | null
@@ -751,12 +760,14 @@ export type Database = {
           dispute_handler?: boolean | null
           game?: string
           game_modes?: Json | null
+          host_verification_method?: string | null
           id?: string
           match_type?: Json | null
           max_players?: number | null
           platforms?: string
           proof_method?: string
           proof_type?: string | null
+          requires_host_verification?: boolean | null
           result_options?: Json | null
           result_submission?: boolean | null
           result_types?: string[] | null
@@ -764,6 +775,7 @@ export type Database = {
           setup_instructions?: string | null
           show_timer?: boolean | null
           timeout_failsafe?: boolean | null
+          trend_score?: number | null
           updated_at?: string
         }
         Relationships: []
