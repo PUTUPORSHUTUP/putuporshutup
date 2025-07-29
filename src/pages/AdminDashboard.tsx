@@ -775,7 +775,7 @@ const AdminDashboard = () => {
                                     generateBracket(tournament.id);
                                   }}
                                   className="text-xs bg-blue-500 text-white hover:bg-blue-600"
-                                  disabled={tournament.current_participants < 1}
+                                  disabled={false}
                                 >
                                   Start Tournament
                                   {tournament.current_participants < 2 && (
