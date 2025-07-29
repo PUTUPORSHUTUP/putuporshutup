@@ -104,6 +104,117 @@ export type Database = {
         }
         Relationships: []
       }
+      api_verification_stats: {
+        Row: {
+          automated_verifications: number | null
+          cost_savings: number | null
+          created_at: string | null
+          date: string | null
+          game_name: string
+          id: string
+          manual_verifications: number | null
+          revenue_generated: number | null
+          updated_at: string | null
+          verification_count: number | null
+        }
+        Insert: {
+          automated_verifications?: number | null
+          cost_savings?: number | null
+          created_at?: string | null
+          date?: string | null
+          game_name: string
+          id?: string
+          manual_verifications?: number | null
+          revenue_generated?: number | null
+          updated_at?: string | null
+          verification_count?: number | null
+        }
+        Update: {
+          automated_verifications?: number | null
+          cost_savings?: number | null
+          created_at?: string | null
+          date?: string | null
+          game_name?: string
+          id?: string
+          manual_verifications?: number | null
+          revenue_generated?: number | null
+          updated_at?: string | null
+          verification_count?: number | null
+        }
+        Relationships: []
+      }
+      automated_actions: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          automation_type: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          processing_time_ms: number | null
+          success: boolean | null
+          target_id: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          automation_type: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean | null
+          target_id?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          automation_type?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          success?: boolean | null
+          target_id?: string | null
+        }
+        Relationships: []
+      }
+      automation_config: {
+        Row: {
+          automation_type: string
+          config_data: Json
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          last_run_at: string | null
+          next_run_at: string | null
+          run_frequency_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          automation_type: string
+          config_data?: Json
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          run_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          automation_type?: string
+          config_data?: Json
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          run_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       challenge_participants: {
         Row: {
           challenge_id: string
@@ -476,6 +587,56 @@ export type Database = {
           },
         ]
       }
+      dynamic_pricing_rules: {
+        Row: {
+          base_price: number
+          created_at: string | null
+          current_price: number | null
+          demand_multiplier: number | null
+          game_id: string | null
+          id: string
+          is_active: boolean | null
+          last_updated: string | null
+          max_price: number | null
+          min_price: number | null
+          supply_multiplier: number | null
+        }
+        Insert: {
+          base_price?: number
+          created_at?: string | null
+          current_price?: number | null
+          demand_multiplier?: number | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          max_price?: number | null
+          min_price?: number | null
+          supply_multiplier?: number | null
+        }
+        Update: {
+          base_price?: number
+          created_at?: string | null
+          current_price?: number | null
+          demand_multiplier?: number | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          max_price?: number | null
+          min_price?: number | null
+          supply_multiplier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dynamic_pricing_rules_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escrow_accounts: {
         Row: {
           amount: number
@@ -604,6 +765,39 @@ export type Database = {
           tournament_match_id?: string | null
           updated_at?: string
           wager_id?: string | null
+        }
+        Relationships: []
+      }
+      fraud_patterns: {
+        Row: {
+          auto_action: string | null
+          created_at: string | null
+          detection_criteria: Json
+          id: string
+          is_active: boolean | null
+          pattern_name: string
+          pattern_type: string
+          severity_level: string | null
+        }
+        Insert: {
+          auto_action?: string | null
+          created_at?: string | null
+          detection_criteria: Json
+          id?: string
+          is_active?: boolean | null
+          pattern_name: string
+          pattern_type: string
+          severity_level?: string | null
+        }
+        Update: {
+          auto_action?: string | null
+          created_at?: string | null
+          detection_criteria?: Json
+          id?: string
+          is_active?: boolean | null
+          pattern_name?: string
+          pattern_type?: string
+          severity_level?: string | null
         }
         Relationships: []
       }
@@ -1288,6 +1482,48 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_revenue: {
+        Row: {
+          amount: number
+          automated: boolean | null
+          created_at: string | null
+          fee_percentage: number | null
+          id: string
+          original_amount: number | null
+          processing_status: string | null
+          revenue_type: string
+          source_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          automated?: boolean | null
+          created_at?: string | null
+          fee_percentage?: number | null
+          id?: string
+          original_amount?: number | null
+          processing_status?: string | null
+          revenue_type: string
+          source_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          automated?: boolean | null
+          created_at?: string | null
+          fee_percentage?: number | null
+          id?: string
+          original_amount?: number | null
+          processing_status?: string | null
+          revenue_type?: string
+          source_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       player_reviews: {
         Row: {
           comment: string | null
@@ -1772,6 +2008,45 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_revenue: {
+        Row: {
+          amount: number
+          billing_period: string
+          created_at: string | null
+          id: string
+          next_billing_date: string | null
+          status: string | null
+          stripe_subscription_id: string | null
+          subscription_tier: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          billing_period: string
+          created_at?: string | null
+          id?: string
+          next_billing_date?: string | null
+          status?: string | null
+          stripe_subscription_id?: string | null
+          subscription_tier: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          billing_period?: string
+          created_at?: string | null
+          id?: string
+          next_billing_date?: string | null
+          status?: string | null
+          stripe_subscription_id?: string | null
+          subscription_tier?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -2073,6 +2348,53 @@ export type Database = {
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_templates: {
+        Row: {
+          created_at: string | null
+          entry_fee: number | null
+          game_id: string | null
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          prize_distribution: Json | null
+          schedule_cron: string
+          template_name: string
+          tournament_settings: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          entry_fee?: number | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          prize_distribution?: Json | null
+          schedule_cron: string
+          template_name: string
+          tournament_settings?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          entry_fee?: number | null
+          game_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          prize_distribution?: Json | null
+          schedule_cron?: string
+          template_name?: string
+          tournament_settings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_templates_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
             referencedColumns: ["id"]
           },
         ]

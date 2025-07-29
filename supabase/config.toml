@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.resolve-disputes]
 verify_jwt = false
+
+[functions.automation-orchestrator]
+verify_jwt = false
+
+[functions.setup-automations]
+verify_jwt = false
