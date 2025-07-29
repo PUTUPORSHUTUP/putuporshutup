@@ -21,13 +21,17 @@ export const TournamentRegistration = ({
   onRegistrationUpdate 
 }: TournamentRegistrationProps) => {
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isUnregistering, setIsUnregistering] = useState(false);
   const [teamName, setTeamName] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
 
   const isUserRegistered = registrations.some(reg => reg.user_id === user?.id);
+  const userRegistration = registrations.find(reg => reg.user_id === user?.id);
   const spotsRemaining = tournament.max_participants - tournament.current_participants;
   const registrationClosed = new Date() > new Date(tournament.registration_closes_at);
+  const tournamentStarted = tournament.status === 'in_progress' || tournament.status === 'completed';
+  const canUnregister = isUserRegistered && !tournamentStarted && !registrationClosed;
 
   const handleRegister = async () => {
     if (!user) {
@@ -71,7 +75,79 @@ export const TournamentRegistration = ({
     }
   };
 
+  const handleUnregister = async () => {
+    if (!user || !userRegistration) {
+      toast({
+        title: "Error",
+        description: "Unable to find your registration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUnregistering(true);
+    try {
+      const { error } = await supabase
+        .from('tournament_registrations')
+        .delete()
+        .eq('id', userRegistration.id);
+
+      if (error) throw error;
+
+      // Refund the entry fee to user's wallet if there was one
+      if (tournament.entry_fee > 0) {
+        const { error: refundError } = await supabase
+          .from('transactions')
+          .insert({
+            user_id: user.id,
+            amount: tournament.entry_fee,
+            type: 'refund',
+            status: 'completed',
+            description: `Tournament registration refund: ${tournament.title}`,
+            metadata: {
+              tournament_id: tournament.id,
+              original_entry_fee: tournament.entry_fee
+            }
+          });
+
+        if (refundError) {
+          console.error('Error processing refund:', refundError);
+        } else {
+          // Update user's wallet balance directly
+          const { error: walletError } = await supabase
+            .from('profiles')
+            .update({ 
+              wallet_balance: supabase.raw(`wallet_balance + ${tournament.entry_fee}`) 
+            })
+            .eq('user_id', user.id);
+
+          if (walletError) {
+            console.error('Error updating wallet balance:', walletError);
+          }
+        }
+      }
+
+      toast({
+        title: "Unregistered Successfully",
+        description: `You've been removed from ${tournament.title}${tournament.entry_fee > 0 ? '. Entry fee has been refunded.' : '.'}`,
+      });
+
+      onRegistrationUpdate();
+    } catch (error: any) {
+      toast({
+        title: "Unregistration Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsUnregistering(false);
+    }
+  };
+
   const getStatusBadge = () => {
+    if (tournamentStarted) {
+      return <Badge variant="destructive">Tournament Started</Badge>;
+    }
     if (registrationClosed) {
       return <Badge variant="destructive">Registration Closed</Badge>;
     }
@@ -154,6 +230,34 @@ export const TournamentRegistration = ({
           </div>
         )}
 
+        {/* Unregister Option */}
+        {isUserRegistered && canUnregister && (
+          <div className="space-y-4 p-4 border rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  You're registered for this tournament
+                </p>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                  {userRegistration?.team_name && `Team: ${userRegistration.team_name}`}
+                </p>
+              </div>
+              <Button 
+                onClick={handleUnregister} 
+                disabled={isUnregistering}
+                variant="destructive"
+                size="sm"
+              >
+                {isUnregistering ? "Unregistering..." : "Back Out"}
+              </Button>
+            </div>
+            <p className="text-xs text-yellow-600 dark:text-yellow-400">
+              You can back out of this tournament until registration closes or the tournament starts.
+              {tournament.entry_fee > 0 && ` Your $${tournament.entry_fee} entry fee will be refunded.`}
+            </p>
+          </div>
+        )}
+
         {/* Registered Players List */}
         {registrations.length > 0 && (
           <div>
@@ -188,10 +292,21 @@ export const TournamentRegistration = ({
           </div>
         )}
 
-        {isUserRegistered && (
+        {isUserRegistered && !canUnregister && (
           <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
             <p className="text-sm text-green-700 dark:text-green-300">
-              You're registered! Tournament details will be sent when it begins.
+              {tournamentStarted 
+                ? "Tournament has started! Good luck!" 
+                : "You're registered! Tournament details will be sent when it begins."
+              }
+            </p>
+          </div>
+        )}
+
+        {isUserRegistered && canUnregister && (
+          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              You're registered! You can back out using the button above until the tournament starts.
             </p>
           </div>
         )}
