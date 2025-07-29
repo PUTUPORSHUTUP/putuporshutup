@@ -94,6 +94,19 @@ export const TournamentRegistration = ({
 
       if (error) throw error;
 
+      // Update tournament participant count
+      const { error: updateError } = await supabase
+        .from('tournaments')
+        .update({ 
+          current_participants: Math.max(tournament.current_participants - 1, 0),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', tournament.id);
+
+      if (updateError) {
+        console.error('Error updating tournament participant count:', updateError);
+      }
+
       // Refund the entry fee to user's wallet if there was one
       if (tournament.entry_fee > 0) {
         const { error: refundError } = await supabase
@@ -103,11 +116,7 @@ export const TournamentRegistration = ({
             amount: tournament.entry_fee,
             type: 'refund',
             status: 'completed',
-            description: `Tournament registration refund: ${tournament.title}`,
-            metadata: {
-              tournament_id: tournament.id,
-              original_entry_fee: tournament.entry_fee
-            }
+            description: `Tournament registration refund: ${tournament.title}`
           });
 
         if (refundError) {
