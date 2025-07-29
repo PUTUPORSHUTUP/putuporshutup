@@ -47,8 +47,32 @@ serve(async (req) => {
       throw new Error("Failed to fetch participants");
     }
 
-    if (!participants || participants.length < 2) {
-      throw new Error("Not enough participants to generate bracket");
+    if (!participants) {
+      throw new Error("Failed to fetch participants");
+    }
+
+    // Allow empty tournaments for admin testing
+    if (participants.length === 0) {
+      console.log('Creating empty tournament bracket for admin testing');
+      
+      // Update tournament status to in_progress even with no participants
+      await supabaseService
+        .from("tournaments")
+        .update({ 
+          status: "in_progress",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", tournamentId);
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: "Empty tournament started for testing",
+        matchesCreated: 0,
+        rounds: 0 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
     // Check if bracket already exists
