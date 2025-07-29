@@ -284,37 +284,26 @@ const Index = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-orbitron font-bold mb-4">Featured Tournament</h2>
             <p className="text-xl text-muted-foreground font-orbitron">
-              Don't miss this week's biggest competition
+              Click to view all upcoming tournaments
             </p>
           </div>
           
-          {/* Sunday Showdown Poster */}
+          {/* Sunday Showdown Poster - Clickable */}
           <div className="flex justify-center mb-16">
-            <div className="w-full max-w-2xl">
-              <img 
-                src="/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png"
-                alt="Sunday Showdown Championship"
-                className="w-full h-auto rounded-lg shadow-2xl"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                }}
-              />
-            </div>
+            <Link to="/tournaments" className="w-full max-w-2xl">
+              <div className="cursor-pointer hover:opacity-90 transition-opacity">
+                <img 
+                  src="/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png"
+                  alt="Sunday Showdown Championship"
+                  className="w-full h-auto rounded-lg shadow-2xl"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Upcoming Tournaments Preview */}
-      <section className="py-20 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-orbitron font-bold mb-4">More Tournaments</h2>
-            <p className="text-xl text-muted-foreground font-orbitron">
-              Additional competitive gaming opportunities
-            </p>
-          </div>
-          <UpcomingTournaments />
         </div>
       </section>
 
