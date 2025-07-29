@@ -74,7 +74,7 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
   const { data, error } = await supabase
     .from('game_matrix')
     .select('*')
-    .order('game');
+    .order('trend_score', { ascending: false });
 
   if (error) throw new Error('Failed to fetch games');
 
@@ -100,6 +100,80 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
     autoForfeitMinutes: item.auto_forfeit_minutes || 10,
     detailedNotes: item.detailed_notes,
     // New automation fields
+    automatedScoreDetection: item.automated_score_detection || false,
+    hostVerificationMethod: item.host_verification_method || 'screenshot',
+    requiresHostVerification: item.requires_host_verification || true,
+    trendScore: item.trend_score || 0
+  }));
+}
+
+// 4. Get games by trend score (popular games first)
+export async function getGamesByTrendScore(): Promise<GameMatrixData[]> {
+  const { data, error } = await supabase
+    .from('game_matrix')
+    .select('*')
+    .order('trend_score', { ascending: false })
+    .limit(10);
+
+  if (error) throw new Error('Failed to fetch trending games');
+
+  return data.map(item => ({
+    id: item.id,
+    game: item.game,
+    platforms: item.platforms.split(', ').map((p: string) => p.trim()),
+    proofMethod: item.proof_method,
+    challengeTypes: item.challenge_type.split(', ').map((c: string) => c.trim()),
+    apiAccess: item.api_access,
+    setupInstructions: item.setup_instructions,
+    gameModes: Array.isArray(item.game_modes) ? item.game_modes.map(String) : [],
+    setupGuide: item.setup_guide,
+    resultSubmission: item.result_submission || true,
+    proofType: item.proof_type || 'screenshot',
+    resultOptions: Array.isArray(item.result_options) ? item.result_options.map(String) : ['Winner', 'Lost'],
+    timeoutFailsafe: item.timeout_failsafe || true,
+    disputeHandler: item.dispute_handler || true,
+    showTimer: item.show_timer || true,
+    matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : [],
+    allowedProofTypes: Array.isArray(item.allowed_proof_types) ? item.allowed_proof_types.map(String) : ['Screenshot'],
+    autoForfeitMinutes: item.auto_forfeit_minutes || 10,
+    detailedNotes: item.detailed_notes,
+    automatedScoreDetection: item.automated_score_detection || false,
+    hostVerificationMethod: item.host_verification_method || 'screenshot',
+    requiresHostVerification: item.requires_host_verification || true,
+    trendScore: item.trend_score || 0
+  }));
+}
+
+// 5. Get automated games only
+export async function getAutomatedGames(): Promise<GameMatrixData[]> {
+  const { data, error } = await supabase
+    .from('game_matrix')
+    .select('*')
+    .eq('automated_score_detection', true)
+    .order('trend_score', { ascending: false });
+
+  if (error) throw new Error('Failed to fetch automated games');
+
+  return data.map(item => ({
+    id: item.id,
+    game: item.game,
+    platforms: item.platforms.split(', ').map((p: string) => p.trim()),
+    proofMethod: item.proof_method,
+    challengeTypes: item.challenge_type.split(', ').map((c: string) => c.trim()),
+    apiAccess: item.api_access,
+    setupInstructions: item.setup_instructions,
+    gameModes: Array.isArray(item.game_modes) ? item.game_modes.map(String) : [],
+    setupGuide: item.setup_guide,
+    resultSubmission: item.result_submission || true,
+    proofType: item.proof_type || 'screenshot',
+    resultOptions: Array.isArray(item.result_options) ? item.result_options.map(String) : ['Winner', 'Lost'],
+    timeoutFailsafe: item.timeout_failsafe || true,
+    disputeHandler: item.dispute_handler || true,
+    showTimer: item.show_timer || true,
+    matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : [],
+    allowedProofTypes: Array.isArray(item.allowed_proof_types) ? item.allowed_proof_types.map(String) : ['Screenshot'],
+    autoForfeitMinutes: item.auto_forfeit_minutes || 10,
+    detailedNotes: item.detailed_notes,
     automatedScoreDetection: item.automated_score_detection || false,
     hostVerificationMethod: item.host_verification_method || 'screenshot',
     requiresHostVerification: item.requires_host_verification || true,
