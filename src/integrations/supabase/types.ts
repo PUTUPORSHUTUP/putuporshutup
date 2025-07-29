@@ -524,6 +524,7 @@ export type Database = {
       disputes: {
         Row: {
           admin_response: string | null
+          archived: boolean
           created_at: string
           description: string
           evidence_urls: string[] | null
@@ -540,6 +541,7 @@ export type Database = {
         }
         Insert: {
           admin_response?: string | null
+          archived?: boolean
           created_at?: string
           description: string
           evidence_urls?: string[] | null
@@ -556,6 +558,7 @@ export type Database = {
         }
         Update: {
           admin_response?: string | null
+          archived?: boolean
           created_at?: string
           description?: string
           evidence_urls?: string[] | null
@@ -2352,41 +2355,100 @@ export type Database = {
           },
         ]
       }
+      tournament_posters: {
+        Row: {
+          cover_art_url: string
+          created_at: string
+          episode_number: number
+          id: string
+          mint_timestamp: string
+          poster_title: string
+          rarity_level: string | null
+          season_number: number
+          series_name: string
+          tournament_id: string
+        }
+        Insert: {
+          cover_art_url: string
+          created_at?: string
+          episode_number: number
+          id?: string
+          mint_timestamp?: string
+          poster_title: string
+          rarity_level?: string | null
+          season_number: number
+          series_name: string
+          tournament_id: string
+        }
+        Update: {
+          cover_art_url?: string
+          created_at?: string
+          episode_number?: number
+          id?: string
+          mint_timestamp?: string
+          poster_title?: string
+          rarity_level?: string | null
+          season_number?: number
+          series_name?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_posters_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_templates: {
         Row: {
+          collectible_series: string | null
+          cover_art_url: string | null
           created_at: string | null
           entry_fee: number | null
           game_id: string | null
           id: string
           is_active: boolean | null
           max_participants: number | null
+          poster_title_template: string | null
           prize_distribution: Json | null
           schedule_cron: string
           template_name: string
+          title_variations: Json | null
           tournament_settings: Json | null
         }
         Insert: {
+          collectible_series?: string | null
+          cover_art_url?: string | null
           created_at?: string | null
           entry_fee?: number | null
           game_id?: string | null
           id?: string
           is_active?: boolean | null
           max_participants?: number | null
+          poster_title_template?: string | null
           prize_distribution?: Json | null
           schedule_cron: string
           template_name: string
+          title_variations?: Json | null
           tournament_settings?: Json | null
         }
         Update: {
+          collectible_series?: string | null
+          cover_art_url?: string | null
           created_at?: string | null
           entry_fee?: number | null
           game_id?: string | null
           id?: string
           is_active?: boolean | null
           max_participants?: number | null
+          poster_title_template?: string | null
           prize_distribution?: Json | null
           schedule_cron?: string
           template_name?: string
+          title_variations?: Json | null
           tournament_settings?: Json | null
         }
         Relationships: [
@@ -2402,18 +2464,23 @@ export type Database = {
       tournaments: {
         Row: {
           auto_verification: boolean | null
+          collectible_series: string | null
+          cover_art_url: string | null
           created_at: string
           creator_id: string
           current_participants: number | null
           custom_rules: string | null
           description: string | null
           entry_fee: number
+          episode_number: number | null
           game_id: string
           id: string
           max_participants: number
           platform: string
+          poster_title: string | null
           prize_pool: number | null
           proof_required: boolean | null
+          season_number: number | null
           sponsor_cost: number | null
           sponsored: boolean | null
           sponsorship_tier: string | null
@@ -2427,18 +2494,23 @@ export type Database = {
         }
         Insert: {
           auto_verification?: boolean | null
+          collectible_series?: string | null
+          cover_art_url?: string | null
           created_at?: string
           creator_id: string
           current_participants?: number | null
           custom_rules?: string | null
           description?: string | null
           entry_fee: number
+          episode_number?: number | null
           game_id: string
           id?: string
           max_participants: number
           platform: string
+          poster_title?: string | null
           prize_pool?: number | null
           proof_required?: boolean | null
+          season_number?: number | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
           sponsorship_tier?: string | null
@@ -2452,18 +2524,23 @@ export type Database = {
         }
         Update: {
           auto_verification?: boolean | null
+          collectible_series?: string | null
+          cover_art_url?: string | null
           created_at?: string
           creator_id?: string
           current_participants?: number | null
           custom_rules?: string | null
           description?: string | null
           entry_fee?: number
+          episode_number?: number | null
           game_id?: string
           id?: string
           max_participants?: number
           platform?: string
+          poster_title?: string | null
           prize_pool?: number | null
           proof_required?: boolean | null
+          season_number?: number | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
           sponsorship_tier?: string | null
