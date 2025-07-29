@@ -264,16 +264,24 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center p-8 hover:shadow-lg transition-shadow border-2 border-neon-green bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-xl font-orbitron font-semibold mb-4">📱 Easy to Use</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground font-orbitron">
-                  Link gamertag, create or accept a challenge, submit result. We handle the rest.
-                </p>
-              </CardContent>
-            </Card>
+            <Link to="/education">
+              <Card className="text-center p-8 hover:shadow-lg transition-all border-2 border-neon-green bg-card/50 cursor-pointer hover:border-neon-green/80 hover:bg-card/70">
+                <CardHeader>
+                  <CardTitle className="text-xl font-orbitron font-semibold mb-4 flex items-center justify-center gap-2">
+                    📱 Easy to Use
+                    <BookOpen className="w-5 h-5" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground font-orbitron mb-4">
+                    Link gamertag, create or accept a challenge, submit result. We handle the rest.
+                  </p>
+                  <Button variant="outline" size="sm" className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
+                    Learn More →
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
