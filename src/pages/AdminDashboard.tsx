@@ -757,7 +757,7 @@ const AdminDashboard = () => {
                             
                             {/* Admin Actions */}
                             <div className="flex gap-1">
-                              {tournament.status === 'open' && tournament.current_participants >= 2 ? (
+                              {tournament.status === 'open' ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -768,13 +768,15 @@ const AdminDashboard = () => {
                                     generateBracket(tournament.id);
                                   }}
                                   className="text-xs bg-blue-500 text-white hover:bg-blue-600"
+                                  disabled={tournament.current_participants < 1}
                                 >
                                   Start Tournament
+                                  {tournament.current_participants < 2 && (
+                                    <span className="ml-1 text-xs opacity-75">
+                                      ({tournament.current_participants} players)
+                                    </span>
+                                  )}
                                 </Button>
-                              ) : tournament.status === 'open' ? (
-                                <div className="text-xs text-muted-foreground px-2 py-1">
-                                  Need 2+ players
-                                </div>
                               ) : (
                                 <Button
                                   size="sm"
