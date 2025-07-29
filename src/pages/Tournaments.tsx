@@ -513,9 +513,11 @@ const Tournaments = () => {
                         <TournamentRegistration
                           tournament={tournament}
                           registrations={registrations.filter(r => r.tournament_id === tournament.id)}
-                          onRegistrationUpdate={() => {
-                            loadTournamentRegistrations(tournament.id);
-                            loadTournaments();
+                          onRegistrationUpdate={async () => {
+                            await Promise.all([
+                              loadTournamentRegistrations(tournament.id),
+                              loadTournaments()
+                            ]);
                           }}
                         />
                       </div>
