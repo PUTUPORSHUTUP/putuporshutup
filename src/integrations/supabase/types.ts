@@ -437,14 +437,20 @@ export type Database = {
           last_admin_action_at: string | null
           lobby_id: string | null
           max_participants: number | null
+          max_skill_rating: number | null
+          min_skill_rating: number | null
           override_reason: string | null
           platform: string
           result_proof_url: string | null
+          skill_tier_restriction:
+            | Database["public"]["Enums"]["skill_tier"][]
+            | null
           stake_amount: number
           start_time: string | null
           stat_criteria: Json | null
           status: string | null
           team_size: number | null
+          tier_locked: boolean | null
           title: string
           total_pot: number | null
           updated_at: string | null
@@ -467,14 +473,20 @@ export type Database = {
           last_admin_action_at?: string | null
           lobby_id?: string | null
           max_participants?: number | null
+          max_skill_rating?: number | null
+          min_skill_rating?: number | null
           override_reason?: string | null
           platform: string
           result_proof_url?: string | null
+          skill_tier_restriction?:
+            | Database["public"]["Enums"]["skill_tier"][]
+            | null
           stake_amount: number
           start_time?: string | null
           stat_criteria?: Json | null
           status?: string | null
           team_size?: number | null
+          tier_locked?: boolean | null
           title: string
           total_pot?: number | null
           updated_at?: string | null
@@ -497,14 +509,20 @@ export type Database = {
           last_admin_action_at?: string | null
           lobby_id?: string | null
           max_participants?: number | null
+          max_skill_rating?: number | null
+          min_skill_rating?: number | null
           override_reason?: string | null
           platform?: string
           result_proof_url?: string | null
+          skill_tier_restriction?:
+            | Database["public"]["Enums"]["skill_tier"][]
+            | null
           stake_amount?: number
           start_time?: string | null
           stat_criteria?: Json | null
           status?: string | null
           team_size?: number | null
+          tier_locked?: boolean | null
           title?: string
           total_pot?: number | null
           updated_at?: string | null
@@ -1278,37 +1296,49 @@ export type Database = {
       match_preferences: {
         Row: {
           auto_match_enabled: boolean
+          avoid_pros: boolean | null
           created_at: string
           id: string
           max_queue_time_minutes: number
+          max_skill_gap: number | null
           max_stake: number
           min_stake: number
           preferred_games: string[]
           preferred_platforms: string[]
+          preferred_tiers: Database["public"]["Enums"]["skill_tier"][] | null
+          skill_matching_enabled: boolean | null
           updated_at: string
           user_id: string
         }
         Insert: {
           auto_match_enabled?: boolean
+          avoid_pros?: boolean | null
           created_at?: string
           id?: string
           max_queue_time_minutes?: number
+          max_skill_gap?: number | null
           max_stake?: number
           min_stake?: number
           preferred_games?: string[]
           preferred_platforms?: string[]
+          preferred_tiers?: Database["public"]["Enums"]["skill_tier"][] | null
+          skill_matching_enabled?: boolean | null
           updated_at?: string
           user_id: string
         }
         Update: {
           auto_match_enabled?: boolean
+          avoid_pros?: boolean | null
           created_at?: string
           id?: string
           max_queue_time_minutes?: number
+          max_skill_gap?: number | null
           max_stake?: number
           min_stake?: number
           preferred_games?: string[]
           preferred_platforms?: string[]
+          preferred_tiers?: Database["public"]["Enums"]["skill_tier"][] | null
+          skill_matching_enabled?: boolean | null
           updated_at?: string
           user_id?: string
         }
@@ -1556,6 +1586,75 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      player_skill_ratings: {
+        Row: {
+          average_kd: number | null
+          created_at: string
+          game_id: string
+          id: string
+          last_match_at: string | null
+          losses: number
+          matches_played: number
+          skill_rating: number
+          skill_tier: Database["public"]["Enums"]["skill_tier"]
+          tier_locked_until: string | null
+          updated_at: string
+          user_id: string
+          verified_stats: boolean | null
+          win_rate: number | null
+          wins: number
+        }
+        Insert: {
+          average_kd?: number | null
+          created_at?: string
+          game_id: string
+          id?: string
+          last_match_at?: string | null
+          losses?: number
+          matches_played?: number
+          skill_rating?: number
+          skill_tier?: Database["public"]["Enums"]["skill_tier"]
+          tier_locked_until?: string | null
+          updated_at?: string
+          user_id: string
+          verified_stats?: boolean | null
+          win_rate?: number | null
+          wins?: number
+        }
+        Update: {
+          average_kd?: number | null
+          created_at?: string
+          game_id?: string
+          id?: string
+          last_match_at?: string | null
+          losses?: number
+          matches_played?: number
+          skill_rating?: number
+          skill_tier?: Database["public"]["Enums"]["skill_tier"]
+          tier_locked_until?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_stats?: boolean | null
+          win_rate?: number | null
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_skill_ratings_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_skill_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       player_stats: {
         Row: {
@@ -2162,6 +2261,47 @@ export type Database = {
           },
         ]
       }
+      tier_protection_rules: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          max_entry_fee: number
+          max_rating_difference: number
+          min_matches_required: number
+          protected: boolean
+          tier: Database["public"]["Enums"]["skill_tier"]
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          max_entry_fee: number
+          max_rating_difference?: number
+          min_matches_required?: number
+          protected?: boolean
+          tier: Database["public"]["Enums"]["skill_tier"]
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          max_entry_fee?: number
+          max_rating_difference?: number
+          min_matches_required?: number
+          protected?: boolean
+          tier?: Database["public"]["Enums"]["skill_tier"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tier_protection_rules_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_announcements: {
         Row: {
           created_at: string
@@ -2740,7 +2880,13 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      skill_tier:
+        | "novice"
+        | "amateur"
+        | "intermediate"
+        | "advanced"
+        | "expert"
+        | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2867,6 +3013,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      skill_tier: [
+        "novice",
+        "amateur",
+        "intermediate",
+        "advanced",
+        "expert",
+        "pro",
+      ],
+    },
   },
 } as const
