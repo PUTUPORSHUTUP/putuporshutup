@@ -68,15 +68,18 @@ export const calculateTournamentEntryFee = (entryFee: number): { entryFee: numbe
   };
 };
 
-// Challenge fee calculation with 6% platform fee
+// Platform fee configuration - adjustable for business growth
+export const PLATFORM_FEE_PERCENTAGE = 5; // Starting at 5%, adjustable based on platform growth
+
+// Challenge fee calculation with configurable platform fee
 export const calculateChallengeFee = (challengeAmount: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): ChallengeFeeCalculation => {
-  let feePercentage = 6; // 6% platform fee for challenges
+  let feePercentage = PLATFORM_FEE_PERCENTAGE; // Configurable platform fee for challenges
   
   // Apply membership discounts
   if (membershipTier === 'basic') {
     feePercentage = feePercentage * 0.5; // 50% fee reduction for basic
   } else if (membershipTier === 'premium') {
-    feePercentage = 0; // No fees for premium
+    feePercentage = feePercentage * 0.25; // 75% fee reduction for premium (still some fee for sustainability)
   }
   
   const platformFee = Math.round((challengeAmount * (feePercentage / 100)) * 100) / 100;
