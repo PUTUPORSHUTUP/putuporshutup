@@ -16,6 +16,7 @@ import { VisitorCounter } from '@/components/ui/visitor-counter';
 import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
 import { RulesOfEngagementModal } from '@/components/games/RulesOfEngagementModal';
 import { SponsorCarousel } from '@/components/ui/sponsor-carousel';
+import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -274,6 +275,19 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* Upcoming Tournaments Preview */}
+      <section className="py-20 bg-muted/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-orbitron font-bold mb-4">Upcoming Tournaments</h2>
+            <p className="text-xl text-muted-foreground font-orbitron">
+              Join the next level of competitive gaming
+            </p>
+          </div>
+          <UpcomingTournaments />
         </div>
       </section>
 

@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateTournamentModal } from '@/components/tournaments/CreateTournamentModal';
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
 import { TournamentStats } from '@/components/tournaments/TournamentStats';
+import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,7 +48,7 @@ const Tournaments = () => {
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [tournamentMatches, setTournamentMatches] = useState<any[]>([]);
   const [tournamentParticipants, setTournamentParticipants] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState('browse');
+  const [activeTab, setActiveTab] = useState('upcoming');
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -300,10 +301,21 @@ const Tournaments = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="browse">Browse Tournaments</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="browse">All Tournaments</TabsTrigger>
             <TabsTrigger value="bracket">Tournament Bracket</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="upcoming" className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold mb-2">Upcoming Tournaments</h2>
+              <p className="text-muted-foreground">
+                Register now for these exciting upcoming competitions
+              </p>
+            </div>
+            <UpcomingTournaments showAll={true} />
+          </TabsContent>
 
           <TabsContent value="browse" className="space-y-6">
             {loading ? (
