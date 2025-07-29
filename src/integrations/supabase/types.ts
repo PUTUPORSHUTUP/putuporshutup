@@ -1574,6 +1574,60 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsored_tournaments: {
+        Row: {
+          created_at: string
+          description: string | null
+          entry_fee: number
+          game_id: string | null
+          id: string
+          max_participants: number
+          platform: string
+          prize_pool: number
+          scheduled_date: string
+          sponsor_name: string
+          status: string
+          title: string
+          tournament_id: string | null
+          tournament_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          entry_fee?: number
+          game_id?: string | null
+          id?: string
+          max_participants?: number
+          platform?: string
+          prize_pool?: number
+          scheduled_date: string
+          sponsor_name?: string
+          status?: string
+          title: string
+          tournament_id?: string | null
+          tournament_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          entry_fee?: number
+          game_id?: string | null
+          id?: string
+          max_participants?: number
+          platform?: string
+          prize_pool?: number
+          scheduled_date?: string
+          sponsor_name?: string
+          status?: string
+          title?: string
+          tournament_id?: string | null
+          tournament_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sponsors: {
         Row: {
           budget_range: string | null
@@ -1730,6 +1784,60 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      tournament_announcements: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          entry_fee: number
+          game_id: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          max_participants: number
+          platform: string
+          prize_details: string | null
+          scheduled_date: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          entry_fee?: number
+          game_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          max_participants?: number
+          platform: string
+          prize_details?: string | null
+          scheduled_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          entry_fee?: number
+          game_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          max_participants?: number
+          platform?: string
+          prize_details?: string | null
+          scheduled_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       tournament_matches: {
         Row: {
