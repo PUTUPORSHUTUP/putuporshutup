@@ -104,7 +104,7 @@ const Education = () => {
             <Alert>
               <BookOpen className="h-4 w-4" />
               <AlertDescription>
-                <strong>Pro Tip:</strong> Start with smaller entry fees to get familiar with the platform before betting bigger amounts. Practice makes perfect!
+                <strong>Pro Tip:</strong> Start with smaller entry fees to get familiar with the platform before wagering larger amounts. Practice makes perfect!
               </AlertDescription>
             </Alert>
           </TabsContent>
