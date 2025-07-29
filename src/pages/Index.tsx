@@ -55,9 +55,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Maintenance Notice */}
-      <div className="bg-red-600 text-white py-3 text-center">
+      <div className="bg-blue-600 text-white py-3 text-center">
         <p className="font-orbitron text-sm sm:text-base font-semibold">
-          🚧 TEMPORARY MAINTENANCE - We're upgrading our payment system and will be back online around August 1st. Thanks for your patience!
+          🎮 BETA TESTING IN PROGRESS - We're testing our platform before launch around August 11th. Join us for early access!
         </p>
       </div>
 
