@@ -731,53 +731,68 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {tournaments.map((tournament) => (
-                    <div key={tournament.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{tournament.title}</div>
-                        <div className="text-sm text-muted-foreground">
-                          ${tournament.prize_pool} prize pool • 
-                          {tournament.current_participants}/{tournament.max_participants} players
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          variant={tournament.status === 'completed' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {tournament.status}
-                        </Badge>
-                        
-                        {/* Admin Actions */}
-                        <div className="flex gap-1">
-                          {tournament.status === 'open' && tournament.current_participants >= 2 && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => generateBracket(tournament.id)}
-                              className="text-xs"
-                            >
-                              Start Tournament
-                            </Button>
-                          )}
-                          
-                          {tournament.status !== 'open' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                // Navigate to tournament details/bracket
-                                window.open(`/tournaments`, '_blank');
-                              }}
-                              className="text-xs"
-                            >
-                              View Details
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                  {tournaments.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No tournaments found
                     </div>
-                  ))}
+                  ) : (
+                    tournaments.map((tournament) => {
+                      console.log('Rendering tournament:', tournament.title, 'status:', tournament.status, 'participants:', tournament.current_participants);
+                      return (
+                        <div key={tournament.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex-1">
+                            <div className="font-medium">{tournament.title}</div>
+                            <div className="text-sm text-muted-foreground">
+                              ${tournament.prize_pool} prize pool • 
+                              {tournament.current_participants}/{tournament.max_participants} players
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant={tournament.status === 'completed' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {tournament.status}
+                            </Badge>
+                            
+                            {/* Admin Actions */}
+                            <div className="flex gap-1">
+                              {tournament.status === 'open' && tournament.current_participants >= 2 ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Button clicked for tournament:', tournament.id);
+                                    generateBracket(tournament.id);
+                                  }}
+                                  className="text-xs bg-blue-500 text-white hover:bg-blue-600"
+                                >
+                                  Start Tournament
+                                </Button>
+                              ) : tournament.status === 'open' ? (
+                                <div className="text-xs text-muted-foreground px-2 py-1">
+                                  Need 2+ players
+                                </div>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    window.open(`/tournaments`, '_blank');
+                                  }}
+                                  className="text-xs"
+                                >
+                                  View Details
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </CardContent>
             </Card>
