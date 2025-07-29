@@ -209,11 +209,9 @@ async function runTournamentScheduler(supabase: any, config: any) {
         .limit(1);
 
       if (!recentTournaments?.length) {
-        // Get next episode number
-        const { data: episodeData } = await supabase
-          .rpc('nextval', { sequence_name: 'tournament_episode_seq' });
-        
-        const episodeNumber = episodeData || 1;
+        // Get next episode number using our safe function
+        const { data: episodeNumber } = await supabase
+          .rpc('safe_nextval', { sequence_name: 'tournament_episode_seq' });
         
         // Get random title variation
         const titleVariations = template.title_variations || ["Championship"];

@@ -56,6 +56,7 @@ import { MatchManagement } from '@/components/admin/MatchManagement';
 import { RoleManagement } from '@/components/admin/RoleManagement';
 import MockRevenueProjection from '@/components/admin/MockRevenueProjection';
 import { AutomationDashboard } from '@/components/admin/AutomationDashboard';
+import { TestTournamentAutomation } from '@/components/admin/TestTournamentAutomation';
 import SponsorDashboard from './SponsorDashboard';
 
 interface AdminAnalytics {
@@ -830,6 +831,7 @@ const AdminDashboard = () => {
 
           {/* Automation Tab */}
           <TabsContent value="automation" className="space-y-6">
+            <TestTournamentAutomation />
             <AutomationDashboard />
           </TabsContent>
 
