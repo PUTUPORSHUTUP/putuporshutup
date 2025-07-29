@@ -21,6 +21,11 @@ export interface GameMatrixData {
   allowedProofTypes: string[];
   autoForfeitMinutes: number;
   detailedNotes?: string;
+  // New automation fields
+  automatedScoreDetection: boolean;
+  hostVerificationMethod: string;
+  requiresHostVerification: boolean;
+  trendScore: number;
 }
 
 // Core Logic for PUOSU Challenge Setup (Based on game_matrix Supabase table)
@@ -55,7 +60,12 @@ export async function getGameDetails(gameName: string): Promise<GameMatrixData> 
     matchType: Array.isArray(data.match_type) ? data.match_type.map(String) : [],
     allowedProofTypes: Array.isArray(data.allowed_proof_types) ? data.allowed_proof_types.map(String) : ['Screenshot'],
     autoForfeitMinutes: data.auto_forfeit_minutes || 10,
-    detailedNotes: data.detailed_notes
+    detailedNotes: data.detailed_notes,
+    // New automation fields
+    automatedScoreDetection: data.automated_score_detection || false,
+    hostVerificationMethod: data.host_verification_method || 'screenshot',
+    requiresHostVerification: data.requires_host_verification || true,
+    trendScore: data.trend_score || 0
   };
 }
 
@@ -88,7 +98,12 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
     matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : [],
     allowedProofTypes: Array.isArray(item.allowed_proof_types) ? item.allowed_proof_types.map(String) : ['Screenshot'],
     autoForfeitMinutes: item.auto_forfeit_minutes || 10,
-    detailedNotes: item.detailed_notes
+    detailedNotes: item.detailed_notes,
+    // New automation fields
+    automatedScoreDetection: item.automated_score_detection || false,
+    hostVerificationMethod: item.host_verification_method || 'screenshot',
+    requiresHostVerification: item.requires_host_verification || true,
+    trendScore: item.trend_score || 0
   }));
 }
 
