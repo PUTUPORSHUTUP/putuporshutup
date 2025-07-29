@@ -186,6 +186,81 @@ const Education = () => {
               </AlertDescription>
             </Alert>
 
+            <Card className="border-2 border-green-500/20 bg-gradient-to-br from-green-500/5 to-blue-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-500" />
+                  🛡️ Fair Play Protection System
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  <strong>Our commitment to fairness:</strong> We use advanced skill-based matchmaking to ensure pros don't dominate beginners. Every player gets fair competition at their skill level.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2 text-green-700 dark:text-green-400">✅ What We Do</h4>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• <strong>Skill Tier System:</strong> 6 tiers from Novice to Pro</li>
+                      <li>• <strong>Entry Fee Limits:</strong> Novices max $10, Amateurs max $25</li>
+                      <li>• <strong>Rating Gaps:</strong> Limited skill differences in matches</li>
+                      <li>• <strong>Tier Protection:</strong> Beginners can't face experts</li>
+                      <li>• <strong>Anti-Sandbagging:</strong> Verified stats prevent fake rankings</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2 text-blue-700 dark:text-blue-400">🎯 Skill Tiers</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-gray-500 text-white">NOVICE</Badge>
+                        </span>
+                        <span className="text-muted-foreground">$10 max</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-green-500 text-white">AMATEUR</Badge>
+                        </span>
+                        <span className="text-muted-foreground">$25 max</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-blue-500 text-white">INTERMEDIATE</Badge>
+                        </span>
+                        <span className="text-muted-foreground">$50 max</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-purple-500 text-white">ADVANCED</Badge>
+                        </span>
+                        <span className="text-muted-foreground">$100 max</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-orange-500 text-white">EXPERT</Badge>
+                        </span>
+                        <span className="text-muted-foreground">$500 max</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <Badge className="bg-red-500 text-white">PRO</Badge>
+                        </span>
+                        <span className="text-muted-foreground">No limits</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Alert className="border-green-500">
+                  <Shield className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Transparency Promise:</strong> All skill ratings are visible to participants before matches. No hidden rankings or unfair advantages.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card>
                 <CardHeader>
