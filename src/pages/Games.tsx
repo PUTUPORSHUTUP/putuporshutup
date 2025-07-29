@@ -7,7 +7,7 @@ import { CreateChallengeModal } from '@/components/games/CreateChallengeModal';
 import { TermsModal } from '@/components/TermsModal';
 import { ChallengeCard } from '@/components/games/ChallengeCard';
 import { SuggestGameModal } from '@/components/games/SuggestGameModal';
-import { AddGameModal } from '@/components/games/AddGameModal';
+
 import { MatchingPreferences } from '@/components/games/MatchingPreferences';
 import { QuickMatch } from '@/components/games/QuickMatch';
 import { MatchNotifications } from '@/components/games/MatchNotifications';
@@ -18,7 +18,7 @@ import { LobbyManagementInterface } from '@/components/games/LobbyManagementInte
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings, Target, Bell } from 'lucide-react';
+import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb } from 'lucide-react';
 import { StatLoggingService } from '@/services/statLoggingService';
 
 interface Game {
@@ -73,7 +73,7 @@ const Games = () => {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [activeTab, setActiveTab] = useState('browse');
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
-  const [addGameModalOpen, setAddGameModalOpen] = useState(false);
+  
   const [selectedWagerType, setSelectedWagerType] = useState('all');
   const [userBalance, setUserBalance] = useState(0);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -496,15 +496,6 @@ const Games = () => {
                   <Lightbulb className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">SUGGEST GAME</span>
                 </Button>
-                <Button 
-                  onClick={() => setAddGameModalOpen(true)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 sm:flex-none"
-                >
-                  <Settings className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">ADD GAME</span>
-                </Button>
               </div>
             </div>
           </div>
@@ -730,11 +721,6 @@ const Games = () => {
         onOpenChange={setSuggestModalOpen}
       />
       
-      <AddGameModal
-        open={addGameModalOpen}
-        onOpenChange={setAddGameModalOpen}
-        onGameAdded={loadGames}
-      />
 
       <TermsModal
         open={showTermsModal}
