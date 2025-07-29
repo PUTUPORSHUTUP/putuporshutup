@@ -689,19 +689,23 @@ export type Database = {
           allowed_proof_types: Json | null
           api_access: boolean
           auto_forfeit_minutes: number | null
+          auto_forfeit_timer_minutes: number | null
           challenge_type: string
           created_at: string
+          cross_platform_supported: boolean | null
           detailed_notes: string | null
           dispute_handler: boolean | null
           game: string
           game_modes: Json | null
           id: string
           match_type: Json | null
+          max_players: number | null
           platforms: string
           proof_method: string
           proof_type: string | null
           result_options: Json | null
           result_submission: boolean | null
+          result_types: string[] | null
           setup_guide: string | null
           setup_instructions: string | null
           show_timer: boolean | null
@@ -712,19 +716,23 @@ export type Database = {
           allowed_proof_types?: Json | null
           api_access?: boolean
           auto_forfeit_minutes?: number | null
+          auto_forfeit_timer_minutes?: number | null
           challenge_type: string
           created_at?: string
+          cross_platform_supported?: boolean | null
           detailed_notes?: string | null
           dispute_handler?: boolean | null
           game: string
           game_modes?: Json | null
           id?: string
           match_type?: Json | null
+          max_players?: number | null
           platforms: string
           proof_method?: string
           proof_type?: string | null
           result_options?: Json | null
           result_submission?: boolean | null
+          result_types?: string[] | null
           setup_guide?: string | null
           setup_instructions?: string | null
           show_timer?: boolean | null
@@ -735,19 +743,23 @@ export type Database = {
           allowed_proof_types?: Json | null
           api_access?: boolean
           auto_forfeit_minutes?: number | null
+          auto_forfeit_timer_minutes?: number | null
           challenge_type?: string
           created_at?: string
+          cross_platform_supported?: boolean | null
           detailed_notes?: string | null
           dispute_handler?: boolean | null
           game?: string
           game_modes?: Json | null
           id?: string
           match_type?: Json | null
+          max_players?: number | null
           platforms?: string
           proof_method?: string
           proof_type?: string | null
           result_options?: Json | null
           result_submission?: boolean | null
+          result_types?: string[] | null
           setup_guide?: string | null
           setup_instructions?: string | null
           show_timer?: boolean | null
