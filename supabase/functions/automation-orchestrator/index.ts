@@ -186,11 +186,11 @@ async function runDisputeResolution(supabase: any, config: any) {
   return { resolvedDisputes: resolvedCount };
 }
 
-// Scheduled tournaments that run without intervention
+// Scheduled tournaments that run without intervention with collectible posters
 async function runTournamentScheduler(supabase: any, config: any) {
-  console.log('🏆 Running tournament scheduler automation');
+  console.log('🏆 Running tournament scheduler automation with collectible posters');
   
-  // Get active tournament templates
+  // Get active tournament templates with cover art
   const { data: templates } = await supabase
     .from('tournament_templates')
     .select('*')
@@ -209,25 +209,65 @@ async function runTournamentScheduler(supabase: any, config: any) {
         .limit(1);
 
       if (!recentTournaments?.length) {
-        // Create new tournament
+        // Get next episode number
+        const { data: episodeData } = await supabase
+          .rpc('nextval', { sequence_name: 'tournament_episode_seq' });
+        
+        const episodeNumber = episodeData || 1;
+        
+        // Get random title variation
+        const titleVariations = template.title_variations || ["Championship"];
+        const randomVariation = titleVariations[Math.floor(Math.random() * titleVariations.length)];
+        
+        // Create collectible poster title
+        const posterTitle = template.poster_title_template
+          ? template.poster_title_template
+              .replace('{series}', template.collectible_series || 'Championship Series')
+              .replace('{episode}', episodeNumber.toString().padStart(3, '0'))
+              .replace('{variation}', randomVariation)
+          : `${template.collectible_series} #${episodeNumber.toString().padStart(3, '0')}: ${randomVariation}`;
+
+        // Create new collectible tournament
         const { data: tournament } = await supabase
           .from('tournaments')
           .insert({
-            title: `${template.template_name} - Auto Tournament`,
+            title: posterTitle,
             game_id: template.game_id,
             max_participants: template.max_participants,
             entry_fee: template.entry_fee,
             prize_pool: template.entry_fee * template.max_participants * 0.9, // 10% platform fee
             status: 'open',
-            tournament_type: 'elimination',
-            start_date: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // Start in 30 minutes
-            registration_deadline: new Date(Date.now() + 25 * 60 * 1000).toISOString()
+            tournament_type: 'single_elimination',
+            start_time: new Date(Date.now() + 120 * 60 * 1000).toISOString(), // Start in 2 hours
+            created_at: new Date().toISOString(),
+            cover_art_url: template.cover_art_url,
+            poster_title: posterTitle,
+            collectible_series: template.collectible_series,
+            season_number: 1,
+            episode_number: episodeNumber,
+            platform: 'PC' // Default platform
           })
           .select()
           .single();
 
         if (tournament) {
+          // Create collectible poster entry
+          await supabase
+            .from('tournament_posters')
+            .insert({
+              tournament_id: tournament.id,
+              poster_title: posterTitle,
+              cover_art_url: template.cover_art_url || '/placeholder-tournament.jpg',
+              series_name: template.collectible_series || 'Championship Series',
+              season_number: 1,
+              episode_number: episodeNumber,
+              rarity_level: episodeNumber === 1 ? 'legendary' : 
+                          episodeNumber <= 10 ? 'rare' : 
+                          episodeNumber <= 50 ? 'uncommon' : 'common'
+            });
+
           createdCount++;
+          console.log(`✨ Created collectible tournament: ${posterTitle}`);
         }
       }
     } catch (error) {
