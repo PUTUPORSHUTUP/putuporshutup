@@ -97,6 +97,32 @@ export function EnhancedGameConfig({
             </div>
           </div>
 
+          {/* Allowed Proof Types */}
+          <div>
+            <h4 className="text-sm font-medium mb-2">Allowed Proof Types</h4>
+            <div className="flex flex-wrap gap-1">
+              {gameData.allowedProofTypes.map((proofType) => (
+                <Badge key={proofType} variant="secondary" className="text-xs">
+                  {proofType}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Auto-Forfeit Timer */}
+          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+            <Clock className="h-4 w-4 text-yellow-500" />
+            <span className="text-sm">Auto-forfeit after {gameData.autoForfeitMinutes} minutes</span>
+          </div>
+
+          {/* Detailed Notes */}
+          {gameData.detailedNotes && (
+            <div className="p-3 bg-muted rounded-lg">
+              <h4 className="text-sm font-medium mb-1">Important Notes</h4>
+              <p className="text-sm text-muted-foreground">{gameData.detailedNotes}</p>
+            </div>
+          )}
+
           {/* Match Features */}
           <div className="grid grid-cols-2 gap-2">
             {gameData.showTimer && (

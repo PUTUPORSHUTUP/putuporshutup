@@ -18,6 +18,9 @@ export interface GameMatrixData {
   disputeHandler: boolean;
   showTimer: boolean;
   matchType: string[];
+  allowedProofTypes: string[];
+  autoForfeitMinutes: number;
+  detailedNotes?: string;
 }
 
 // Core Logic for PUOSU Challenge Setup (Based on game_matrix Supabase table)
@@ -49,7 +52,10 @@ export async function getGameDetails(gameName: string): Promise<GameMatrixData> 
     timeoutFailsafe: data.timeout_failsafe || true,
     disputeHandler: data.dispute_handler || true,
     showTimer: data.show_timer || true,
-    matchType: Array.isArray(data.match_type) ? data.match_type.map(String) : []
+    matchType: Array.isArray(data.match_type) ? data.match_type.map(String) : [],
+    allowedProofTypes: Array.isArray(data.allowed_proof_types) ? data.allowed_proof_types.map(String) : ['Screenshot'],
+    autoForfeitMinutes: data.auto_forfeit_minutes || 10,
+    detailedNotes: data.detailed_notes
   };
 }
 
@@ -79,7 +85,10 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
     timeoutFailsafe: item.timeout_failsafe || true,
     disputeHandler: item.dispute_handler || true,
     showTimer: item.show_timer || true,
-    matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : []
+    matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : [],
+    allowedProofTypes: Array.isArray(item.allowed_proof_types) ? item.allowed_proof_types.map(String) : ['Screenshot'],
+    autoForfeitMinutes: item.auto_forfeit_minutes || 10,
+    detailedNotes: item.detailed_notes
   }));
 }
 

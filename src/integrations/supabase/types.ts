@@ -686,9 +686,12 @@ export type Database = {
       }
       game_matrix: {
         Row: {
+          allowed_proof_types: Json | null
           api_access: boolean
+          auto_forfeit_minutes: number | null
           challenge_type: string
           created_at: string
+          detailed_notes: string | null
           dispute_handler: boolean | null
           game: string
           game_modes: Json | null
@@ -706,9 +709,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_proof_types?: Json | null
           api_access?: boolean
+          auto_forfeit_minutes?: number | null
           challenge_type: string
           created_at?: string
+          detailed_notes?: string | null
           dispute_handler?: boolean | null
           game: string
           game_modes?: Json | null
@@ -726,9 +732,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_proof_types?: Json | null
           api_access?: boolean
+          auto_forfeit_minutes?: number | null
           challenge_type?: string
           created_at?: string
+          detailed_notes?: string | null
           dispute_handler?: boolean | null
           game?: string
           game_modes?: Json | null
