@@ -14,14 +14,53 @@ export const TestTournamentAutomation = () => {
   const testAutomation = async () => {
     setIsLoading(true);
     try {
+      // First, ensure we have tournament templates for automation to work
+      const { data: templates } = await supabase
+        .from('tournament_templates')
+        .select('*')
+        .eq('is_active', true);
+
+      if (!templates?.length) {
+        // Create a test tournament template
+        const { data: games } = await supabase
+          .from('games')
+          .select('*')
+          .limit(1)
+          .single();
+
+        if (games) {
+          await supabase
+            .from('tournament_templates')
+            .insert({
+              template_name: 'Test Championship Template',
+              schedule_cron: '0 */2 * * *', // Every 2 hours
+              game_id: games.id,
+              max_participants: 8,
+              entry_fee: 25,
+              collectible_series: 'Elite Gaming Championship',
+              poster_title_template: '{series} #{episode}: {variation}',
+              title_variations: ['Elite Showdown', 'Pro Championship', 'Masters Cup'],
+              cover_art_url: '/placeholder-tournament.jpg',
+              is_active: true
+            });
+        }
+      }
+
+      console.log('🎮 Starting automation test...');
+      
       // Call the automation orchestrator to create a test tournament
       const { data, error } = await supabase.functions.invoke('automation-orchestrator', {
         body: { test: true }
       });
 
+      console.log('🔄 Automation response:', data, error);
+
       if (error) {
         throw error;
       }
+
+      // Wait a moment for the tournament to be created
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Fetch the latest tournament to show the result
       const { data: latestTournament } = await supabase
@@ -35,16 +74,21 @@ export const TestTournamentAutomation = () => {
         .limit(1)
         .single();
 
-      setLastTournament(latestTournament);
+      console.log('📋 Latest tournament:', latestTournament);
 
-      toast({
-        title: "🎉 Collectible Tournament Created!",
-        description: `Generated: ${latestTournament?.poster_title || 'New Tournament'}`,
-        duration: 5000,
-      });
+      if (latestTournament) {
+        setLastTournament(latestTournament);
+        toast({
+          title: "🎉 Collectible Tournament Created!",
+          description: `Generated: ${latestTournament.poster_title || latestTournament.title}`,
+          duration: 5000,
+        });
+      } else {
+        throw new Error('No tournament was created by automation');
+      }
 
     } catch (error) {
-      console.error('Automation test error:', error);
+      console.error('❌ Automation test error:', error);
       toast({
         title: "❌ Automation Failed",
         description: error.message || 'Failed to create tournament',
@@ -115,7 +159,11 @@ export const TestTournamentAutomation = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
                     <p className="text-muted-foreground">Game</p>
-                    <p className="font-medium">{lastTournament.games?.display_name}</p>
+                    <p className="font-medium">{lastTournament.games?.display_name || 'Unknown Game'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground">Platform</p>
+                    <p className="font-medium">{lastTournament.platform || 'PC'}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-muted-foreground">Entry Fee</p>
@@ -131,6 +179,10 @@ export const TestTournamentAutomation = () => {
                       <Users className="h-3 w-3" />
                       {lastTournament.max_participants}
                     </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-muted-foreground">Tournament Type</p>
+                    <p className="font-medium">{lastTournament.tournament_type || 'Single Elimination'}</p>
                   </div>
                 </div>
 

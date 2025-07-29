@@ -359,10 +359,45 @@ export const AutomationDashboard: React.FC = () => {
           <Button onClick={loadDashboardData}>
             Refresh Data
           </Button>
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              // Create downloadable report
+              const reportData = {
+                overview: {
+                  totalGames: allGames.length,
+                  automatedGames: automatedGames.length,
+                  automationRate: automationRate.toFixed(1) + '%',
+                  avgTrendScore: avgTrendScore.toFixed(1)
+                },
+                games: allGames.map(game => ({
+                  name: game.game,
+                  platforms: game.platforms.join(', '),
+                  automated: game.automatedScoreDetection,
+                  trendScore: game.trendScore,
+                  verification: game.hostVerificationMethod
+                })),
+                generatedAt: new Date().toISOString()
+              };
+              
+              const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `automation-report-${new Date().toISOString().split('T')[0]}.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
             Export Report
           </Button>
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              // Navigate to automation config or open modal
+              window.location.href = '/admin#automation-setup';
+            }}
+          >
             Configure Automation
           </Button>
         </CardContent>
