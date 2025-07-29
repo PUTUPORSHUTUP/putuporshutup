@@ -147,7 +147,7 @@ export const TestTournamentAutomation = () => {
               season_number: 1,
               episode_number: 1,
               platform: 'PC',
-              creator_id: '00000000-0000-0000-0000-000000000000' // System-created tournament
+              creator_id: (await supabase.auth.getUser()).data.user?.id || null // Use authenticated user ID
             })
             .select(`
               *,
