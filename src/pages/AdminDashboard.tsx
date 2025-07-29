@@ -400,6 +400,31 @@ const AdminDashboard = () => {
     }
   };
 
+  const generateBracket = async (tournamentId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('generate-tournament-bracket', {
+        body: { tournamentId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Tournament Started",
+        description: "Tournament bracket has been generated and the tournament is now in progress.",
+      });
+
+      // Refresh tournament data
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error generating bracket:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start tournament. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -716,6 +741,34 @@ const AdminDashboard = () => {
                         >
                           {tournament.status}
                         </Badge>
+                        
+                        {/* Admin Actions */}
+                        <div className="flex gap-1">
+                          {tournament.status === 'open' && tournament.current_participants >= 2 && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => generateBracket(tournament.id)}
+                              className="text-xs"
+                            >
+                              Start Tournament
+                            </Button>
+                          )}
+                          
+                          {tournament.status !== 'open' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                // Navigate to tournament details/bracket
+                                window.open(`/tournaments`, '_blank');
+                              }}
+                              className="text-xs"
+                            >
+                              View Details
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
