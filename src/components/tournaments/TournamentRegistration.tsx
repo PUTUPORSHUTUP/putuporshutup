@@ -114,7 +114,7 @@ export const TournamentRegistration = ({
           .insert({
             user_id: user.id,
             amount: tournament.entry_fee,
-            type: 'refund',
+            type: 'withdrawal',
             status: 'completed',
             description: `Tournament registration refund: ${tournament.title}`
           });
