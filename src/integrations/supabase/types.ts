@@ -689,33 +689,60 @@ export type Database = {
           api_access: boolean
           challenge_type: string
           created_at: string
+          dispute_handler: boolean | null
           game: string
+          game_modes: Json | null
           id: string
+          match_type: Json | null
           platforms: string
           proof_method: string
+          proof_type: string | null
+          result_options: Json | null
+          result_submission: boolean | null
+          setup_guide: string | null
           setup_instructions: string | null
+          show_timer: boolean | null
+          timeout_failsafe: boolean | null
           updated_at: string
         }
         Insert: {
           api_access?: boolean
           challenge_type: string
           created_at?: string
+          dispute_handler?: boolean | null
           game: string
+          game_modes?: Json | null
           id?: string
+          match_type?: Json | null
           platforms: string
           proof_method?: string
+          proof_type?: string | null
+          result_options?: Json | null
+          result_submission?: boolean | null
+          setup_guide?: string | null
           setup_instructions?: string | null
+          show_timer?: boolean | null
+          timeout_failsafe?: boolean | null
           updated_at?: string
         }
         Update: {
           api_access?: boolean
           challenge_type?: string
           created_at?: string
+          dispute_handler?: boolean | null
           game?: string
+          game_modes?: Json | null
           id?: string
+          match_type?: Json | null
           platforms?: string
           proof_method?: string
+          proof_type?: string | null
+          result_options?: Json | null
+          result_submission?: boolean | null
+          setup_guide?: string | null
           setup_instructions?: string | null
+          show_timer?: boolean | null
+          timeout_failsafe?: boolean | null
           updated_at?: string
         }
         Relationships: []

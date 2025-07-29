@@ -8,6 +8,16 @@ export interface GameMatrixData {
   challengeTypes: string[];
   apiAccess: boolean;
   setupInstructions?: string;
+  // New rich configuration fields
+  gameModes: string[];
+  setupGuide?: string;
+  resultSubmission: boolean;
+  proofType: string;
+  resultOptions: string[];
+  timeoutFailsafe: boolean;
+  disputeHandler: boolean;
+  showTimer: boolean;
+  matchType: string[];
 }
 
 // Core Logic for PUOSU Challenge Setup (Based on game_matrix Supabase table)
@@ -29,7 +39,17 @@ export async function getGameDetails(gameName: string): Promise<GameMatrixData> 
     proofMethod: data.proof_method,
     challengeTypes: data.challenge_type.split(', ').map((c: string) => c.trim()),
     apiAccess: data.api_access,
-    setupInstructions: data.setup_instructions
+    setupInstructions: data.setup_instructions,
+    // New rich configuration fields
+    gameModes: Array.isArray(data.game_modes) ? data.game_modes.map(String) : [],
+    setupGuide: data.setup_guide,
+    resultSubmission: data.result_submission || true,
+    proofType: data.proof_type || 'screenshot',
+    resultOptions: Array.isArray(data.result_options) ? data.result_options.map(String) : ['Winner', 'Lost'],
+    timeoutFailsafe: data.timeout_failsafe || true,
+    disputeHandler: data.dispute_handler || true,
+    showTimer: data.show_timer || true,
+    matchType: Array.isArray(data.match_type) ? data.match_type.map(String) : []
   };
 }
 
@@ -49,7 +69,17 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
     proofMethod: item.proof_method,
     challengeTypes: item.challenge_type.split(', ').map((c: string) => c.trim()),
     apiAccess: item.api_access,
-    setupInstructions: item.setup_instructions
+    setupInstructions: item.setup_instructions,
+    // New rich configuration fields
+    gameModes: Array.isArray(item.game_modes) ? item.game_modes.map(String) : [],
+    setupGuide: item.setup_guide,
+    resultSubmission: item.result_submission || true,
+    proofType: item.proof_type || 'screenshot',
+    resultOptions: Array.isArray(item.result_options) ? item.result_options.map(String) : ['Winner', 'Lost'],
+    timeoutFailsafe: item.timeout_failsafe || true,
+    disputeHandler: item.dispute_handler || true,
+    showTimer: item.show_timer || true,
+    matchType: Array.isArray(item.match_type) ? item.match_type.map(String) : []
   }));
 }
 

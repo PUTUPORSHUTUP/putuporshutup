@@ -7,9 +7,10 @@ import { Gamepad2, Zap, Shield } from "lucide-react";
 import { getAllGames, getGameDetails, type GameMatrixData } from "@/services/gameMatrixService";
 import { toast } from "sonner";
 import { GameInstructions } from "./GameInstructions";
+import { EnhancedGameConfig } from "./EnhancedGameConfig";
 
 interface GameMatrixSelectorProps {
-  onGameSelect: (gameData: GameMatrixData, selectedPlatform: string, selectedChallengeType: string) => void;
+  onGameSelect: (gameData: GameMatrixData, selectedPlatform: string, selectedChallengeType: string, selectedGameMode?: string, selectedMatchType?: string) => void;
 }
 
 export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
@@ -17,6 +18,8 @@ export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
   const [selectedGame, setSelectedGame] = useState<GameMatrixData | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("");
   const [selectedChallengeType, setSelectedChallengeType] = useState<string>("");
+  const [selectedGameMode, setSelectedGameMode] = useState<string>("");
+  const [selectedMatchType, setSelectedMatchType] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,6 +44,8 @@ export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
       setSelectedGame(gameData);
       setSelectedPlatform("");
       setSelectedChallengeType("");
+      setSelectedGameMode("");
+      setSelectedMatchType("");
     } catch (error) {
       toast.error("Failed to load game details");
       console.error("Error loading game details:", error);
@@ -49,7 +54,7 @@ export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
 
   const handleCreateChallenge = () => {
     if (selectedGame && selectedPlatform && selectedChallengeType) {
-      onGameSelect(selectedGame, selectedPlatform, selectedChallengeType);
+      onGameSelect(selectedGame, selectedPlatform, selectedChallengeType, selectedGameMode, selectedMatchType);
     }
   };
 
@@ -158,31 +163,25 @@ export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
               </Select>
             </div>
 
+            {/* Enhanced Game Configuration */}
+            {selectedPlatform && selectedChallengeType && (
+              <EnhancedGameConfig
+                gameData={selectedGame}
+                selectedGameMode={selectedGameMode}
+                selectedMatchType={selectedMatchType}
+                onGameModeChange={setSelectedGameMode}
+                onMatchTypeChange={setSelectedMatchType}
+              />
+            )}
+
             {/* Game Setup Instructions */}
             {selectedPlatform && (
               <GameInstructions 
                 gameName={selectedGame.game}
-                instructions={selectedGame.setupInstructions}
+                instructions={selectedGame.setupGuide || selectedGame.setupInstructions}
                 platform={selectedPlatform}
               />
             )}
-
-            {/* Proof Method Info */}
-            <div className="p-3 bg-muted rounded-lg">
-              <div className="flex items-center gap-2 text-sm">
-                {selectedGame.apiAccess ? (
-                  <>
-                    <Zap className="h-4 w-4 text-green-500" />
-                    <span>This game supports automatic API validation</span>
-                  </>
-                ) : (
-                  <>
-                    <Shield className="h-4 w-4 text-blue-500" />
-                    <span>Manual proof submission required</span>
-                  </>
-                )}
-              </div>
-            </div>
 
             {/* Create Challenge Button */}
             {isReadyToCreate && (
