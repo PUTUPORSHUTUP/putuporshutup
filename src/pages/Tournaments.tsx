@@ -291,11 +291,14 @@ const Tournaments = () => {
             </Button>
             <Button 
               onClick={() => setCreateModalOpen(true)}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
               size="lg"
             >
               <Plus className="w-5 h-5 mr-2" />
               CREATE TOURNAMENT
+              <Badge variant="secondary" className="ml-2 bg-yellow-200 text-yellow-800">
+                Premium
+              </Badge>
             </Button>
           </div>
         </div>

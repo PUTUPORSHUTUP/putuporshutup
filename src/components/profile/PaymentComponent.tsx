@@ -22,6 +22,7 @@ import {
 import { calculateDepositFee, getFeeStructure, PREMIUM_MONTHLY_COST } from '@/lib/feeCalculator';
 import { TilledBadge } from '@/components/ui/tilled-badge';
 import { PayoneerPayoutModal } from '@/components/payments/PayoneerPayoutModal';
+import { CashAppPayPalPayment } from '@/components/payments/CashAppPayPalPayment';
 
 const TILLED_PUBLISHABLE_KEY = "pk_sandbox_1234567890PUOSU"; // Will be replaced with actual Tilled key
 
@@ -232,6 +233,9 @@ export const PaymentComponent = ({ balance, onBalanceUpdate, isPremiumUser = fal
 
   return (
     <div className="space-y-6">
+      {/* Cash App/PayPal Alternative */}
+      <CashAppPayPalPayment onDepositComplete={onBalanceUpdate} />
+      
       {/* Wallet Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">

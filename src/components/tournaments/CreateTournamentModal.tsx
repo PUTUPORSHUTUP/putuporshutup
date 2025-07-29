@@ -231,14 +231,24 @@ export const CreateTournamentModal = ({
         return;
       }
 
-      // Check user's wallet balance
+      // Check user's wallet balance and premium status
       const { data: profile } = await supabase
         .from('profiles')
         .select('wallet_balance, is_premium')
         .eq('user_id', user.id)
         .single();
 
-      if (!profile || profile.wallet_balance < totalCost) {
+      // PREMIUM RESTRICTION: Only premium members can create tournaments
+      if (!profile || !profile.is_premium) {
+        toast({
+          title: "Premium Required",
+          description: "Tournament creation is exclusive to Premium members. Upgrade to Premium to create tournaments!",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (profile.wallet_balance < totalCost) {
         toast({
           title: "Insufficient Funds",
           description: `You need $${totalCost.toFixed(2)} to create this tournament (Entry: $${entryFee} + Sponsorship: $${(totalCost - entryFee).toFixed(2)})`,
@@ -247,7 +257,7 @@ export const CreateTournamentModal = ({
         return;
       }
 
-      // Check if sponsorship requires premium
+      // Check if sponsorship requires premium (already checked above, but keeping for clarity)
       if (isSponsored && !profile.is_premium) {
         toast({
           title: "Premium Required",
@@ -369,6 +379,15 @@ export const CreateTournamentModal = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Premium Restriction Notice */}
+          <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
+            <Crown className="w-4 h-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800 dark:text-yellow-300">
+              <strong>Premium Feature:</strong> Tournament creation is exclusive to Premium members. 
+              <span className="block mt-1 text-sm">Basic members can create matches and challenges, while Premium members unlock tournament hosting privileges.</span>
+            </AlertDescription>
+          </Alert>
+
           {/* Tournament Type Selection */}
           <div className="space-y-4">
             <div>
