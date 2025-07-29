@@ -112,18 +112,6 @@ export const TournamentRegistration = ({
 
         if (refundError) {
           console.error('Error processing refund:', refundError);
-        } else {
-          // Update user's wallet balance directly
-          const { error: walletError } = await supabase
-            .from('profiles')
-            .update({ 
-              wallet_balance: supabase.raw(`wallet_balance + ${tournament.entry_fee}`) 
-            })
-            .eq('user_id', user.id);
-
-          if (walletError) {
-            console.error('Error updating wallet balance:', walletError);
-          }
         }
       }
 
