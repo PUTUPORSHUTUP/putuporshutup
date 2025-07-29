@@ -57,7 +57,7 @@ const Index = () => {
       {/* Maintenance Notice */}
       <div className="bg-blue-600 text-white py-3 text-center">
         <p className="font-orbitron text-sm sm:text-base font-semibold">
-          🎮 BETA TESTING IN PROGRESS - We're testing our platform before launch around August 11th. Join us for early access!
+          🎮 BETA TESTING IN PROGRESS - Platform launching around August 11th. Stay tuned for updates!
         </p>
       </div>
 
