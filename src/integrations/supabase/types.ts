@@ -2542,6 +2542,48 @@ export type Database = {
           },
         ]
       }
+      tournament_registrations: {
+        Row: {
+          created_at: string
+          id: string
+          payment_status: string
+          registered_at: string
+          skill_rating: number | null
+          stake_paid: number | null
+          status: string
+          team_name: string | null
+          tournament_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payment_status?: string
+          registered_at?: string
+          skill_rating?: number | null
+          stake_paid?: number | null
+          status?: string
+          team_name?: string | null
+          tournament_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payment_status?: string
+          registered_at?: string
+          skill_rating?: number | null
+          stake_paid?: number | null
+          status?: string
+          team_name?: string | null
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tournament_templates: {
         Row: {
           collectible_series: string | null
@@ -2620,6 +2662,8 @@ export type Database = {
           poster_title: string | null
           prize_pool: number | null
           proof_required: boolean | null
+          registration_closes_at: string | null
+          registration_opens_at: string | null
           season_number: number | null
           sponsor_cost: number | null
           sponsored: boolean | null
@@ -2627,6 +2671,7 @@ export type Database = {
           start_time: string | null
           status: string
           title: string
+          tournament_status: string | null
           tournament_type: string | null
           updated_at: string
           verification_threshold: number | null
@@ -2650,6 +2695,8 @@ export type Database = {
           poster_title?: string | null
           prize_pool?: number | null
           proof_required?: boolean | null
+          registration_closes_at?: string | null
+          registration_opens_at?: string | null
           season_number?: number | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
@@ -2657,6 +2704,7 @@ export type Database = {
           start_time?: string | null
           status?: string
           title: string
+          tournament_status?: string | null
           tournament_type?: string | null
           updated_at?: string
           verification_threshold?: number | null
@@ -2680,6 +2728,8 @@ export type Database = {
           poster_title?: string | null
           prize_pool?: number | null
           proof_required?: boolean | null
+          registration_closes_at?: string | null
+          registration_opens_at?: string | null
           season_number?: number | null
           sponsor_cost?: number | null
           sponsored?: boolean | null
@@ -2687,6 +2737,7 @@ export type Database = {
           start_time?: string | null
           status?: string
           title?: string
+          tournament_status?: string | null
           tournament_type?: string | null
           updated_at?: string
           verification_threshold?: number | null
