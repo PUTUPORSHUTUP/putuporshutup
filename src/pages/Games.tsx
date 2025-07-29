@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings, Target, Bell } from 'lucide-react';
+import { StatLoggingService } from '@/services/statLoggingService';
 
 interface Game {
   id: string;
@@ -305,6 +306,19 @@ const Games = () => {
 
       if (balanceError) {
         console.error('Error updating balance:', balanceError);
+      }
+
+      // Find the wager for stat logging
+      const wager = wagers.find(w => w.id === wagerId);
+      if (wager) {
+        // Log challenge participation silently
+        await StatLoggingService.logChallengeParticipation(
+          user.id,
+          wagerId,
+          wager.game?.display_name || 'Unknown Game',
+          wager.platform,
+          stakeAmount
+        );
       }
 
       toast({

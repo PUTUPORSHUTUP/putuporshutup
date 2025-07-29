@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play, Target, Link, UserCheck } from 'lucide-react';
-import { ReportResultModal } from './ReportResultModal';
+import { EnhancedResultModal } from './EnhancedResultModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -290,10 +290,15 @@ export const ChallengeCard = ({ wager, onJoin, onLeave, onResultReported, curren
               Wager Cancelled
             </Button>
           ) : wager.status === 'in_progress' && isParticipant ? (
-            <ReportResultModal
-              wager={wager}
-              currentUserId={currentUserId!}
-              onResultReported={onResultReported}
+            <EnhancedResultModal
+              challenge={{
+                id: wager.id,
+                title: wager.title,
+                game_id: wager.game?.id || '',
+                total_pot: wager.total_pot,
+                status: wager.status
+              }}
+              onResultSubmitted={onResultReported}
             />
           ) : wager.status === 'open' ? (
             isFull && isCreator ? (

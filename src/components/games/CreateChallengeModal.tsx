@@ -20,6 +20,8 @@ import { StatCriteriaBuilder } from './StatCriteriaBuilder';
 import { TeamFormationInterface } from './TeamFormationInterface';
 import { LobbyLinkingSystem } from './LobbyLinkingSystem';
 import { LobbyStatChallengeConfig } from './LobbyStatChallengeConfig';
+import { ChallengeSetupGuide } from './ChallengeSetupGuide';
+import { StatLoggingService } from '@/services/statLoggingService';
 import { ChallengeType, VerificationMethod, StatCriteria, ChallengeTeam } from '@/types/wager';
 
 interface Game {
@@ -191,6 +193,15 @@ export const CreateChallengeModal = ({
         console.error('Error adding creator as participant:', participantError);
       }
 
+      // Log challenge creation silently
+      await StatLoggingService.logChallengeCreation(
+        user.id,
+        challenge.id,
+        selectedGameData?.display_name || 'Unknown Game',
+        form.platform,
+        stakeAmount
+      );
+
       // Update user's wallet balance
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -253,7 +264,10 @@ export const CreateChallengeModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="font-gaming text-xl">CREATE NEW CHALLENGE</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="font-gaming text-xl">CREATE NEW CHALLENGE</DialogTitle>
+            <ChallengeSetupGuide gameName={selectedGameData?.display_name} />
+          </div>
         </DialogHeader>
 
         <ResponsibleGamblingWarning 
