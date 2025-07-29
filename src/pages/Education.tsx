@@ -96,7 +96,11 @@ const Education = () => {
                   <p className="text-muted-foreground mb-4">
                     Create challenges or join existing ones. Deposit your entry fee and prove your skills to win prizes.
                   </p>
-                  <Badge className="w-full justify-center">Ready to compete?</Badge>
+                  <Link to="/games">
+                    <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                      Start Competing Now!
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>
