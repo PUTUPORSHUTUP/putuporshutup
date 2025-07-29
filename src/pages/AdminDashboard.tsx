@@ -401,13 +401,19 @@ const AdminDashboard = () => {
   };
 
   const generateBracket = async (tournamentId: string) => {
+    console.log('Generate bracket clicked for tournament:', tournamentId);
     try {
+      console.log('Invoking generate-tournament-bracket function...');
       const { error } = await supabase.functions.invoke('generate-tournament-bracket', {
         body: { tournamentId }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
 
+      console.log('Tournament bracket generated successfully');
       toast({
         title: "Tournament Started",
         description: "Tournament bracket has been generated and the tournament is now in progress.",
