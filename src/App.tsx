@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Sponsor from "./pages/Sponsor";
 import SponsorSignup from "./pages/SponsorSignup";
 import SponsorDashboard from "./pages/SponsorDashboard";
+import HowItWorks from "./pages/HowItWorks";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -73,6 +74,7 @@ const App = () => {
                   <SponsorDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/how-it-works" element={<HowItWorks />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
