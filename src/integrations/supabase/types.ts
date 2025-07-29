@@ -2730,6 +2730,10 @@ export type Database = {
         Args: { user_uuid?: string }
         Returns: boolean
       }
+      safe_nextval: {
+        Args: { sequence_name: string }
+        Returns: number
+      }
       verify_otp: {
         Args: { p_user_id: string; p_otp_code: string; p_purpose: string }
         Returns: boolean
