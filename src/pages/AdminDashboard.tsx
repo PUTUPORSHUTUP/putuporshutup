@@ -54,6 +54,7 @@ import {
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { MatchManagement } from '@/components/admin/MatchManagement';
 import { RoleManagement } from '@/components/admin/RoleManagement';
+import MockRevenueProjection from '@/components/admin/MockRevenueProjection';
 import SponsorDashboard from './SponsorDashboard';
 
 interface AdminAnalytics {
@@ -456,7 +457,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 max-w-7xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-11 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
@@ -466,6 +467,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="suggestions" className="text-xs sm:text-sm">Suggestions</TabsTrigger>
             <TabsTrigger value="games" className="text-xs sm:text-sm">Games</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
+            <TabsTrigger value="projections" className="text-xs sm:text-sm">💰 Projections</TabsTrigger>
             <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
           </TabsList>
 
@@ -873,6 +875,11 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Revenue Projections Tab */}
+          <TabsContent value="projections" className="space-y-6">
+            <MockRevenueProjection />
           </TabsContent>
 
           {/* Sponsor Hub Tab */}
