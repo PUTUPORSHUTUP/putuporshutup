@@ -1294,6 +1294,42 @@ export type Database = {
         }
         Relationships: []
       }
+      player_stats: {
+        Row: {
+          challenge_id: string | null
+          created_at: string
+          game_name: string
+          id: string
+          match_date: string
+          platform: string
+          stats_data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id?: string | null
+          created_at?: string
+          game_name: string
+          id?: string
+          match_date?: string
+          platform: string
+          stats_data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string | null
+          created_at?: string
+          game_name?: string
+          id?: string
+          match_date?: string
+          platform?: string
+          stats_data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
