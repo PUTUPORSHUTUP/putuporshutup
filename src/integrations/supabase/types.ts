@@ -2264,19 +2264,6 @@ export type Database = {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
       }
-      generate_otp: {
-        Args: {
-          p_user_id: string
-          p_purpose: string
-          p_email?: string
-          p_phone?: string
-          p_expiry_minutes?: number
-        }
-        Returns: {
-          otp_code: string
-          expires_at: string
-        }[]
-      }
       generate_secure_otp: {
         Args: {
           p_user_id: string
