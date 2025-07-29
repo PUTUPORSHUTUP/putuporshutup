@@ -2905,6 +2905,10 @@ export type Database = {
           visits_this_week: number
         }[]
       }
+      increment_wallet_balance: {
+        Args: { user_id_param: string; amount_param: number }
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_uuid?: string }
         Returns: boolean
