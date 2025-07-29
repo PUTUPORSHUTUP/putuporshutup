@@ -205,7 +205,8 @@ const AdminDashboard = () => {
         .limit(20);
 
       // Load recent tournaments - simplified query
-      const { data: tournamentsData } = await supabase
+      console.log('Loading tournaments...');
+      const { data: tournamentsData, error: tournamentsError } = await supabase
         .from('tournaments')
         .select(`
           id,
@@ -218,6 +219,12 @@ const AdminDashboard = () => {
         `)
         .order('created_at', { ascending: false })
         .limit(20);
+
+      if (tournamentsError) {
+        console.error('Tournament loading error:', tournamentsError);
+      }
+      
+      console.log('Loaded tournaments:', tournamentsData);
 
       // Load disputes with simpler query
       const { data: disputesData } = await supabase
