@@ -7,6 +7,7 @@ export interface GameMatrixData {
   proofMethod: string;
   challengeTypes: string[];
   apiAccess: boolean;
+  setupInstructions?: string;
 }
 
 // Core Logic for PUOSU Challenge Setup (Based on game_matrix Supabase table)
@@ -27,7 +28,8 @@ export async function getGameDetails(gameName: string): Promise<GameMatrixData> 
     platforms: data.platforms.split(', ').map((p: string) => p.trim()),
     proofMethod: data.proof_method,
     challengeTypes: data.challenge_type.split(', ').map((c: string) => c.trim()),
-    apiAccess: data.api_access
+    apiAccess: data.api_access,
+    setupInstructions: data.setup_instructions
   };
 }
 
@@ -46,7 +48,8 @@ export async function getAllGames(): Promise<GameMatrixData[]> {
     platforms: item.platforms.split(', ').map((p: string) => p.trim()),
     proofMethod: item.proof_method,
     challengeTypes: item.challenge_type.split(', ').map((c: string) => c.trim()),
-    apiAccess: item.api_access
+    apiAccess: item.api_access,
+    setupInstructions: item.setup_instructions
   }));
 }
 

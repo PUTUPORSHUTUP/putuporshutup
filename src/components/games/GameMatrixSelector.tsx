@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Gamepad2, Zap, Shield } from "lucide-react";
 import { getAllGames, getGameDetails, type GameMatrixData } from "@/services/gameMatrixService";
 import { toast } from "sonner";
+import { GameInstructions } from "./GameInstructions";
 
 interface GameMatrixSelectorProps {
   onGameSelect: (gameData: GameMatrixData, selectedPlatform: string, selectedChallengeType: string) => void;
@@ -156,6 +157,15 @@ export function GameMatrixSelector({ onGameSelect }: GameMatrixSelectorProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Game Setup Instructions */}
+            {selectedPlatform && (
+              <GameInstructions 
+                gameName={selectedGame.game}
+                instructions={selectedGame.setupInstructions}
+                platform={selectedPlatform}
+              />
+            )}
 
             {/* Proof Method Info */}
             <div className="p-3 bg-muted rounded-lg">
