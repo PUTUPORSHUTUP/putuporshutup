@@ -43,64 +43,64 @@ serve(async (req) => {
 
     console.log("Processing result report for wager:", wager_id, "winner:", winner_id, "by user:", user.id);
 
-    // Get wager details with participants
-    const { data: wager, error: wagerError } = await supabaseService
-      .from("wagers")
+    // Get challenge details with participants
+    const { data: challenge, error: challengeError } = await supabaseService
+      .from("challenges")
       .select(`
         *,
-        wager_participants(*)
+        challenge_participants(*)
       `)
       .eq("id", wager_id)
       .eq("status", "in_progress")
       .single();
 
-    if (wagerError || !wager) {
-      throw new Error("Wager not found or not in progress");
+    if (challengeError || !challenge) {
+      throw new Error("Challenge not found or not in progress");
     }
 
     // Check if user is a participant or creator
-    const isCreator = wager.creator_id === user.id;
-    const isParticipant = wager.wager_participants.some((p: any) => p.user_id === user.id);
+    const isCreator = challenge.creator_id === user.id;
+    const isParticipant = challenge.challenge_participants.some((p: any) => p.user_id === user.id);
 
     if (!isCreator && !isParticipant) {
-      throw new Error("Not authorized to report result for this wager");
+      throw new Error("Not authorized to report result for this challenge");
     }
 
     // Verify winner is a valid participant
-    const winnerIsValid = wager.wager_participants.some((p: any) => p.user_id === winner_id) || wager.creator_id === winner_id;
+    const winnerIsValid = challenge.challenge_participants.some((p: any) => p.user_id === winner_id) || challenge.creator_id === winner_id;
     if (!winnerIsValid) {
-      throw new Error("Winner must be a participant in this wager");
+      throw new Error("Winner must be a participant in this challenge");
     }
 
     // Check if this user has already reported a result
     const { data: existingReport } = await supabaseService
-      .from("wager_result_reports")
+      .from("challenge_result_reports")
       .select("*")
-      .eq("wager_id", wager_id)
+      .eq("challenge_id", wager_id)
       .eq("reported_by", user.id)
       .single();
 
     if (existingReport) {
-      throw new Error("You have already reported a result for this wager");
+      throw new Error("You have already reported a result for this challenge");
     }
 
     // Insert the result report
     await supabaseService
-      .from("wager_result_reports")
+      .from("challenge_result_reports")
       .insert({
-        wager_id,
+        challenge_id: wager_id,
         winner_id,
         reported_by: user.id,
         created_at: new Date().toISOString()
       });
 
-    // Get all reports for this wager
+    // Get all reports for this challenge
     const { data: allReports } = await supabaseService
-      .from("wager_result_reports")
+      .from("challenge_result_reports")
       .select("*")
-      .eq("wager_id", wager_id);
+      .eq("challenge_id", wager_id);
 
-    const totalParticipants = wager.wager_participants.length + (wager.creator_id ? 1 : 0);
+    const totalParticipants = challenge.challenge_participants.length + (challenge.creator_id ? 1 : 0);
     const reportsForWinner = allReports?.filter(r => r.winner_id === winner_id).length || 0;
     const uniqueReporters = new Set(allReports?.map(r => r.reported_by)).size;
 
@@ -111,8 +111,8 @@ serve(async (req) => {
     let message = "Result reported successfully";
 
     if (hasConsensus) {
-      // Finalize the wager
-      await finalizeWager(supabaseService, wager_id, winner_id, wager.total_pot);
+      // Finalize the challenge
+      await finalizeChallenge(supabaseService, wager_id, winner_id, challenge.total_pot);
       message = "🏆 Challenge completed! Winner received INSTANT payout!";
     } else {
       message = `Result reported. Waiting for more reports (${reportsForWinner}/${majorityNeeded} needed).`;
@@ -142,23 +142,23 @@ serve(async (req) => {
   }
 });
 
-async function finalizeWager(supabaseService: any, wagerId: string, winnerId: string, totalPot: number) {
+async function finalizeChallenge(supabaseService: any, challengeId: string, winnerId: string, totalPot: number) {
   try {
-    // Update wager status
+    // Update challenge status
     await supabaseService
-      .from("wagers")
+      .from("challenges")
       .update({
         status: "completed",
         winner_id: winnerId,
         end_time: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
-      .eq("id", wagerId);
+      .eq("id", challengeId);
 
-    // Get winner's current balance
+    // Get winner's profile with membership status
     const { data: profile } = await supabaseService
       .from("profiles")
-      .select("wallet_balance, total_wins")
+      .select("wallet_balance, total_wins, is_premium")
       .eq("user_id", winnerId)
       .single();
 
@@ -166,8 +166,9 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
       throw new Error("Winner profile not found");
     }
 
-    // Calculate platform fee (6% on winnings)
-    const platformFeePercentage = 6;
+    // Calculate platform fee based on membership tier
+    const membershipTier = profile.is_premium ? 'premium' : 'none';
+    const platformFeePercentage = membershipTier === 'premium' ? 1.25 : 5; // 75% discount for premium, 5% base fee
     const platformFee = Math.round((totalPot * (platformFeePercentage / 100)) * 100) / 100;
     const netPayout = totalPot - platformFee;
 
@@ -186,10 +187,10 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
           type: 'payout',
           amountInCents: Math.round(netPayout * 100),
           destinationAccountId: 'winner_account_id', // This would be the winner's connected account
-          challengeId: wagerId,
+          challengeId: challengeId,
           metadata: {
             user_id: winnerId,
-            challenge_id: wagerId,
+            challenge_id: challengeId,
             original_amount: totalPot,
             platform_fee: platformFee
           }
@@ -210,7 +211,7 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
             amount: netPayout,
             status: "completed",
             stripe_payment_intent: tilledResult.payout.id,
-            description: `🏆 INSTANT Winner Payout - Challenge ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+            description: `🏆 INSTANT Winner Payout - Challenge ${challengeId} (${platformFeePercentage}% platform fee deducted)`,
             created_at: new Date().toISOString()
           });
           
@@ -233,7 +234,7 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
             type: "deposit",
             amount: netPayout,
             status: "completed",
-            description: `🏆 Challenge Win Payout - ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+            description: `🏆 Challenge Win Payout - ${challengeId} (${platformFeePercentage}% platform fee deducted)`,
             created_at: new Date().toISOString()
           });
       }
@@ -256,7 +257,7 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
           type: "deposit",
           amount: netPayout,
           status: "completed",
-          description: `🏆 Challenge Win Payout - ${wagerId} (${platformFeePercentage}% platform fee deducted)`,
+          description: `🏆 Challenge Win Payout - ${challengeId} (${platformFeePercentage}% platform fee deducted)`,
           created_at: new Date().toISOString()
         });
     }
@@ -270,35 +271,35 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
       })
       .eq("user_id", winnerId);
 
-    // Record platform fee transaction
+    // Record platform fee transaction for revenue tracking
     await supabaseService
       .from("transactions")
       .insert({
-        user_id: winnerId,
+        user_id: null, // Platform transaction (no specific user)
         type: "platform_fee",
-        amount: -platformFee,
+        amount: platformFee,
         status: "completed",
-        description: `Platform Fee (${platformFeePercentage}%) - Challenge ${wagerId}`,
+        description: `Platform Fee (${platformFeePercentage}%) - Challenge ${challengeId}`,
         created_at: new Date().toISOString()
       });
 
     // Update losers' stats
     const { data: participants } = await supabaseService
-      .from("wager_participants")
+      .from("challenge_participants")
       .select("user_id")
-      .eq("wager_id", wagerId);
+      .eq("challenge_id", challengeId);
 
     const loserIds = participants?.map(p => p.user_id).filter(id => id !== winnerId) || [];
     
     // Include creator if they're not the winner
-    const { data: wager } = await supabaseService
-      .from("wagers")
+    const { data: challenge } = await supabaseService
+      .from("challenges")
       .select("creator_id")
-      .eq("id", wagerId)
+      .eq("id", challengeId)
       .single();
 
-    if (wager?.creator_id && wager.creator_id !== winnerId) {
-      loserIds.push(wager.creator_id);
+    if (challenge?.creator_id && challenge.creator_id !== winnerId) {
+      loserIds.push(challenge.creator_id);
     }
 
     // Update losers' loss count
@@ -320,7 +321,7 @@ async function finalizeWager(supabaseService: any, wagerId: string, winnerId: st
       }
     }
 
-    console.log("🏁 Challenge finalized with INSTANT payout:", wagerId, "Winner:", winnerId, "Net Payout:", netPayout, "Platform Fee:", platformFee);
+    console.log("🏁 Challenge finalized with INSTANT payout:", challengeId, "Winner:", winnerId, "Net Payout:", netPayout, "Platform Fee:", platformFee);
 
   } catch (error) {
     console.error("Error finalizing challenge:", error);

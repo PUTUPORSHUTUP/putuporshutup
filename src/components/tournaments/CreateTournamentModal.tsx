@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { calculateTournamentEntryFee } from '@/lib/feeCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -682,53 +683,89 @@ export const CreateTournamentModal = ({
             </div>
           </div>
 
-          {/* Prize Pool Preview */}
+          {/* Prize Pool & Fee Preview */}
           {form.entryFee && form.maxParticipants && (
-            <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-6 h-6 text-yellow-600" />
-                      <span className="text-lg font-bold">Total Prize Pool</span>
-                    </div>
-                    <Badge variant="default" className="text-xl px-4 py-2">
-                      ${calculatePrizePool().toFixed(2)}
-                    </Badge>
-                  </div>
-                  
-                  {isSponsored && (
-                    <div className="text-sm text-muted-foreground space-y-1">
-                      <div className="flex justify-between">
-                        <span>Entry Fees Total:</span>
-                        <span>${(parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants)).toFixed(2)}</span>
+            <div className="space-y-4">
+              {/* Platform Fee Preview for Entry Fees */}
+              <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/10">
+                <CardContent className="p-4">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Tournament Entry Fee Breakdown
+                  </h4>
+                  {(() => {
+                    const entryFee = parseFloat(form.entryFee);
+                    const feeCalculation = calculateTournamentEntryFee(entryFee, 'none'); // Tournaments have no premium discounts
+                    
+                    return (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Base Entry Fee:</span>
+                          <span className="font-medium">${entryFee.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Platform Fee (5%):</span>
+                          <span className="font-medium">${feeCalculation.platformFee.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-2 font-semibold">
+                          <span>Total per Player:</span>
+                          <span className="text-primary">${feeCalculation.totalCost.toFixed(2)}</span>
+                        </div>
+                        <div className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                          * ALL players pay platform fees regardless of membership status
+                        </div>
                       </div>
-                      <div className="flex justify-between font-semibold text-green-600">
-                        <span>Sponsor Contribution:</span>
-                        <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
-                      </div>
-                      <div className="text-xs text-blue-600 mt-2 space-y-1">
-                        <div>* Tournament entry fees apply to ALL players regardless of membership status</div>
-                        <div>* Sponsor funds the entire multiplied prize pool</div>
-                        <div>* Platform revenue: 50% of sponsor cost</div>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
+                </CardContent>
+              </Card>
 
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Your Total Cost:</span>
-                      <div className="text-right">
-                        <div className="text-lg font-bold">${getTotalCost().toFixed(2)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Entry: ${form.entryFee} {isSponsored && `+ Sponsorship: $${(getTotalCost() - parseFloat(form.entryFee || '0')).toFixed(2)}`}
+              {/* Prize Pool Preview */}
+              <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="w-6 h-6 text-yellow-600" />
+                        <span className="text-lg font-bold">Total Prize Pool</span>
+                      </div>
+                      <Badge variant="default" className="text-xl px-4 py-2">
+                        ${calculatePrizePool().toFixed(2)}
+                      </Badge>
+                    </div>
+                    
+                    {isSponsored && (
+                      <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="flex justify-between">
+                          <span>Entry Fees Total:</span>
+                          <span>${(parseFloat(form.entryFee || '0') * parseInt(form.maxParticipants)).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold text-green-600">
+                          <span>Sponsor Contribution:</span>
+                          <span>+${(sponsorshipTiers.find(t => t.id === sponsorshipTier)?.cost || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="text-xs text-blue-600 mt-2 space-y-1">
+                          <div>* Sponsor funds the entire multiplied prize pool</div>
+                          <div>* Platform revenue: 50% of sponsor cost + entry fee platform fees</div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Your Total Cost:</span>
+                        <div className="text-right">
+                          <div className="text-lg font-bold">${getTotalCost().toFixed(2)}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Entry: ${form.entryFee} {isSponsored && `+ Sponsorship: $${(getTotalCost() - parseFloat(form.entryFee || '0')).toFixed(2)}`}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           <div className="flex justify-end gap-4">

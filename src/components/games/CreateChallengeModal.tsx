@@ -22,6 +22,7 @@ import { LobbyLinkingSystem } from './LobbyLinkingSystem';
 import { LobbyStatChallengeConfig } from './LobbyStatChallengeConfig';
 import { ChallengeSetupGuide } from './ChallengeSetupGuide';
 import { StatLoggingService } from '@/services/statLoggingService';
+import { calculateChallengeFee } from '@/lib/feeCalculator';
 import { ChallengeType, VerificationMethod, StatCriteria, ChallengeTeam } from '@/types/wager';
 
 interface Game {
@@ -66,6 +67,7 @@ export const CreateChallengeModal = ({
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('manual');
   const [teams, setTeams] = useState<ChallengeTeam[]>([]);
   const [teamPreference, setTeamPreference] = useState<'same' | 'opposite' | 'any'>('any');
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -73,7 +75,10 @@ export const CreateChallengeModal = ({
 
   useEffect(() => {
     loadGames();
-  }, []);
+    if (user) {
+      loadUserProfile();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (selectedGame) {
@@ -93,6 +98,16 @@ export const CreateChallengeModal = ({
       .order('display_name');
     
     setGames(data || []);
+  };
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('is_premium, wallet_balance')
+      .eq('user_id', user.id)
+      .single();
+    setUserProfile(data);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -452,10 +467,48 @@ export const CreateChallengeModal = ({
                         <SelectItem value="Custom">Custom</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                   </div>
+                 </div>
+
+                 {/* Platform Fee Preview */}
+                 {form.stakeAmount && parseFloat(form.stakeAmount) > 0 && userProfile && (
+                   <div className="mt-4 p-4 bg-muted/50 rounded-lg border">
+                     <h4 className="font-semibold mb-2 flex items-center gap-2">
+                       <DollarSign className="w-4 h-4" />
+                       Fee Breakdown
+                     </h4>
+                     {(() => {
+                       const stakeAmount = parseFloat(form.stakeAmount);
+                       const membershipTier = userProfile.is_premium ? 'premium' : 'none';
+                       const feeCalculation = calculateChallengeFee(stakeAmount, membershipTier);
+                       
+                       return (
+                         <div className="space-y-2 text-sm">
+                           <div className="flex justify-between">
+                             <span>Challenge Amount:</span>
+                             <span className="font-medium">${stakeAmount.toFixed(2)}</span>
+                           </div>
+                           <div className="flex justify-between">
+                             <span>Platform Fee ({feeCalculation.platformFeePercentage.toFixed(1)}%):</span>
+                             <span className="font-medium">${feeCalculation.platformFee.toFixed(2)}</span>
+                           </div>
+                           <div className="flex justify-between border-t pt-2 font-semibold">
+                             <span>Winner Receives:</span>
+                             <span className="text-primary">${feeCalculation.totalToWinner.toFixed(2)}</span>
+                           </div>
+                           {membershipTier === 'premium' && (
+                             <div className="flex items-center gap-1 text-xs text-primary">
+                               <Badge variant="secondary" className="text-xs">Premium Member</Badge>
+                               <span>75% fee discount applied!</span>
+                             </div>
+                           )}
+                         </div>
+                       );
+                     })()}
+                   </div>
+                 )}
+               </CardContent>
+             </Card>
 
             {/* Step 4: Challenge Type Specific Configuration */}
             {(challengeType === 'team_vs_team' || challengeType === '1v1_lobby' || 
