@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateTournamentModal } from '@/components/tournaments/CreateTournamentModal';
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
 import { TournamentStats } from '@/components/tournaments/TournamentStats';
+import { TournamentCountdown } from '@/components/tournaments/TournamentCountdown';
 import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -34,11 +35,22 @@ interface Tournament {
   status: 'open' | 'in_progress' | 'completed' | 'cancelled';
   start_time: string | null;
   created_at: string;
+  cover_art_url?: string;
+  poster_title?: string;
+  collectible_series?: string;
+  season_number?: number;
+  episode_number?: number;
   game: {
     id: string;
     display_name: string;
     name: string;
   };
+  tournament_posters?: {
+    id: string;
+    poster_title: string;
+    cover_art_url: string;
+    rarity_level: string;
+  }[];
 }
 
 const Tournaments = () => {
@@ -63,7 +75,8 @@ const Tournaments = () => {
         .from('tournaments')
         .select(`
           *,
-          game:games(*)
+          game:games(*),
+          tournament_posters(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -343,7 +356,33 @@ const Tournaments = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tournaments.map((tournament) => (
-                  <Card key={tournament.id} className="hover:shadow-lg transition-shadow">
+                  <Card key={tournament.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                    {/* Tournament Poster/Cover Art */}
+                    {(tournament.cover_art_url || tournament.tournament_posters?.[0]?.cover_art_url) && (
+                      <div className="relative h-48 bg-gradient-to-br from-primary/20 to-secondary/20">
+                        <img 
+                          src={tournament.cover_art_url || tournament.tournament_posters?.[0]?.cover_art_url || '/placeholder-tournament.jpg'} 
+                          alt={tournament.poster_title || tournament.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder-tournament.jpg';
+                          }}
+                        />
+                        <div className="absolute top-2 left-2 flex gap-2">
+                          {tournament.tournament_posters?.[0] && (
+                            <div className="bg-black/70 px-2 py-1 rounded text-white text-xs">
+                              #{tournament.episode_number?.toString().padStart(3, '0')}
+                            </div>
+                          )}
+                          {tournament.tournament_posters?.[0]?.rarity_level && (
+                            <div className="bg-gradient-to-r from-yellow-500/80 to-orange-500/80 px-2 py-1 rounded text-white text-xs font-bold">
+                              {tournament.tournament_posters[0].rarity_level}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -356,7 +395,14 @@ const Tournaments = () => {
                             </Badge>
                             <div className={`w-2 h-2 rounded-full ${getStatusColor(tournament.status)}`} />
                           </div>
-                          <CardTitle className="text-lg leading-tight">{tournament.title}</CardTitle>
+                          <CardTitle className="text-lg leading-tight">
+                            {tournament.poster_title || tournament.title}
+                          </CardTitle>
+                          {tournament.collectible_series && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {tournament.collectible_series}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
@@ -399,11 +445,19 @@ const Tournaments = () => {
                         </div>
                       </div>
 
-                      {/* Start Time */}
+                      {/* Start Time and Countdown */}
                       {tournament.start_time && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="w-4 h-4 text-muted-foreground" />
-                          <span>Starts: {new Date(tournament.start_time).toLocaleString()}</span>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <span>Starts: {new Date(tournament.start_time).toLocaleString()}</span>
+                          </div>
+                          {tournament.status === 'open' && new Date(tournament.start_time) > new Date() && (
+                            <TournamentCountdown 
+                              startTime={tournament.start_time} 
+                              className="text-primary font-bold"
+                            />
+                          )}
                         </div>
                       )}
 
