@@ -388,15 +388,17 @@ export const CreateChallengeModal = ({
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                       <SelectContent>
+                        <SelectItem value="1">1 Player</SelectItem>
                         <SelectItem value="2">2 Players</SelectItem>
+                        <SelectItem value="3">3 Players</SelectItem>
                         <SelectItem value="4">4 Players</SelectItem>
+                        <SelectItem value="5">5 Players</SelectItem>
+                        <SelectItem value="6">6 Players</SelectItem>
+                        <SelectItem value="7">7 Players</SelectItem>
                         <SelectItem value="8">8 Players</SelectItem>
-                        <SelectItem value="12">12 Players (6v6)</SelectItem>
-                        <SelectItem value="16">16 Players</SelectItem>
-                        <SelectItem value="20">20 Players (10v10)</SelectItem>
-                        <SelectItem value="24">24 Players</SelectItem>
-                        <SelectItem value="32">32 Players</SelectItem>
+                        <SelectItem value="9">9 Players</SelectItem>
+                        <SelectItem value="10">10 Players</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
