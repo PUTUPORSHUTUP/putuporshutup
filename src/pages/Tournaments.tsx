@@ -7,6 +7,7 @@ import { CreateTournamentModal } from '@/components/tournaments/CreateTournament
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
 import { TournamentStats } from '@/components/tournaments/TournamentStats';
 import { TournamentCountdown } from '@/components/tournaments/TournamentCountdown';
+import { TournamentRegistration } from '@/components/tournaments/TournamentRegistration';
 import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -55,6 +56,7 @@ interface Tournament {
 
 const Tournaments = () => {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [registrations, setRegistrations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
@@ -67,7 +69,21 @@ const Tournaments = () => {
 
   useEffect(() => {
     loadTournaments();
+    loadAllRegistrations();
   }, []);
+
+  const loadAllRegistrations = async () => {
+    try {
+      const { data } = await supabase
+        .from('tournament_registrations')
+        .select('*')
+        .order('registered_at');
+
+      setRegistrations(data || []);
+    } catch (error) {
+      console.error('Error loading all registrations:', error);
+    }
+  };
 
   const loadTournaments = async () => {
     try {
@@ -113,10 +129,32 @@ const Tournaments = () => {
         .eq('tournament_id', tournamentId)
         .order('bracket_position');
 
+      // Load registrations
+      const { data: regs } = await supabase
+        .from('tournament_registrations')
+        .select('*')
+        .eq('tournament_id', tournamentId)
+        .order('registered_at');
+
       setTournamentMatches(matches || []);
       setTournamentParticipants(participants || []);
+      setRegistrations(regs || []);
     } catch (error) {
       console.error('Error loading tournament details:', error);
+    }
+  };
+
+  const loadTournamentRegistrations = async (tournamentId: string) => {
+    try {
+      const { data } = await supabase
+        .from('tournament_registrations')
+        .select('*')
+        .eq('tournament_id', tournamentId)
+        .order('registered_at');
+
+      setRegistrations(data || []);
+    } catch (error) {
+      console.error('Error loading registrations:', error);
     }
   };
 
@@ -470,19 +508,20 @@ const Tournaments = () => {
                         </div>
                       )}
 
+                      {/* Tournament Registration */}
+                      <div className="pt-2">
+                        <TournamentRegistration
+                          tournament={tournament}
+                          registrations={registrations.filter(r => r.tournament_id === tournament.id)}
+                          onRegistrationUpdate={() => {
+                            loadTournamentRegistrations(tournament.id);
+                            loadTournaments();
+                          }}
+                        />
+                      </div>
+
                       {/* Action Buttons */}
                       <div className="pt-2 space-y-2">
-                        {tournament.status === 'open' && (
-                          <Button 
-                            onClick={() => handleJoinTournament(tournament.id, tournament.entry_fee)}
-                            className="w-full bg-primary hover:bg-primary/90"
-                            disabled={tournament.current_participants >= tournament.max_participants}
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            Join for ${tournament.entry_fee}
-                          </Button>
-                        )}
-                        
                         {/* Tournament Creator Actions */}
                         {user?.id === tournament.creator_id && tournament.status === 'open' && 
                          tournament.current_participants >= 2 && (
