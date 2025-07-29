@@ -18,8 +18,9 @@ import { LobbyManagementInterface } from '@/components/games/LobbyManagementInte
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb } from 'lucide-react';
+import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings } from 'lucide-react';
 import { StatLoggingService } from '@/services/statLoggingService';
+import { GameRulesConfig } from '@/components/games/GameRulesConfig';
 
 interface Game {
   id: string;
@@ -578,11 +579,15 @@ const Games = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
             <TabsTrigger value="browse">Browse Wagers</TabsTrigger>
             <TabsTrigger value="quick-match">Quick Match</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="games">All Games</TabsTrigger>
+            <TabsTrigger value="rules" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Game Rules
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
@@ -704,6 +709,10 @@ const Games = () => {
                 });
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="rules" className="space-y-6">
+            <GameRulesConfig />
           </TabsContent>
         </Tabs>
       </div>

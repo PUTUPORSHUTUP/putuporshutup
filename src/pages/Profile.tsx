@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save, Crown, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PlayerStatsDisplay } from '@/components/profile/PlayerStatsDisplay';
 
 interface Profile {
   id: string;
@@ -366,8 +367,9 @@ const Profile = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="edit" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="edit">Edit Profile</TabsTrigger>
+          <TabsTrigger value="stats">Stats</TabsTrigger>
           <TabsTrigger value="premium">Premium</TabsTrigger>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
@@ -524,104 +526,7 @@ const Profile = () => {
 
         {/* Stats Dashboard Tab */}
         <TabsContent value="stats" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Wagered</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  <span className="text-2xl font-bold">${profile.total_wagered}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Win Rate</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <span className="text-2xl font-bold">{getWinRate()}%</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Matches</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-purple-600" />
-                  <span className="text-2xl font-bold">{profile.total_wins + profile.total_losses}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Current Balance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-yellow-600" />
-                  <span className="text-2xl font-bold">${profile.wallet_balance}</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Gamer Tags Display */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Gaming Profiles</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {profile.gamer_tag_xbox && (
-                  <div className="flex items-center gap-3 p-3 border rounded-lg">
-                    <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center text-white text-xs font-bold">
-                      XB
-                    </div>
-                    <div>
-                      <div className="font-medium">Xbox</div>
-                      <div className="text-sm text-muted-foreground">{profile.gamer_tag_xbox}</div>
-                    </div>
-                  </div>
-                )}
-                {profile.gamer_tag_psn && (
-                  <div className="flex items-center gap-3 p-3 border rounded-lg">
-                    <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
-                      PS
-                    </div>
-                    <div>
-                      <div className="font-medium">PlayStation</div>
-                      <div className="text-sm text-muted-foreground">{profile.gamer_tag_psn}</div>
-                    </div>
-                  </div>
-                )}
-                {profile.gamer_tag_steam && (
-                  <div className="flex items-center gap-3 p-3 border rounded-lg">
-                    <div className="w-8 h-8 bg-gray-700 rounded flex items-center justify-center text-white text-xs font-bold">
-                      ST
-                    </div>
-                    <div>
-                      <div className="font-medium">Steam</div>
-                      <div className="text-sm text-muted-foreground">{profile.gamer_tag_steam}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {!profile.gamer_tag_xbox && !profile.gamer_tag_psn && !profile.gamer_tag_steam && (
-                <p className="text-muted-foreground text-center py-4">
-                  No gamer tags set up yet. Add them in the Edit Profile tab!
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <PlayerStatsDisplay />
         </TabsContent>
 
         {/* Match History Tab */}
