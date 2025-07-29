@@ -625,6 +625,28 @@ export const CreateTournamentModal = ({
                   <SelectItem value="8">8 Players</SelectItem>
                   <SelectItem value="9">9 Players</SelectItem>
                   <SelectItem value="10">10 Players</SelectItem>
+                  <SelectItem value="11">11 Players</SelectItem>
+                  <SelectItem value="12">12 Players</SelectItem>
+                  <SelectItem value="13">13 Players</SelectItem>
+                  <SelectItem value="14">14 Players</SelectItem>
+                  <SelectItem value="15">15 Players</SelectItem>
+                  <SelectItem value="16">16 Players</SelectItem>
+                  <SelectItem value="17">17 Players</SelectItem>
+                  <SelectItem value="18">18 Players</SelectItem>
+                  <SelectItem value="19">19 Players</SelectItem>
+                  <SelectItem value="20">20 Players</SelectItem>
+                  <SelectItem value="21">21 Players</SelectItem>
+                  <SelectItem value="22">22 Players</SelectItem>
+                  <SelectItem value="23">23 Players</SelectItem>
+                  <SelectItem value="24">24 Players</SelectItem>
+                  <SelectItem value="25">25 Players</SelectItem>
+                  <SelectItem value="26">26 Players</SelectItem>
+                  <SelectItem value="27">27 Players</SelectItem>
+                  <SelectItem value="28">28 Players</SelectItem>
+                  <SelectItem value="29">29 Players</SelectItem>
+                  <SelectItem value="30">30 Players</SelectItem>
+                  <SelectItem value="31">31 Players</SelectItem>
+                  <SelectItem value="32">32 Players</SelectItem>
                 </SelectContent>
               </Select>
             </div>
