@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Users, DollarSign, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import sundayShowdownImage from '@/assets/sunday-showdown.jpg';
+const sundayShowdownImage = '/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png';
 
 interface UpcomingTournament {
   id: string;
