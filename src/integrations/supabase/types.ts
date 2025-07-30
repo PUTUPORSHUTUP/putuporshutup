@@ -3240,6 +3240,19 @@ export type Database = {
         Args: { sequence_name: string }
         Returns: number
       }
+      schedule_otp_cleanup: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      security_health_check: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          check_name: string
+          status: string
+          details: string
+          severity: string
+        }[]
+      }
       update_xbox_leaderboard_stats: {
         Args: {
           p_xuid: string
