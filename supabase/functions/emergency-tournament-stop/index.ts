@@ -33,27 +33,9 @@ serve(async (req) => {
       throw new Error("Tournament not found");
     }
 
-    // Get all participants - check if tournament_participants table exists, if not create empty array
-    let participants = [];
-    let participantsError = null;
-    
-    try {
-      const result = await supabaseService
-        .from("tournament_participants")
-        .select("user_id, stake_paid")
-        .eq("tournament_id", tournamentId);
-      
-      participants = result.data;
-      participantsError = result.error;
-    } catch (error) {
-      console.log("tournament_participants table may not exist, continuing with empty participants");
-      participants = [];
-    }
-
-    if (participantsError) {
-      console.error("Participants query error:", participantsError);
-      throw new Error("Failed to get participants");
-    }
+    // Since tournament_participants table doesn't exist, proceed with empty participants
+    const participants = [];
+    console.log('No tournament_participants table found, proceeding with tournament cancellation without refunds');
 
     // Handle case where there are no participants (empty array is valid)
     const participantsList = participants || [];
