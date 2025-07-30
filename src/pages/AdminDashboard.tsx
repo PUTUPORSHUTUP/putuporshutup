@@ -31,6 +31,8 @@ import {
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
 import { GameManagement } from '@/components/admin/GameManagement';
+import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
+import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -526,7 +528,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-12 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-14 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
@@ -539,6 +541,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
             <TabsTrigger value="projections" className="text-xs sm:text-sm">💰 Projections</TabsTrigger>
             <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
+            <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">🎮 Xbox Live</TabsTrigger>
+            <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">🧪 Xbox Test</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1079,6 +1083,16 @@ const AdminDashboard = () => {
           {/* Sponsor Hub Tab */}
           <TabsContent value="sponsor-hub" className="space-y-6">
             <SponsorDashboard />
+          </TabsContent>
+
+          {/* Xbox Live Integration Tab */}
+          <TabsContent value="xbox-live" className="space-y-6">
+            <XboxLiveDashboard />
+          </TabsContent>
+
+          {/* Xbox Integration Test Tab */}
+          <TabsContent value="xbox-test" className="space-y-6">
+            <XboxIntegrationTest />
           </TabsContent>
         </Tabs>
       </div>
