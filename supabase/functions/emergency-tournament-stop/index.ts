@@ -40,14 +40,18 @@ serve(async (req) => {
       .eq("tournament_id", tournamentId);
 
     if (participantsError) {
+      console.error("Participants query error:", participantsError);
       throw new Error("Failed to get participants");
     }
+
+    // Handle case where there are no participants (empty array is valid)
+    const participantsList = participants || [];
 
     let totalRefunded = 0;
     const refundDetails = [];
 
     // Process refunds for each participant
-    for (const participant of participants) {
+    for (const participant of participantsList) {
       const refundAmount = refundType === "full" ? participant.entry_fee : participant.entry_fee * 0.5;
       
       // Add money back to user's wallet
@@ -119,20 +123,20 @@ serve(async (req) => {
         action_data: {
           reason,
           refundType,
-          participantCount: participants.length,
+          participantCount: participantsList.length,
           totalRefunded,
           refundDetails
         }
       });
 
-    console.log(`Tournament ${tournamentId} cancelled. Refunded $${totalRefunded} to ${participants.length} players`);
+    console.log(`Tournament ${tournamentId} cancelled. Refunded $${totalRefunded} to ${participantsList.length} players`);
 
     return new Response(JSON.stringify({
       success: true,
       message: "Tournament cancelled and refunds processed",
       details: {
         tournamentId,
-        participantCount: participants.length,
+        participantCount: participantsList.length,
         totalRefunded,
         refundType,
         reason
