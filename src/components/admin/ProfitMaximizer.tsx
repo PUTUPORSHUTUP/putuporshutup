@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { AdminXboxSearch } from './AdminXboxSearch';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -332,8 +333,9 @@ export const ProfitMaximizer = () => {
       </Card>
 
       <Tabs defaultValue="profit-streams" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profit-streams">Profit Streams</TabsTrigger>
+          <TabsTrigger value="xbox-search">Xbox Search</TabsTrigger>
           <TabsTrigger value="xbox-setup">Xbox Setup</TabsTrigger>
           <TabsTrigger value="xbox-analytics">Xbox Analytics</TabsTrigger>
         </TabsList>
@@ -397,6 +399,10 @@ export const ProfitMaximizer = () => {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="xbox-search" className="space-y-4">
+          <AdminXboxSearch />
         </TabsContent>
 
         <TabsContent value="xbox-setup" className="space-y-4">
