@@ -33,7 +33,7 @@ serve(async (req) => {
     const { data: tournamentsToCancel } = await supabase
       .from('tournaments')
       .select('*')
-      .in('tournament_status', ['registration_open', 'registration_closed'])
+      .in('tournament_status', ['registration_open', 'registration_closed', 'in_progress'])
       .lte('start_time', new Date(Date.now() - 15 * 60 * 1000).toISOString()) // 15 minutes ago
       .lt('current_participants', 2)
 
