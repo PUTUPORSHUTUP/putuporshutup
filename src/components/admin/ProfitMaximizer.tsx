@@ -294,6 +294,33 @@ export const ProfitMaximizer = () => {
     }
   };
 
+  const createLiveMatch = async () => {
+    try {
+      console.log('Creating live match...');
+      const { data, error } = await supabase.functions.invoke('create-live-match', {
+        body: { 
+          gameId: "cod_bo6", 
+          stakeTier: "gold", 
+          participants: 2 
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "🎮 LIVE MATCH CREATED!",
+        description: `Join Code: ${data.match.joinCode} - Stakes: $${data.match.stakeAmount}`,
+      });
+    } catch (error) {
+      console.error('Error creating live match:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create live match",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -321,15 +348,25 @@ export const ProfitMaximizer = () => {
             Activate all profit streams and Xbox automation with one click
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button 
-            onClick={startFullAutomation}
-            className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-            size="lg"
-          >
-            <Play className="w-5 h-5 mr-2" />
-            START FULL AUTOMATION SYSTEM
-          </Button>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button 
+              onClick={startFullAutomation}
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+              size="lg"
+            >
+              <Play className="w-5 h-5 mr-2" />
+              START FULL AUTOMATION
+            </Button>
+            <Button 
+              onClick={createLiveMatch}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              size="lg"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              CREATE LIVE MATCH NOW
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
