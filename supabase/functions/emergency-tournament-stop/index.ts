@@ -33,11 +33,22 @@ serve(async (req) => {
       throw new Error("Tournament not found");
     }
 
-    // Get all participants
-    const { data: participants, error: participantsError } = await supabaseService
-      .from("tournament_participants")
-      .select("user_id, entry_fee")
-      .eq("tournament_id", tournamentId);
+    // Get all participants - check if tournament_participants table exists, if not create empty array
+    let participants = [];
+    let participantsError = null;
+    
+    try {
+      const result = await supabaseService
+        .from("tournament_participants")
+        .select("user_id, stake_paid")
+        .eq("tournament_id", tournamentId);
+      
+      participants = result.data;
+      participantsError = result.error;
+    } catch (error) {
+      console.log("tournament_participants table may not exist, continuing with empty participants");
+      participants = [];
+    }
 
     if (participantsError) {
       console.error("Participants query error:", participantsError);
@@ -52,7 +63,7 @@ serve(async (req) => {
 
     // Process refunds for each participant
     for (const participant of participantsList) {
-      const refundAmount = refundType === "full" ? participant.entry_fee : participant.entry_fee * 0.5;
+      const refundAmount = refundType === "full" ? participant.stake_paid : participant.stake_paid * 0.5;
       
       // Add money back to user's wallet
       const { error: walletError } = await supabaseService
@@ -77,7 +88,7 @@ serve(async (req) => {
           description: `Tournament refund: ${reason}`,
           metadata: {
             tournamentId,
-            originalEntryFee: participant.entry_fee,
+            originalEntryFee: participant.stake_paid,
             refundType,
             reason
           }
@@ -87,7 +98,7 @@ serve(async (req) => {
       refundDetails.push({
         userId: participant.user_id,
         refundAmount,
-        originalFee: participant.entry_fee
+        originalFee: participant.stake_paid
       });
     }
 
