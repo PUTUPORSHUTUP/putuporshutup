@@ -21,6 +21,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trophy, DollarSign, Users, Gamepad2, Lightbulb, Settings } from 'lucide-react';
 import { StatLoggingService } from '@/services/statLoggingService';
 import { GameRulesConfig } from '@/components/games/GameRulesConfig';
+import { GameAPIHub } from '@/components/games/GameAPIHub';
+import { MatchOutcomeAutomation } from '@/components/games/MatchOutcomeAutomation';
 
 interface Game {
   id: string;
@@ -579,15 +581,14 @@ const Games = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
-            <TabsTrigger value="browse">Browse Wagers</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7 max-w-4xl text-xs">
+            <TabsTrigger value="browse">Browse</TabsTrigger>
             <TabsTrigger value="quick-match">Quick Match</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="games">All Games</TabsTrigger>
-            <TabsTrigger value="rules" className="flex items-center gap-2">
-              <Settings className="w-4 h-4" />
-              Game Rules
-            </TabsTrigger>
+            <TabsTrigger value="games">Games</TabsTrigger>
+            <TabsTrigger value="api-hub">API Hub</TabsTrigger>
+            <TabsTrigger value="automation">Automation</TabsTrigger>
+            <TabsTrigger value="rules">Rules</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
@@ -709,6 +710,14 @@ const Games = () => {
                 });
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="api-hub" className="space-y-6">
+            <GameAPIHub />
+          </TabsContent>
+
+          <TabsContent value="automation" className="space-y-6">
+            <MatchOutcomeAutomation />
           </TabsContent>
 
           <TabsContent value="rules" className="space-y-6">
