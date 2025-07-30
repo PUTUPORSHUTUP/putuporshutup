@@ -19,6 +19,7 @@ import SponsorDashboard from "./pages/SponsorDashboard";
 import SundayShowdown from "./pages/SundayShowdown";
 import HowItWorks from "./pages/HowItWorks";
 import Education from "./pages/Education";
+import Promotion from "./pages/Promotion";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -79,6 +80,11 @@ const App = () => {
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/education" element={<Education />} />
               <Route path="/sunday-showdown" element={<SundayShowdown />} />
+              <Route path="/promotion" element={
+                <ProtectedRoute>
+                  <Promotion />
+                </ProtectedRoute>
+              } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

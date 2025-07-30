@@ -15,7 +15,8 @@ import {
   LogOut,
   Shield,
   Bell,
-  X
+  X,
+  Megaphone
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -120,6 +121,16 @@ export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
                 >
                   <User className="w-5 h-5 mr-3 text-gray-500" />
                   <span className="font-medium">Profile</span>
+                </Button>
+              </Link>
+
+              <Link to="/promotion" onClick={handleNavClick}>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start h-12 text-left hover:bg-muted/50"
+                >
+                  <Megaphone className="w-5 h-5 mr-3 text-pink-500" />
+                  <span className="font-medium">Promotion Tools</span>
                 </Button>
               </Link>
 
