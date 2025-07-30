@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Sponsor from "./pages/Sponsor";
 import SponsorSignup from "./pages/SponsorSignup";
 import SponsorDashboard from "./pages/SponsorDashboard";
+import SundayShowdown from "./pages/SundayShowdown";
 import HowItWorks from "./pages/HowItWorks";
 import Education from "./pages/Education";
 import { AuthProvider } from "./hooks/useAuth";
@@ -77,6 +78,7 @@ const App = () => {
               } />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/education" element={<Education />} />
+              <Route path="/sunday-showdown" element={<SundayShowdown />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
