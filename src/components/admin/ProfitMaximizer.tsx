@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AdminXboxSearch } from './AdminXboxSearch';
+import { XboxSeriesXAutomation } from './XboxSeriesXAutomation';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -333,10 +334,11 @@ export const ProfitMaximizer = () => {
       </Card>
 
       <Tabs defaultValue="profit-streams" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profit-streams">Profit Streams</TabsTrigger>
           <TabsTrigger value="xbox-search">Xbox Search</TabsTrigger>
           <TabsTrigger value="xbox-setup">Xbox Setup</TabsTrigger>
+          <TabsTrigger value="xbox-automation">Xbox Automation</TabsTrigger>
           <TabsTrigger value="xbox-analytics">Xbox Analytics</TabsTrigger>
         </TabsList>
 
@@ -480,6 +482,10 @@ export const ProfitMaximizer = () => {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="xbox-automation" className="space-y-4">
+          <XboxSeriesXAutomation />
         </TabsContent>
 
         <TabsContent value="xbox-analytics" className="space-y-4">
