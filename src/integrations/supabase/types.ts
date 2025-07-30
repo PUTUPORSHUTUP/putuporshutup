@@ -2888,6 +2888,235 @@ export type Database = {
         }
         Relationships: []
       }
+      xbox_api_calls: {
+        Row: {
+          created_at: string
+          endpoint: string
+          error_message: string | null
+          id: string
+          method: string
+          rate_limit_remaining: number | null
+          rate_limit_reset: string | null
+          response_status: number | null
+          response_time_ms: number | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          method?: string
+          rate_limit_remaining?: number | null
+          rate_limit_reset?: string | null
+          response_status?: number | null
+          response_time_ms?: number | null
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          method?: string
+          rate_limit_remaining?: number | null
+          rate_limit_reset?: string | null
+          response_status?: number | null
+          response_time_ms?: number | null
+        }
+        Relationships: []
+      }
+      xbox_leaderboard_stats: {
+        Row: {
+          avg_kd_ratio: number | null
+          best_winstreak: number
+          challenges_won: number
+          created_at: string
+          current_winstreak: number
+          gamertag: string
+          id: string
+          last_match_at: string | null
+          matches_played: number
+          skill_rating: number
+          tier: string
+          total_assists: number
+          total_deaths: number
+          total_kills: number
+          total_score: number
+          total_winnings: number
+          updated_at: string
+          user_id: string | null
+          xuid: string
+        }
+        Insert: {
+          avg_kd_ratio?: number | null
+          best_winstreak?: number
+          challenges_won?: number
+          created_at?: string
+          current_winstreak?: number
+          gamertag: string
+          id?: string
+          last_match_at?: string | null
+          matches_played?: number
+          skill_rating?: number
+          tier?: string
+          total_assists?: number
+          total_deaths?: number
+          total_kills?: number
+          total_score?: number
+          total_winnings?: number
+          updated_at?: string
+          user_id?: string | null
+          xuid: string
+        }
+        Update: {
+          avg_kd_ratio?: number | null
+          best_winstreak?: number
+          challenges_won?: number
+          created_at?: string
+          current_winstreak?: number
+          gamertag?: string
+          id?: string
+          last_match_at?: string | null
+          matches_played?: number
+          skill_rating?: number
+          tier?: string
+          total_assists?: number
+          total_deaths?: number
+          total_kills?: number
+          total_score?: number
+          total_winnings?: number
+          updated_at?: string
+          user_id?: string | null
+          xuid?: string
+        }
+        Relationships: []
+      }
+      xbox_match_history: {
+        Row: {
+          assists: number
+          challenge_id: string | null
+          created_at: string
+          deaths: number
+          game_mode: string
+          id: string
+          kills: number
+          match_duration: number | null
+          match_end_time: string | null
+          match_id: string
+          match_start_time: string | null
+          placement: number | null
+          raw_match_data: Json | null
+          score: number
+          verification_source: string
+          verified_at: string
+          xuid: string
+        }
+        Insert: {
+          assists?: number
+          challenge_id?: string | null
+          created_at?: string
+          deaths?: number
+          game_mode: string
+          id?: string
+          kills?: number
+          match_duration?: number | null
+          match_end_time?: string | null
+          match_id: string
+          match_start_time?: string | null
+          placement?: number | null
+          raw_match_data?: Json | null
+          score?: number
+          verification_source?: string
+          verified_at?: string
+          xuid: string
+        }
+        Update: {
+          assists?: number
+          challenge_id?: string | null
+          created_at?: string
+          deaths?: number
+          game_mode?: string
+          id?: string
+          kills?: number
+          match_duration?: number | null
+          match_end_time?: string | null
+          match_id?: string
+          match_start_time?: string | null
+          placement?: number | null
+          raw_match_data?: Json | null
+          score?: number
+          verification_source?: string
+          verified_at?: string
+          xuid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xbox_match_history_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xbox_verification_queue: {
+        Row: {
+          attempts: number
+          challenge_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          max_attempts: number
+          next_retry_at: string | null
+          priority: number
+          processed_at: string | null
+          status: string
+          submitted_stats: Json
+          user_id: string
+          verification_result: Json | null
+          xuid: string
+        }
+        Insert: {
+          attempts?: number
+          challenge_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          max_attempts?: number
+          next_retry_at?: string | null
+          priority?: number
+          processed_at?: string | null
+          status?: string
+          submitted_stats: Json
+          user_id: string
+          verification_result?: Json | null
+          xuid: string
+        }
+        Update: {
+          attempts?: number
+          challenge_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          max_attempts?: number
+          next_retry_at?: string | null
+          priority?: number
+          processed_at?: string | null
+          status?: string
+          submitted_stats?: Json
+          user_id?: string
+          verification_result?: Json | null
+          xuid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xbox_verification_queue_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -2967,6 +3196,18 @@ export type Database = {
       safe_nextval: {
         Args: { sequence_name: string }
         Returns: number
+      }
+      update_xbox_leaderboard_stats: {
+        Args: {
+          p_xuid: string
+          p_kills: number
+          p_deaths: number
+          p_assists: number
+          p_score: number
+          p_won_challenge?: boolean
+          p_winnings?: number
+        }
+        Returns: undefined
       }
       verify_otp: {
         Args: { p_user_id: string; p_otp_code: string; p_purpose: string }
