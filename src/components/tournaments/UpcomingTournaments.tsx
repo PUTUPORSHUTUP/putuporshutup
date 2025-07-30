@@ -205,7 +205,7 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
 
                 {/* Action Button */}
                 <div className="pt-2">
-                  <Link to="/tournaments">
+                  <Link to={`/tournaments?id=${tournament.id}`}>
                     <Button variant="outline" className="w-full">
                       <Trophy className="w-4 h-4 mr-2" />
                       View Tournament
