@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, DollarSign, Target, Star } from "lucide-react";
-import sundayShowdownImage from "@/assets/sunday-showdown-12noon.jpg";
+import sundayShowdownImage from "@/assets/sunday-showdown.jpg";
 
 export default function SundayShowdown() {
   const [registered, setRegistered] = useState(false);
@@ -15,12 +15,12 @@ export default function SundayShowdown() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-red-50 dark:from-amber-950 dark:via-orange-950 dark:to-red-950">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden min-h-screen">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${sundayShowdownImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 via-orange-900/60 to-red-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
         
         <div className="relative container mx-auto px-4 py-20">
           <div className="text-center space-y-6">
