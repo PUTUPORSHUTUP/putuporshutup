@@ -309,13 +309,13 @@ export const ProfitMaximizer = () => {
         </div>
       </div>
 
-      <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+      <Card className="bg-card border-border shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <Zap className="w-5 h-5 text-yellow-500" />
             Quick Start: Full Automation
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-muted-foreground">
             Activate all profit streams and Xbox automation with one click
           </CardDescription>
         </CardHeader>
