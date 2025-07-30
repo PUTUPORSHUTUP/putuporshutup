@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { gamertag, platform = "xbl" } = await req.json();
+    const { gamertag } = await req.json();
     
     if (!gamertag) {
       return new Response(JSON.stringify({ 
@@ -23,11 +23,11 @@ serve(async (req) => {
       });
     }
 
-    // Get API key from environment
-    const apiKey = Deno.env.get("COD_TRACKER_API_KEY");
-    if (!apiKey) {
+    // Get session cookie from environment
+    const sessionCookie = Deno.env.get("COD_SESSION_COOKIE");
+    if (!sessionCookie) {
       return new Response(JSON.stringify({ 
-        error: "COD Tracker API key not configured" 
+        error: "COD session cookie not configured" 
       }), { 
         status: 500, 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 
@@ -35,18 +35,17 @@ serve(async (req) => {
     }
 
     const encodedTag = encodeURIComponent(gamertag);
+    const platform = "xbl"; // Xbox Live platform ID
+
+    const apiURL = `https://my.cod.tracker.api/cod/v1/title/mw/platform/${platform}/gamer/${encodedTag}/matches`;
     
-    // Use COD Tracker API (replace with actual endpoint)
-    const apiURL = `https://api.tracker.gg/api/v2/warzone/standard/profile/${platform}/${encodedTag}`;
-    
-    console.log(`Fetching COD stats for ${gamertag} on platform ${platform}`);
+    console.log(`Fetching COD latest match for ${gamertag} on platform ${platform}`);
 
     const response = await fetch(apiURL, {
       method: "GET",
       headers: {
-        "TRN-Api-Key": apiKey,
         "Content-Type": "application/json",
-        "User-Agent": "Xbox-Gaming-Platform/1.0"
+        "Cookie": `ACT_SSO_COOKIE=${sessionCookie}`,
       },
     });
 
@@ -56,7 +55,17 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    
+    const latestMatch = data?.matches?.[0];
+
+    if (!latestMatch) {
+      return new Response(JSON.stringify({
+        error: "No matches found for this gamertag"
+      }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
     // Initialize Supabase client for logging
     const supabaseService = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -64,20 +73,14 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Extract key stats for easier access
-    const stats = data?.data?.segments?.[0]?.stats || {};
     const matchStats = {
       gamertag,
       platform,
-      kills: stats.kills?.value || 0,
-      deaths: stats.deaths?.value || 0,
-      kdRatio: stats.kdRatio?.value || 0,
-      wins: stats.wins?.value || 0,
-      matches: stats.matchesPlayed?.value || 0,
-      winRate: stats.wlRatio?.value || 0,
-      damage: stats.damage?.value || 0,
-      score: stats.score?.value || 0,
-      timePlayed: stats.timePlayed?.value || 0,
+      mode: latestMatch?.mode,
+      kills: latestMatch?.playerStats?.kills || 0,
+      deaths: latestMatch?.playerStats?.deaths || 0,
+      kdRatio: latestMatch?.playerStats?.kdRatio || 0,
+      matchDate: latestMatch?.utcStartSeconds,
       lastUpdated: new Date().toISOString()
     };
 
@@ -85,41 +88,34 @@ serve(async (req) => {
     await supabaseService
       .from("automated_actions")
       .insert({
-        automation_type: "cod_stat_fetch",
+        automation_type: "cod_latest_match",
         action_type: "api_call",
         success: true,
         action_data: {
           gamertag,
           platform,
-          statsRetrieved: Object.keys(stats).length,
-          kdRatio: matchStats.kdRatio,
-          matches: matchStats.matches
+          mode: matchStats.mode,
+          kills: matchStats.kills,
+          deaths: matchStats.deaths,
+          kdRatio: matchStats.kdRatio
         }
       });
 
-    console.log(`Successfully fetched COD stats for ${gamertag}: K/D ${matchStats.kdRatio}, Matches ${matchStats.matches}`);
+    console.log(`Successfully fetched COD latest match for ${gamertag}: ${matchStats.mode}, K/D ${matchStats.kdRatio}`);
 
     return new Response(JSON.stringify({
       success: true,
-      data: {
-        raw: data,
-        stats: matchStats,
-        profile: {
-          platformInfo: data?.data?.platformInfo,
-          userInfo: data?.data?.userInfo,
-          metadata: data?.data?.metadata
-        }
-      }
+      data: matchStats
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
 
   } catch (error) {
-    console.error("Error fetching COD data:", error);
+    console.error("Error fetching COD latest match:", error);
     
     return new Response(JSON.stringify({
-      error: error instanceof Error ? error.message : "Failed to fetch Call of Duty data",
+      error: error instanceof Error ? error.message : "Failed to fetch Call of Duty latest match",
       details: "Check console logs for more information"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
