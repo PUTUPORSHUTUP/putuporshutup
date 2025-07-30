@@ -21,7 +21,8 @@ import {
   Plus,
   Clock,
   CheckCircle,
-  Gamepad2
+  Gamepad2,
+  ArrowLeft
 } from 'lucide-react';
 
 interface Tournament {
@@ -341,9 +342,30 @@ const Tournaments = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-gaming text-primary">TOURNAMENTS</h1>
-            <p className="text-muted-foreground mt-2">Compete in bracket-style competitions</p>
+          <div className="flex items-center gap-4">
+            {/* Back Button - Show when tournament is selected via URL */}
+            {searchParams.get('id') && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setSelectedTournament(null);
+                  setActiveTab('upcoming');
+                  // Clear URL parameter
+                  const newUrl = new URL(window.location.href);
+                  newUrl.searchParams.delete('id');
+                  window.history.pushState({}, '', newUrl.toString());
+                }}
+                className="mr-2"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            )}
+            <div>
+              <h1 className="text-4xl font-gaming text-primary">TOURNAMENTS</h1>
+              <p className="text-muted-foreground mt-2">Compete in bracket-style competitions</p>
+            </div>
           </div>
           <div className="flex gap-3">
             <Button 
