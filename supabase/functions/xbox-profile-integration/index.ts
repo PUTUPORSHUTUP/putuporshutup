@@ -6,6 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// PUOSU Xbox Live Integration Configuration
+const PUOSU_XBOX_CONFIG = {
+  titleId: "2140035565",
+  scid: "00000000-0000-0000-0000-00007f8e521d",
+  sandboxId: "BTWDGW.158"
+};
+
 interface XboxProfile {
   gamertag: string;
   xuid: string;
@@ -13,6 +20,18 @@ interface XboxProfile {
   gamerScore: number;
   accountTier: string;
   isPublic: boolean;
+}
+
+interface XboxMatchData {
+  matchId: string;
+  kills: number;
+  deaths: number;
+  assists: number;
+  score: number;
+  placement: number;
+  gameMode: string;
+  matchDuration: number;
+  timestamp: string;
 }
 
 serve(async (req) => {
