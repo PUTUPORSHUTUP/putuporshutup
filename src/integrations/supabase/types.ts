@@ -1713,6 +1713,11 @@ export type Database = {
           user_id: string
           username: string | null
           wallet_balance: number | null
+          xbox_gamer_score: number | null
+          xbox_gamertag: string | null
+          xbox_linked_at: string | null
+          xbox_profile_picture: string | null
+          xbox_xuid: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -1734,6 +1739,11 @@ export type Database = {
           user_id: string
           username?: string | null
           wallet_balance?: number | null
+          xbox_gamer_score?: number | null
+          xbox_gamertag?: string | null
+          xbox_linked_at?: string | null
+          xbox_profile_picture?: string | null
+          xbox_xuid?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -1755,6 +1765,11 @@ export type Database = {
           user_id?: string
           username?: string | null
           wallet_balance?: number | null
+          xbox_gamer_score?: number | null
+          xbox_gamertag?: string | null
+          xbox_linked_at?: string | null
+          xbox_profile_picture?: string | null
+          xbox_xuid?: string | null
         }
         Relationships: []
       }
