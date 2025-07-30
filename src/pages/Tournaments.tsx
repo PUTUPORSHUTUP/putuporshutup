@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -63,6 +64,7 @@ const Tournaments = () => {
   const [tournamentMatches, setTournamentMatches] = useState<any[]>([]);
   const [tournamentParticipants, setTournamentParticipants] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [searchParams] = useSearchParams();
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -71,6 +73,19 @@ const Tournaments = () => {
     loadTournaments();
     loadAllRegistrations();
   }, []);
+
+  // Handle URL parameter for tournament selection
+  useEffect(() => {
+    const tournamentId = searchParams.get('id');
+    if (tournamentId && tournaments.length > 0) {
+      const tournament = tournaments.find(t => t.id === tournamentId);
+      if (tournament) {
+        setSelectedTournament(tournament);
+        loadTournamentDetails(tournamentId);
+        setActiveTab('bracket');
+      }
+    }
+  }, [searchParams, tournaments]);
 
   const loadAllRegistrations = async () => {
     try {
