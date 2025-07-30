@@ -332,9 +332,10 @@ export const ProfitMaximizer = () => {
       </Card>
 
       <Tabs defaultValue="profit-streams" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profit-streams">Profit Streams</TabsTrigger>
           <TabsTrigger value="xbox-setup">Xbox Setup</TabsTrigger>
+          <TabsTrigger value="xbox-analytics">Xbox Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profit-streams" className="space-y-4">
@@ -471,6 +472,104 @@ export const ProfitMaximizer = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Configure Xbox Automation
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="xbox-analytics" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gamepad2 className="w-5 h-5" />
+                Xbox Integration Analytics
+              </CardTitle>
+              <CardDescription>
+                Monitor Xbox profile linking and automation performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-card border rounded-lg p-4">
+                  <div className="text-2xl font-bold text-primary">247</div>
+                  <div className="text-sm text-muted-foreground">Xbox Profiles Linked</div>
+                </div>
+                <div className="bg-card border rounded-lg p-4">
+                  <div className="text-2xl font-bold text-green-600">89%</div>
+                  <div className="text-sm text-muted-foreground">Auto-Verification Rate</div>
+                </div>
+                <div className="bg-card border rounded-lg p-4">
+                  <div className="text-2xl font-bold text-blue-600">1,342</div>
+                  <div className="text-sm text-muted-foreground">Stats Verified Today</div>
+                </div>
+                <div className="bg-card border rounded-lg p-4">
+                  <div className="text-2xl font-bold text-purple-600">$23,450</div>
+                  <div className="text-sm text-muted-foreground">Revenue from Xbox Users</div>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 border border-border p-4 rounded-lg">
+                <h4 className="font-medium mb-2 text-foreground">Recent Xbox Activity</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">MrKeith00767 linked Xbox profile</span>
+                    <span className="text-xs text-muted-foreground">2 min ago</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Auto-verified COD stats for xX_ProGamer_Xx</span>
+                    <span className="text-xs text-muted-foreground">5 min ago</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Xbox automation created 3 new lobbies</span>
+                    <span className="text-xs text-muted-foreground">12 min ago</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Top Xbox Games</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Call of Duty: Black Ops 6</span>
+                        <span className="font-bold">67%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Apex Legends</span>
+                        <span className="font-bold">23%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Rocket League</span>
+                        <span className="font-bold">10%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Verification Status</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Auto-Verified</span>
+                        <span className="font-bold text-green-600">1,892</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Manual Review</span>
+                        <span className="font-bold text-yellow-600">156</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Failed</span>
+                        <span className="font-bold text-red-600">23</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

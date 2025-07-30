@@ -26,6 +26,7 @@ import {
 import { Loader2, Camera, Trophy, TrendingUp, DollarSign, GamepadIcon, Save, Crown, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PlayerStatsDisplay } from '@/components/profile/PlayerStatsDisplay';
+import { XboxLinking } from '@/components/profile/XboxLinking';
 
 interface Profile {
   id: string;
@@ -367,8 +368,9 @@ const Profile = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="edit" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="edit">Edit Profile</TabsTrigger>
+          <TabsTrigger value="xbox">Xbox</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
           <TabsTrigger value="premium">Premium</TabsTrigger>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
@@ -504,6 +506,21 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Xbox Integration Tab */}
+        <TabsContent value="xbox" className="space-y-6">
+          <div className="max-w-2xl mx-auto">
+            <XboxLinking 
+              onProfileLinked={(xboxProfile) => {
+                toast({
+                  title: "Xbox Profile Connected!",
+                  description: `Successfully linked ${xboxProfile.gamertag}`,
+                });
+                loadProfile(); // Refresh profile data
+              }}
+            />
+          </div>
         </TabsContent>
 
         {/* Premium Membership Tab */}
