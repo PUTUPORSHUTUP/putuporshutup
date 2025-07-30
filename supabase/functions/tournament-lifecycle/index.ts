@@ -145,6 +145,9 @@ serve(async (req) => {
     // Step 3: Handle tournament timeouts and no-shows
     await handleTournamentTimeouts()
 
+    // Step 4: Cancel tournaments that have been running too long without completion
+    await cancelStuckTournaments()
+
     console.log('🎯 Tournament Lifecycle Manager Complete:', results)
 
     return new Response(JSON.stringify({
@@ -276,6 +279,47 @@ async function handleTournamentTimeouts() {
       .eq('id', match.id)
 
     console.log(`⏰ Match ${match.id} timed out, winner: ${winnerId || 'none'}`)
+  }
+}
+
+async function cancelStuckTournaments() {
+  console.log(`🛑 Checking for stuck tournaments...`)
+  
+  // Cancel tournaments that have been in progress for more than 2 hours
+  const stuckThreshold = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+  
+  const { data: stuckTournaments } = await supabase
+    .from('tournaments')
+    .select('*')
+    .eq('tournament_status', 'in_progress')
+    .lte('updated_at', stuckThreshold)
+
+  for (const tournament of stuckTournaments || []) {
+    // Cancel the tournament
+    const { error } = await supabase
+      .from('tournaments')
+      .update({
+        tournament_status: 'cancelled',
+        status: 'cancelled',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', tournament.id)
+
+    if (error) {
+      console.error(`Error cancelling stuck tournament ${tournament.id}:`, error)
+    } else {
+      console.log(`🛑 Cancelled stuck tournament: ${tournament.title}`)
+      
+      // Cancel all pending matches
+      await supabase
+        .from('tournament_matches')
+        .update({
+          status: 'cancelled',
+          updated_at: new Date().toISOString()
+        })
+        .eq('tournament_id', tournament.id)
+        .in('status', ['pending', 'ready'])
+    }
   }
 }
 
