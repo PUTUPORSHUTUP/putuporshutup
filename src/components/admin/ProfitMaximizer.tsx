@@ -21,7 +21,8 @@ import {
   Zap,
   Target,
   Settings,
-  Play
+  Play,
+  XCircle
 } from 'lucide-react';
 
 interface ProfitStream {
@@ -321,6 +322,32 @@ export const ProfitMaximizer = () => {
     }
   };
 
+  const emergencyStopTournament = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('emergency-tournament-stop', {
+        body: { 
+          tournamentId: "10aee21d-27f5-4d53-83d3-592970be6dbc", // The test tournament
+          reason: "Platform technical issue - emergency stop",
+          refundType: "full" // or "partial" for 50% refund
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "🚨 EMERGENCY STOP EXECUTED",
+        description: `Tournament cancelled. $${data.details.totalRefunded} refunded to ${data.details.participantCount} players`,
+      });
+    } catch (error) {
+      console.error('Error stopping tournament:', error);
+      toast({
+        title: "Error",
+        description: "Failed to execute emergency stop",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -349,7 +376,7 @@ export const ProfitMaximizer = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button 
               onClick={startFullAutomation}
               className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
@@ -365,6 +392,14 @@ export const ProfitMaximizer = () => {
             >
               <Zap className="w-5 h-5 mr-2" />
               CREATE LIVE MATCH NOW
+            </Button>
+            <Button 
+              onClick={emergencyStopTournament}
+              className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+              size="lg"
+            >
+              <XCircle className="w-5 h-5 mr-2" />
+              EMERGENCY STOP & REFUND
             </Button>
           </div>
         </CardContent>
