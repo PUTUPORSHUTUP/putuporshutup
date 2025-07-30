@@ -28,7 +28,37 @@ serve(async (req) => {
       errors: []
     }
 
-    // Step 1: Close registration for tournaments that have reached their deadline
+    // Step 1: Cancel tournaments that don't have enough participants 15 minutes after start time
+    const cancelThreshold = new Date(Date.now()).toISOString()
+    const { data: tournamentsToCancel } = await supabase
+      .from('tournaments')
+      .select('*')
+      .in('tournament_status', ['registration_open', 'registration_closed'])
+      .lte('start_time', new Date(Date.now() - 15 * 60 * 1000).toISOString()) // 15 minutes ago
+      .lt('current_participants', 2)
+
+    console.log(`Found ${tournamentsToCancel?.length || 0} tournaments to cancel due to low participation`)
+
+    for (const tournament of tournamentsToCancel || []) {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ 
+          tournament_status: 'cancelled',
+          status: 'cancelled',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', tournament.id)
+
+      if (error) {
+        console.error(`Error cancelling tournament ${tournament.id}:`, error)
+        results.errors.push(`Tournament cancellation failed: ${error.message}`)
+      } else {
+        results.closed_registration++
+        console.log(`❌ Cancelled tournament due to low participation: ${tournament.title}`)
+      }
+    }
+
+    // Step 2: Close registration for tournaments that have reached their deadline
     const { data: registrationExpired } = await supabase
       .from('tournaments')
       .select('*')
