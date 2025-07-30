@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { calculateTournamentEntryFee } from '@/lib/feeCalculator';
+import { calculateTournamentEntryFee, calculateTournamentPrizePool } from '@/lib/feeCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -186,20 +186,19 @@ export const CreateTournamentModal = ({
   const calculatePrizePool = () => {
     const baseEntryFee = parseFloat(form.entryFee || '0');
     const participants = parseInt(form.maxParticipants);
-    const basePrizePool = baseEntryFee * participants;
+    
+    // New business model: $1 per player to platform, rest to prize pool
+    const { prizePool } = calculateTournamentPrizePool(baseEntryFee, participants);
     
     if (isSponsored) {
       const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
       const multiplier = tier?.multiplier || 1;
-      const sponsorContribution = tier?.cost || 0;
       
-      // Sponsor funds the entire multiplied prize pool
-      // Example: $200 base pool -> 2.5x = $500 total
-      // Sponsor pays $300 ($200 platform revenue + $100 additional prize)
-      return basePrizePool * multiplier;
+      // Sponsored tournaments multiply the prize pool
+      return prizePool * multiplier;
     }
     
-    return basePrizePool;
+    return prizePool;
   };
 
   const getTotalCost = () => {

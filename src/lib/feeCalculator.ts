@@ -59,24 +59,28 @@ export const getFeeStructure = () => [
 export const BASIC_MONTHLY_COST = 9.99;
 export const PREMIUM_MONTHLY_COST = 19.99;
 
-// Tournament entry fees with platform fees for revenue generation
-export const calculateTournamentEntryFee = (entryFee: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): { entryFee: number; platformFee: number; totalCost: number } => {
-  let feePercentage = PLATFORM_FEE_PERCENTAGE; // Same platform fee as challenges
-  
-  // Apply membership discounts
-  if (membershipTier === 'basic') {
-    feePercentage = feePercentage * 0.5; // 50% fee reduction for basic
-  } else if (membershipTier === 'premium') {
-    feePercentage = feePercentage * 0.25; // 75% fee reduction for premium
-  }
-  
-  const platformFee = Math.round((entryFee * (feePercentage / 100)) * 100) / 100;
-  const totalCost = entryFee + platformFee;
+// Tournament entry fees - simple $1 platform fee per player
+export const calculateTournamentEntryFee = (entryFee: number, membershipTier: 'none' | 'basic' | 'premium' = 'none'): { entryFee: number; platformFee: number; totalCost: number; requiresPremium: boolean } => {
+  const platformFee = 1.00; // Fixed $1 platform fee per player
+  const totalCost = entryFee; // Players only pay the entry fee, platform fee comes from prize pool
+  const requiresPremium = entryFee >= 10; // $10+ tournaments require premium membership
   
   return {
     entryFee,
     platformFee,
-    totalCost
+    totalCost,
+    requiresPremium
+  };
+};
+
+// Calculate tournament prize pool after platform fees
+export const calculateTournamentPrizePool = (entryFee: number, participantCount: number): { prizePool: number; platformRevenue: number } => {
+  const platformRevenue = participantCount * 1.00; // $1 per player
+  const prizePool = (entryFee * participantCount) - platformRevenue;
+  
+  return {
+    prizePool,
+    platformRevenue
   };
 };
 

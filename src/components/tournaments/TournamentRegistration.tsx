@@ -45,17 +45,52 @@ export const TournamentRegistration = ({
 
     setIsRegistering(true);
     try {
+      // Check user profile and premium status
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('wallet_balance, is_premium')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile) {
+        throw new Error('Profile not found');
+      }
+
+      // Check premium requirement for $10+ tournaments
+      const entryFee = tournament.entry_fee || 0;
+      if (entryFee >= 10 && !profile.is_premium) {
+        throw new Error('Premium membership required for tournaments with $10+ entry fees');
+      }
+
+      // Check wallet balance
+      if (profile.wallet_balance < entryFee) {
+        throw new Error(`Insufficient funds. You need $${entryFee.toFixed(2)} to register.`);
+      }
+
+      // Register for tournament
       const { error } = await supabase
         .from('tournament_registrations')
         .insert({
           tournament_id: tournament.id,
           user_id: user.id,
           team_name: teamName || null,
-          stake_paid: tournament.entry_fee || 0,
+          stake_paid: entryFee,
           payment_status: 'completed'
         });
 
       if (error) throw error;
+
+      // Update user wallet balance
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .update({ 
+          wallet_balance: profile.wallet_balance - entryFee 
+        })
+        .eq('user_id', user.id);
+
+      if (balanceError) {
+        console.error('Error updating balance:', balanceError);
+      }
 
       toast({
         title: "Registration Successful!",
