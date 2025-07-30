@@ -33,18 +33,57 @@ serve(async (req) => {
       throw new Error("Tournament not found");
     }
 
-    // Since tournament_participants table doesn't exist, proceed with empty participants
-    const participants = [];
-    console.log('No tournament_participants table found, proceeding with tournament cancellation without refunds');
+    console.log(`Found tournament: ${tournament.title}, current status: ${tournament.status}`);
 
-    // Handle case where there are no participants (empty array is valid)
-    const participantsList = participants || [];
-
+    // Initialize participants array - we'll handle different scenarios
+    let participants = [];
     let totalRefunded = 0;
     const refundDetails = [];
 
+    // Try to get participants but handle gracefully if table doesn't exist or has wrong columns
+    try {
+      // First try with stake_paid column
+      const { data: participantsData, error } = await supabaseService
+        .from("tournament_participants")
+        .select("user_id, stake_paid")
+        .eq("tournament_id", tournamentId);
+      
+      if (error) {
+        console.log("Error querying tournament_participants with stake_paid:", error.message);
+        
+        // If stake_paid doesn't exist, try with entry_fee
+        try {
+          const { data: participantsDataAlt, error: errorAlt } = await supabaseService
+            .from("tournament_participants")
+            .select("user_id, entry_fee")
+            .eq("tournament_id", tournamentId);
+          
+          if (errorAlt) {
+            console.log("Error querying tournament_participants with entry_fee:", errorAlt.message);
+            participants = [];
+          } else {
+            // Map entry_fee to stake_paid for consistency
+            participants = (participantsDataAlt || []).map(p => ({
+              user_id: p.user_id,
+              stake_paid: p.entry_fee
+            }));
+          }
+        } catch (altError) {
+          console.log("Tournament_participants table structure unknown:", altError);
+          participants = [];
+        }
+      } else {
+        participants = participantsData || [];
+      }
+    } catch (tableError) {
+      console.log("Tournament_participants table may not exist:", tableError.message);
+      participants = [];
+    }
+
+    console.log(`Found ${participants.length} participants to process refunds for`);
+
     // Process refunds for each participant
-    for (const participant of participantsList) {
+    for (const participant of participants) {
       const refundAmount = refundType === "full" ? participant.stake_paid : participant.stake_paid * 0.5;
       
       // Add money back to user's wallet
@@ -116,20 +155,20 @@ serve(async (req) => {
         action_data: {
           reason,
           refundType,
-          participantCount: participantsList.length,
+          participantCount: participants.length,
           totalRefunded,
           refundDetails
         }
       });
 
-    console.log(`Tournament ${tournamentId} cancelled. Refunded $${totalRefunded} to ${participantsList.length} players`);
+    console.log(`Tournament ${tournamentId} cancelled. Refunded $${totalRefunded} to ${participants.length} players`);
 
     return new Response(JSON.stringify({
       success: true,
       message: "Tournament cancelled and refunds processed",
       details: {
         tournamentId,
-        participantCount: participantsList.length,
+        participantCount: participants.length,
         totalRefunded,
         refundType,
         reason
