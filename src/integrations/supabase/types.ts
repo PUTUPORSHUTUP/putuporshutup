@@ -1846,6 +1846,36 @@ export type Database = {
           },
         ]
       }
+      security_events: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       security_settings: {
         Row: {
           account_locked_until: string | null
@@ -3122,6 +3152,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rls_policy_coverage: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          rls_enabled: boolean
+          policy_count: number
+          needs_attention: boolean
+        }[]
+      }
       cleanup_expired_otp: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -3192,6 +3231,10 @@ export type Database = {
       is_user_moderator: {
         Args: { user_uuid?: string }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
+        Returns: undefined
       }
       safe_nextval: {
         Args: { sequence_name: string }
