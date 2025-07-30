@@ -456,9 +456,9 @@ export const ProfitMaximizer = () => {
                 />
               </div>
 
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Xbox Setup Instructions:</h4>
-                <ol className="list-decimal list-inside space-y-1 text-sm">
+              <div className="bg-muted/50 border border-border p-4 rounded-lg">
+                <h4 className="font-medium mb-2 text-foreground">Xbox Setup Instructions:</h4>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
                   <li>Enable Xbox Remote Play on your console</li>
                   <li>Set console to "Instant-on" power mode</li>
                   <li>Configure static IP address</li>
