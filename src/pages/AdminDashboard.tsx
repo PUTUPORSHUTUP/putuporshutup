@@ -438,6 +438,35 @@ const AdminDashboard = () => {
     }
   };
 
+  const cancelTournament = async (tournamentId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('emergency-tournament-stop', {
+        body: { 
+          tournamentId,
+          reason: 'Manual cancellation by admin',
+          refundType: 'full'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Tournament Cancelled",
+        description: "Tournament has been cancelled and refunds processed.",
+      });
+
+      // Refresh tournament data
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error cancelling tournament:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to cancel tournament. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -765,25 +794,98 @@ const AdminDashboard = () => {
                             {/* Admin Actions */}
                             <div className="flex gap-1">
                               {tournament.status === 'open' ? (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    console.log('Button clicked for tournament:', tournament.id);
-                                    generateBracket(tournament.id);
-                                  }}
-                                  className="text-xs bg-blue-500 text-white hover:bg-blue-600"
-                                  disabled={false}
-                                >
-                                  Start Tournament
-                                  {tournament.current_participants < 2 && (
-                                    <span className="ml-1 text-xs opacity-75">
-                                      ({tournament.current_participants} players)
-                                    </span>
-                                  )}
-                                </Button>
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      console.log('Button clicked for tournament:', tournament.id);
+                                      generateBracket(tournament.id);
+                                    }}
+                                    className="text-xs bg-blue-500 text-white hover:bg-blue-600"
+                                    disabled={false}
+                                  >
+                                    Start Tournament
+                                    {tournament.current_participants < 2 && (
+                                      <span className="ml-1 text-xs opacity-75">
+                                        ({tournament.current_participants} players)
+                                      </span>
+                                    )}
+                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        className="text-xs"
+                                      >
+                                        <XCircle className="w-4 h-4 mr-1" />
+                                        Cancel
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Cancel Tournament?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This will cancel "{tournament.title}" and issue full refunds to all participants. This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction 
+                                          onClick={() => cancelTournament(tournament.id)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Yes, Cancel Tournament
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
+                              ) : tournament.status !== 'completed' && tournament.status !== 'cancelled' ? (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      window.open(`/tournaments`, '_blank');
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    View Details
+                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        className="text-xs"
+                                      >
+                                        <XCircle className="w-4 h-4 mr-1" />
+                                        Cancel
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Cancel Tournament?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This will cancel "{tournament.title}" and issue full refunds to all participants. This action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction 
+                                          onClick={() => cancelTournament(tournament.id)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Yes, Cancel Tournament
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
                               ) : (
                                 <Button
                                   size="sm"
