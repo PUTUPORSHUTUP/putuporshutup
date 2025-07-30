@@ -46,7 +46,7 @@ interface AutomationStatus {
 
 export const XboxSeriesXAutomation = () => {
   const [config, setConfig] = useState<XboxAutomationConfig>({
-    consoleIP: '',
+    consoleIP: '10.0.0.51', // Pre-populated from your network settings
     apiKey: '',
     autoStartEnabled: false,
     hoursPerDay: 24,
