@@ -1033,6 +1033,45 @@ export type Database = {
           },
         ]
       }
+      game_presence: {
+        Row: {
+          activity_state: string
+          created_at: string
+          current_game: string | null
+          game_title_id: string | null
+          id: string
+          is_online: boolean
+          last_seen_at: string
+          updated_at: string
+          user_id: string
+          xbox_xuid: string | null
+        }
+        Insert: {
+          activity_state?: string
+          created_at?: string
+          current_game?: string | null
+          game_title_id?: string | null
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          updated_at?: string
+          user_id: string
+          xbox_xuid?: string | null
+        }
+        Update: {
+          activity_state?: string
+          created_at?: string
+          current_game?: string | null
+          game_title_id?: string | null
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          updated_at?: string
+          user_id?: string
+          xbox_xuid?: string | null
+        }
+        Relationships: []
+      }
       game_suggestions: {
         Row: {
           created_at: string

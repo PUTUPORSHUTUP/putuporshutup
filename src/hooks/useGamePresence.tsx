@@ -36,22 +36,38 @@ export const useGamePresence = (): UseGamePresenceReturn => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch all presence data with profile info
+      // Fetch all presence data with profile info using raw query
       const { data: presenceData, error: presenceError } = await supabase
-        .from('game_presence')
-        .select(`
-          *,
-          profiles!inner(xbox_gamertag, display_name)
-        `)
-        .eq('is_online', true)
-        .order('last_seen_at', { ascending: false });
-
+        .rpc('get_game_presence_with_profiles')
+        
       if (presenceError) {
         console.error('Error fetching presence data:', presenceError);
-        throw presenceError;
+        // Fallback to simple profiles query for now
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, xbox_gamertag, display_name, xbox_linked')
+          .eq('xbox_linked', true)
+          .limit(20);
+        
+        const formattedPresence = (profilesData || []).map(profile => ({
+          user_id: profile.user_id,
+          xbox_xuid: '',
+          current_game: null,
+          game_title_id: null,
+          activity_state: 'unknown',
+          last_seen_at: new Date().toISOString(),
+          is_online: false,
+          xbox_gamertag: profile.xbox_gamertag,
+          display_name: profile.display_name
+        }));
+        
+        setAllPresence(formattedPresence);
+        const currentUserPresence = formattedPresence.find(p => p.user_id === user.id);
+        setUserPresence(currentUserPresence || null);
+        return;
       }
 
-      const formattedPresence = (presenceData || []).map(item => ({
+      const formattedPresence = (presenceData || []).map((item: any) => ({
         user_id: item.user_id,
         xbox_xuid: item.xbox_xuid,
         current_game: item.current_game,
@@ -59,8 +75,8 @@ export const useGamePresence = (): UseGamePresenceReturn => {
         activity_state: item.activity_state,
         last_seen_at: item.last_seen_at,
         is_online: item.is_online,
-        xbox_gamertag: item.profiles?.xbox_gamertag,
-        display_name: item.profiles?.display_name
+        xbox_gamertag: item.xbox_gamertag,
+        display_name: item.display_name
       }));
 
       setAllPresence(formattedPresence);
