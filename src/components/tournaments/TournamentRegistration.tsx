@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trophy, Clock, DollarSign } from "lucide-react";
+import { Users, Trophy, Clock, DollarSign, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -248,6 +248,23 @@ export const TournamentRegistration = ({
             </div>
           </div>
         </div>
+
+        
+        {/* Premium Requirement Notice for $10+ tournaments */}
+        {(tournament.entry_fee || 0) >= 10 && (
+          <div className="p-4 border border-yellow-500 rounded-lg bg-yellow-50 dark:bg-yellow-950/20 mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Crown className="w-4 h-4 text-yellow-600" />
+              <span className="font-semibold text-yellow-800 dark:text-yellow-200">
+                Premium Tournament
+              </span>
+            </div>
+            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              This tournament requires a Premium membership to participate. 
+              Entry fee $10+ tournaments are exclusive to Premium members.
+            </p>
+          </div>
+        )}
 
         {/* Registration Form */}
         {!isUserRegistered && !registrationClosed && spotsRemaining > 0 && user && (
