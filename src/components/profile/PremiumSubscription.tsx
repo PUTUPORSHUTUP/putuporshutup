@@ -130,8 +130,8 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   ];
 
   const premiumFeatures = [
-    { icon: Zap, title: "No Platform Fees", description: "Zero fees on deposits (tournament entries still apply)" },
-    { icon: Trophy, title: "Exclusive Tournaments", description: "Premium-only competitions" },
+    { icon: Zap, title: "No Platform Fees", description: "Zero fees on deposits (challenges only)" },
+    { icon: Trophy, title: "10+ Tournaments Access", description: "Compete in premium tournaments with exclusive prizes" },
     { icon: Star, title: "VIP Priority", description: "First access to everything" },
     { icon: Shield, title: "Premium Support", description: "24/7 priority customer service" },
     { icon: Crown, title: "Elite Status", description: "Special badges and recognition" }
