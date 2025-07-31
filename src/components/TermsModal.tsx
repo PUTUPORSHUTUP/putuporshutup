@@ -8,10 +8,11 @@ import { AlertTriangle, Shield } from 'lucide-react';
 interface TermsModalProps {
   open: boolean;
   onAccept: () => void;
+  onClose?: () => void;
   actionText?: string;
 }
 
-export const TermsModal = ({ open, onAccept, actionText = "Accept Challenge" }: TermsModalProps) => {
+export const TermsModal = ({ open, onAccept, onClose, actionText = "Accept Challenge" }: TermsModalProps) => {
   const [hasReadTerms, setHasReadTerms] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -40,7 +41,7 @@ export const TermsModal = ({ open, onAccept, actionText = "Accept Challenge" }: 
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(newOpen) => !newOpen && onClose?.()}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

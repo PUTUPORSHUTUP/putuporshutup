@@ -743,6 +743,7 @@ const Games = () => {
       <TermsModal
         open={showTermsModal}
         onAccept={() => setShowTermsModal(false)}
+        onClose={() => setShowTermsModal(false)}
       />
     </div>
   );
