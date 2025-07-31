@@ -48,10 +48,7 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const xboxApiKey = Deno.env.get("XBOX_API_KEY");
-    if (!xboxApiKey) {
-      throw new Error("Xbox API key not configured");
-    }
+    const xboxApiKey = Deno.env.get("XBOX_API_KEY"); // Still needed for linking/verification
 
     console.log(`Processing Xbox action: ${action}`);
 
@@ -86,67 +83,62 @@ serve(async (req) => {
 });
 
 async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
-  console.log(`Looking up gamertag: ${gamertag}`);
+  console.log(`Looking up gamertag: ${gamertag} using XUID.io`);
   
-  const response = await fetch(`https://xboxapi.com/v2/xuid/${encodeURIComponent(gamertag)}`, {
-    headers: {
-      "X-AUTH": apiKey,
-      "Content-Type": "application/json"
-    }
-  });
-
-  console.log(`Xbox API response status: ${response.status}`);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`Xbox API error: ${response.status} ${response.statusText}, Body: ${errorText}`);
+  try {
+    // Use XUID.io - more reliable and doesn't require API key
+    const response = await fetch(`https://xuid.io/lookup/${encodeURIComponent(gamertag)}`);
     
-    if (response.status === 403) {
-      throw new Error("Xbox API authentication failed. Please check your API key.");
-    }
+    console.log(`XUID.io response status: ${response.status}`);
     
-    throw new Error(`Xbox API error: ${response.status} ${response.statusText}`);
-  }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`XUID.io error: ${response.status} ${response.statusText}, Body: ${errorText}`);
+      
+      if (response.status === 404) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Gamertag not found"
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 404,
+        });
+      }
+      
+      throw new Error(`XUID.io error: ${response.status} ${response.statusText}`);
+    }
 
-  const xuid = await response.text();
-  
-  if (!xuid || xuid === "null") {
+    const data = await response.json();
+    console.log(`XUID.io response:`, data);
+    
+    if (!data.xuid) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Gamertag not found"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
     return new Response(JSON.stringify({
-      success: false,
-      error: "Gamertag not found"
+      success: true,
+      profile: {
+        gamertag: data.gamertag || gamertag,
+        xuid: data.xuid,
+        profilePictureUrl: data.avatar || `https://avatar-ssl.xboxlive.com/avatar/${gamertag}/avatar-body.png`,
+        gamerScore: data.gamerscore || 0,
+        isPublic: true
+      }
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 404,
+      status: 200,
     });
+    
+  } catch (error) {
+    console.error('XUID.io lookup failed:', error);
+    throw error;
   }
-
-  // Get profile details using the XUID
-  const profileResponse = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
-    headers: {
-      "X-AUTH": apiKey,
-      "Content-Type": "application/json"
-    }
-  });
-
-  if (!profileResponse.ok) {
-    throw new Error(`Xbox API profile error: ${profileResponse.status}`);
-  }
-
-  const profile = await profileResponse.json();
-  
-  return new Response(JSON.stringify({
-    success: true,
-    profile: {
-      gamertag: profile.gamertag,
-      xuid: xuid,
-      profilePictureUrl: profile.gamerpic,
-      gamerScore: profile.gamescore,
-      isPublic: true // Xbox API profiles are typically public
-    }
-  }), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-    status: 200,
-  });
 }
 
 async function linkXboxProfile(gamertag: string, xuid: string, req: Request, supabase: any, apiKey: string) {
