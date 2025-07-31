@@ -33,6 +33,7 @@ import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptim
 import { GameManagement } from '@/components/admin/GameManagement';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
+import ComprehensiveSystemTest from '@/components/admin/ComprehensiveSystemTest';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -528,7 +529,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-14 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-15 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
@@ -543,6 +544,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">🎮 Xbox Live</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">🧪 Xbox Test</TabsTrigger>
+            <TabsTrigger value="system-test" className="text-xs sm:text-sm">🚀 Full Test</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1093,6 +1095,11 @@ const AdminDashboard = () => {
           {/* Xbox Integration Test Tab */}
           <TabsContent value="xbox-test" className="space-y-6">
             <XboxIntegrationTest />
+          </TabsContent>
+
+          {/* Comprehensive System Test Tab */}
+          <TabsContent value="system-test" className="space-y-6">
+            <ComprehensiveSystemTest />
           </TabsContent>
         </Tabs>
       </div>
