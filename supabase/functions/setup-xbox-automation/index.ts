@@ -75,7 +75,7 @@ serve(async (req) => {
           action: "auto_start_tournaments",
           minimumPlayers: 4,
           maxWaitTime: 10, // minutes
-          entryFees: [25, 50, 100],
+          entryFees: [5, 10, 25, 50], // Include $5 and $10 for accessibility
           peakHourMultipliers: {
             "18:00-23:00": 2.0,
             "12:00-17:00": 1.5,

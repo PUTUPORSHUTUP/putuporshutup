@@ -550,14 +550,14 @@ async function runPremiumTournaments(supabase: any, config: any) {
     .from('profiles')
     .select('user_id')
     .eq('is_premium', true)
-    .gte('wallet_balance', 100)
+    .gte('wallet_balance', 25)
     .limit(20);
     
   let createdTournaments = 0;
   
   if (premiumUsers && premiumUsers.length >= 4) {
-    // Create a premium tournament
-    const entryFees = [25, 50, 100];
+    // Create tournaments with inclusive entry fees - only $10+ require premium
+    const entryFees = [5, 10, 25, 50]; // $5 is open to everyone, $10+ premium only
     const entryFee = entryFees[Math.floor(Math.random() * entryFees.length)];
     
     const { data: games } = await supabase
@@ -567,10 +567,14 @@ async function runPremiumTournaments(supabase: any, config: any) {
       .limit(1);
       
     if (games && games.length > 0) {
+      const tournamentTitle = entryFee >= 10 ? 
+        `Premium Championship - $${entryFee}` : 
+        `Open Championship - $${entryFee} (Everyone Welcome!)`;
+        
       await supabase
         .from('tournaments')
         .insert({
-          title: `Premium Championship - $${entryFee}`,
+          title: tournamentTitle,
           game_id: games[0].id,
           entry_fee: entryFee,
           max_participants: 16,
@@ -694,11 +698,13 @@ async function runSponsoredChallenges(supabase: any, config: any) {
 async function runFranchiseTournaments(supabase: any, config: any) {
   console.log('🏆 Running franchise tournaments automation');
   
-  // Create franchise-specific tournaments
+  // Create franchise-specific tournaments with inclusive pricing
   const franchises = ['NBA 2K25', 'Madden NFL 25', 'Call of Duty'];
+  const inclusiveEntryFees = [5, 10, 25]; // Mix of accessible and premium fees
   let createdFranchise = 0;
   
   for (const franchise of franchises) {
+    const entryFee = inclusiveEntryFees[Math.floor(Math.random() * inclusiveEntryFees.length)];
     const { data: game } = await supabase
       .from('games')
       .select('id')
@@ -714,14 +720,18 @@ async function runFranchiseTournaments(supabase: any, config: any) {
         .eq('status', 'open');
         
       if ((existingTournaments || 0) < 2) {
+        const tournamentTitle = entryFee >= 10 ? 
+          `${franchise} Championship Series (Premium)` : 
+          `${franchise} Open Series - $${entryFee}`;
+          
         await supabase
           .from('tournaments')
           .insert({
-            title: `${franchise} Championship Series`,
+            title: tournamentTitle,
             game_id: game.id,
-            entry_fee: 25,
+            entry_fee: entryFee,
             max_participants: 32,
-            prize_pool: 25 * 32 * 0.9,
+            prize_pool: (entryFee * 32 * 0.9) - 32, // Subtract $1 platform fee per player
             status: 'open',
             start_time: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
             platform: 'Cross-Platform',
@@ -833,14 +843,16 @@ async function runAutomatedLeagues(supabase: any, config: any) {
       .eq('status', 'open');
       
     if ((existingLeagues || 0) === 0) {
+      // Create affordable weekly leagues for everyone
+      const weeklyEntryFee = 5; // Accessible to all players
       await supabase
         .from('tournaments')
         .insert({
-          title: `${game.name} Weekly League`,
+          title: `${game.name} Weekly League - $5 Entry (Open to All!)`,
           game_id: game.id,
-          entry_fee: 15,
+          entry_fee: weeklyEntryFee,
           max_participants: 16,
-          prize_pool: 15 * 16 * 0.9,
+          prize_pool: (weeklyEntryFee * 16 * 0.9) - 16, // Subtract $1 platform fee per player
           status: 'open',
           start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           platform: 'Cross-Platform',
