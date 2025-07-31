@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface ReportResultRequest {
-  wager_id: string;
+  challenge_id: string;
   winner_id: string;
 }
 
@@ -35,13 +35,13 @@ serve(async (req) => {
       throw new Error("User not authenticated");
     }
 
-    const { wager_id, winner_id }: ReportResultRequest = await req.json();
+    const { challenge_id, winner_id }: ReportResultRequest = await req.json();
     
-    if (!wager_id || !winner_id) {
-      throw new Error("Wager ID and Winner ID required");
+    if (!challenge_id || !winner_id) {
+      throw new Error("Challenge ID and Winner ID required");
     }
 
-    console.log("Processing result report for wager:", wager_id, "winner:", winner_id, "by user:", user.id);
+    console.log("Processing result report for challenge:", challenge_id, "winner:", winner_id, "by user:", user.id);
 
     // Get challenge details with participants
     const { data: challenge, error: challengeError } = await supabaseService
@@ -50,7 +50,7 @@ serve(async (req) => {
         *,
         challenge_participants(*)
       `)
-      .eq("id", wager_id)
+      .eq("id", challenge_id)
       .eq("status", "in_progress")
       .single();
 
@@ -76,7 +76,7 @@ serve(async (req) => {
     const { data: existingReport } = await supabaseService
       .from("challenge_result_reports")
       .select("*")
-      .eq("challenge_id", wager_id)
+      .eq("challenge_id", challenge_id)
       .eq("reported_by", user.id)
       .single();
 
@@ -88,7 +88,7 @@ serve(async (req) => {
     await supabaseService
       .from("challenge_result_reports")
       .insert({
-        challenge_id: wager_id,
+        challenge_id: challenge_id,
         winner_id,
         reported_by: user.id,
         created_at: new Date().toISOString()
@@ -98,7 +98,7 @@ serve(async (req) => {
     const { data: allReports } = await supabaseService
       .from("challenge_result_reports")
       .select("*")
-      .eq("challenge_id", wager_id);
+      .eq("challenge_id", challenge_id);
 
     const totalParticipants = challenge.challenge_participants.length + (challenge.creator_id ? 1 : 0);
     const reportsForWinner = allReports?.filter(r => r.winner_id === winner_id).length || 0;
@@ -112,7 +112,7 @@ serve(async (req) => {
 
     if (hasConsensus) {
       // Finalize the challenge
-      await finalizeChallenge(supabaseService, wager_id, winner_id, challenge.total_pot);
+      await finalizeChallenge(supabaseService, challenge_id, winner_id, challenge.total_pot);
       message = "🏆 Challenge completed! Winner received INSTANT payout!";
     } else {
       message = `Result reported. Waiting for more reports (${reportsForWinner}/${majorityNeeded} needed).`;
