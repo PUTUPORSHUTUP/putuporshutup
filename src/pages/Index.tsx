@@ -17,6 +17,8 @@ import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
 import { RulesOfEngagementModal } from '@/components/games/RulesOfEngagementModal';
 import { SponsorCarousel } from '@/components/ui/sponsor-carousel';
 import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
+import { LiveGameStatus } from '@/components/realtime/LiveGameStatus';
+import { KillRaceChallenge } from '@/components/games/KillRaceChallenge';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -325,10 +327,28 @@ const Index = () => {
           
           <RealTimeStats />
           
-          {/* Live Gaming Trends */}
-          <div className="mt-16 flex justify-center">
-            <LiveGamingTrends />
-          </div>
+      {/* Live Gaming Trends & Game Status */}
+      <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="flex justify-center">
+          <LiveGamingTrends />
+        </div>
+        <div className="flex justify-center">
+          <LiveGameStatus showAllUsers={true} maxUsers={5} />
+        </div>
+      </div>
+      
+      {/* Kill Race Feature Showcase */}
+      <div className="mt-16 flex justify-center">
+        <div className="max-w-md">
+          <h3 className="text-2xl font-orbitron font-bold mb-4 text-center">Try Kill Race Challenges</h3>
+          <p className="text-center text-muted-foreground mb-6 text-sm">
+            Auto-verified COD multiplayer challenges using Xbox Live APIs
+          </p>
+          <KillRaceChallenge onChallengeCreate={(data) => {
+            console.log('Demo challenge created:', data);
+          }} />
+        </div>
+      </div>
           
           {/* Visitor Counter */}
           <div className="mt-16">

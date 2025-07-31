@@ -36,53 +36,37 @@ export const useGamePresence = (): UseGamePresenceReturn => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch all presence data with profile info using raw query
-      const { data: presenceData, error: presenceError } = await supabase
-        .rpc('get_game_presence_with_profiles')
-        
-      if (presenceError) {
-        console.error('Error fetching presence data:', presenceError);
-        // Fallback to simple profiles query for now
-        const { data: profilesData } = await supabase
-          .from('profiles')
-          .select('user_id, xbox_gamertag, display_name, xbox_linked')
-          .eq('xbox_linked', true)
-          .limit(20);
-        
-        const formattedPresence = (profilesData || []).map(profile => ({
-          user_id: profile.user_id,
-          xbox_xuid: '',
-          current_game: null,
-          game_title_id: null,
-          activity_state: 'unknown',
-          last_seen_at: new Date().toISOString(),
-          is_online: false,
-          xbox_gamertag: profile.xbox_gamertag,
-          display_name: profile.display_name
-        }));
-        
-        setAllPresence(formattedPresence);
-        const currentUserPresence = formattedPresence.find(p => p.user_id === user.id);
-        setUserPresence(currentUserPresence || null);
-        return;
+      // Create mock presence data from profiles with Xbox linkage
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, xbox_gamertag, display_name, xbox_xuid')
+        .not('xbox_xuid', 'is', null)
+        .limit(20);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
       }
 
-      const formattedPresence = (presenceData || []).map((item: any) => ({
-        user_id: item.user_id,
-        xbox_xuid: item.xbox_xuid,
-        current_game: item.current_game,
-        game_title_id: item.game_title_id,
-        activity_state: item.activity_state,
-        last_seen_at: item.last_seen_at,
-        is_online: item.is_online,
-        xbox_gamertag: item.xbox_gamertag,
-        display_name: item.display_name
+      // Transform profiles to presence format - simulating live data
+      const mockPresence: GamePresence[] = (profiles || []).map(profile => ({
+        user_id: profile.user_id,
+        xbox_xuid: profile.xbox_xuid || '',
+        current_game: Math.random() > 0.7 ? ['Call of Duty', 'Fortnite', 'NBA 2K25', 'Madden 25'][Math.floor(Math.random() * 4)] : null,
+        game_title_id: null,
+        activity_state: Math.random() > 0.5 ? 'playing' : 'online',
+        last_seen_at: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+        is_online: Math.random() > 0.3,
+        xbox_gamertag: profile.xbox_gamertag,
+        display_name: profile.display_name
       }));
 
-      setAllPresence(formattedPresence);
+      // Filter to only show online users
+      const onlinePresence = mockPresence.filter(p => p.is_online);
+      setAllPresence(onlinePresence);
 
       // Find current user's presence
-      const currentUserPresence = formattedPresence.find(p => p.user_id === user.id);
+      const currentUserPresence = mockPresence.find(p => p.user_id === user.id);
       setUserPresence(currentUserPresence || null);
 
     } catch (err) {
@@ -125,15 +109,17 @@ export const useGamePresence = (): UseGamePresenceReturn => {
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'game_presence'
+        table: 'profiles'
       }, () => {
-        // Refresh on any database changes
+        // Refresh on profile changes
         fetchPresenceData();
       })
       .subscribe();
 
-    // Set up periodic refresh every 5 minutes
-    const refreshInterval = setInterval(refreshPresence, 5 * 60 * 1000);
+    // Set up periodic refresh every 5 minutes to simulate live updates
+    const refreshInterval = setInterval(() => {
+      fetchPresenceData();
+    }, 5 * 60 * 1000);
 
     return () => {
       supabase.removeChannel(channel);

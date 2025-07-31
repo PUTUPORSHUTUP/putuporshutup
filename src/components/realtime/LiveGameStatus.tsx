@@ -32,7 +32,7 @@ export const LiveGameStatus = ({ showAllUsers = false, maxUsers = 10 }: LiveGame
         setIsRefreshing(false);
         toast({
           title: "Status Updated",
-          description: "Game activity has been refreshed"
+          description: "Game activity tracking refreshed"
         });
       }, 2000);
     } catch (err) {
@@ -40,7 +40,7 @@ export const LiveGameStatus = ({ showAllUsers = false, maxUsers = 10 }: LiveGame
       setIsRefreshing(false);
       toast({
         title: "Refresh Failed",
-        description: "Could not update game activity",
+        description: "Could not update activity tracker",
         variant: "destructive"
       });
     }
