@@ -3251,6 +3251,14 @@ export type Database = {
           visits_this_week: number
         }[]
       }
+      get_xbox_profile: {
+        Args: { gamertag: string }
+        Returns: {
+          xuid: string
+          gamer_score: number
+          last_played: string
+        }[]
+      }
       increment_wallet_balance: {
         Args: { user_id_param: string; amount_param: number }
         Returns: undefined
