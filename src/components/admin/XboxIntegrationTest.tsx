@@ -31,20 +31,20 @@ const XboxIntegrationTest: React.FC = () => {
         .select('id')
         .limit(1);
 
-      const { data: xboxHistory, error: historyError } = await supabase
-        .from('xbox_match_history')
+      const { data: challenges, error: challengesError } = await supabase
+        .from('challenges')
         .select('id')
         .limit(1);
 
-      const { data: xboxQueue, error: queueError } = await supabase
-        .from('xbox_verification_queue')
-        .select('id')
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('xbox_gamertag, xbox_xuid')
         .limit(1);
 
       results.databaseStructure = {
-        success: !statsError && !historyError && !queueError,
-        tables: ['xbox_leaderboard_stats', 'xbox_match_history', 'xbox_verification_queue'],
-        errors: [statsError?.message, historyError?.message, queueError?.message].filter(Boolean)
+        success: !statsError && !challengesError && !profilesError,
+        tables: ['xbox_leaderboard_stats', 'challenges', 'profiles'],
+        errors: [statsError?.message, challengesError?.message, profilesError?.message].filter(Boolean)
       };
 
       // Test 2: Xbox Profile Integration Function
