@@ -58,7 +58,7 @@ const Index = () => {
       {/* Live Platform Notice */}
       <div className="bg-green-600 text-white py-3 text-center">
         <p className="font-orbitron text-sm sm:text-base font-semibold">
-          🚀 FULLY OPERATIONAL - Join thousands of players competing for real prizes! Start your journey today!
+          🚀 FULLY OPERATIONAL - Become one of the thousands competing for real prizes! Start your journey today!
         </p>
       </div>
 
