@@ -48,25 +48,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const openXblApiKey = Deno.env.get("OPENXBL_API_KEY");
-    if (!openXblApiKey) {
-      throw new Error("OpenXBL API key not configured");
+    const xboxApiKey = Deno.env.get("XBOX_API_KEY");
+    if (!xboxApiKey) {
+      throw new Error("Xbox API key not configured");
     }
 
     console.log(`Processing Xbox action: ${action}`);
 
     switch (action) {
       case "lookup_gamertag":
-        return await lookupGamertag(gamertag, openXblApiKey, supabaseService);
+        return await lookupGamertag(gamertag, xboxApiKey, supabaseService);
       
       case "link_profile":
-        return await linkXboxProfile(gamertag, xuid, req, supabaseService, openXblApiKey);
+        return await linkXboxProfile(gamertag, xuid, req, supabaseService, xboxApiKey);
       
       case "get_profile":
-        return await getXboxProfile(xuid, openXblApiKey);
+        return await getXboxProfile(xuid, xboxApiKey);
       
       case "verify_gamertag":
-        return await verifyGamertag(gamertag, openXblApiKey);
+        return await verifyGamertag(gamertag, xboxApiKey);
       
       default:
         throw new Error(`Unknown action: ${action}`);
@@ -88,20 +88,20 @@ serve(async (req) => {
 async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
   console.log(`Looking up gamertag: ${gamertag}`);
   
-  const response = await fetch(`https://xbl.io/api/v2/search/${encodeURIComponent(gamertag)}`, {
+  const response = await fetch(`https://xboxapi.com/v2/xuid/${encodeURIComponent(gamertag)}`, {
     headers: {
-      "X-Authorization": apiKey,
+      "X-AUTH": apiKey,
       "Content-Type": "application/json"
     }
   });
 
   if (!response.ok) {
-    throw new Error(`OpenXBL API error: ${response.status} ${response.statusText}`);
+    throw new Error(`Xbox API error: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const xuid = await response.text();
   
-  if (!data.people || data.people.length === 0) {
+  if (!xuid || xuid === "null") {
     return new Response(JSON.stringify({
       success: false,
       error: "Gamertag not found"
@@ -111,16 +111,28 @@ async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
     });
   }
 
-  const profile = data.people[0];
+  // Get profile details using the XUID
+  const profileResponse = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
+    headers: {
+      "X-AUTH": apiKey,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!profileResponse.ok) {
+    throw new Error(`Xbox API profile error: ${profileResponse.status}`);
+  }
+
+  const profile = await profileResponse.json();
   
   return new Response(JSON.stringify({
     success: true,
     profile: {
       gamertag: profile.gamertag,
-      xuid: profile.xuid,
-      profilePictureUrl: profile.displayPicRaw,
-      gamerScore: profile.gamerScore,
-      isPublic: !profile.isFavorite // OpenXBL returns isFavorite for privacy
+      xuid: xuid,
+      profilePictureUrl: profile.gamerpic,
+      gamerScore: profile.gamescore,
+      isPublic: true // Xbox API profiles are typically public
     }
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -143,9 +155,9 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
   }
 
   // Verify the Xbox profile exists
-  const profileResponse = await fetch(`https://xbl.io/api/v2/player/xuid/${xuid}`, {
+  const profileResponse = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
     headers: {
-      "X-Authorization": apiKey,
+      "X-AUTH": apiKey,
       "Content-Type": "application/json"
     }
   });
@@ -180,8 +192,8 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
     .update({
       xbox_gamertag: xboxProfile.gamertag,
       xbox_xuid: xuid,
-      xbox_profile_picture: xboxProfile.displayPicRaw,
-      xbox_gamer_score: xboxProfile.gamerScore,
+      xbox_profile_picture: xboxProfile.gamerpic,
+      xbox_gamer_score: xboxProfile.gamescore,
       xbox_linked_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
@@ -202,7 +214,7 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
       metadata: {
         gamertag: xboxProfile.gamertag,
         xuid: xuid,
-        gamerScore: xboxProfile.gamerScore
+        gamerScore: xboxProfile.gamescore
       }
     });
 
@@ -212,8 +224,8 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
     profile: {
       gamertag: xboxProfile.gamertag,
       xuid: xuid,
-      gamerScore: xboxProfile.gamerScore,
-      profilePictureUrl: xboxProfile.displayPicRaw
+      gamerScore: xboxProfile.gamescore,
+      profilePictureUrl: xboxProfile.gamerpic
     }
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -222,9 +234,9 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
 }
 
 async function getXboxProfile(xuid: string, apiKey: string) {
-  const response = await fetch(`https://xbl.io/api/v2/player/xuid/${xuid}`, {
+  const response = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
     headers: {
-      "X-Authorization": apiKey,
+      "X-AUTH": apiKey,
       "Content-Type": "application/json"
     }
   });
@@ -239,10 +251,10 @@ async function getXboxProfile(xuid: string, apiKey: string) {
     success: true,
     profile: {
       gamertag: profile.gamertag,
-      xuid: profile.xuid,
-      profilePictureUrl: profile.displayPicRaw,
-      gamerScore: profile.gamerScore,
-      accountTier: profile.accountTier || "Silver"
+      xuid: xuid,
+      profilePictureUrl: profile.gamerpic,
+      gamerScore: profile.gamescore,
+      accountTier: "Gold" // Xbox API doesn't return tier info
     }
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -251,20 +263,20 @@ async function getXboxProfile(xuid: string, apiKey: string) {
 }
 
 async function verifyGamertag(gamertag: string, apiKey: string) {
-  const response = await fetch(`https://xbl.io/api/v2/search/${encodeURIComponent(gamertag)}`, {
+  const response = await fetch(`https://xboxapi.com/v2/xuid/${encodeURIComponent(gamertag)}`, {
     headers: {
-      "X-Authorization": apiKey,
+      "X-AUTH": apiKey,
       "Content-Type": "application/json"
     }
   });
 
-  const data = await response.json();
-  const isValid = response.ok && data.people && data.people.length > 0;
+  const xuid = await response.text();
+  const isValid = response.ok && xuid && xuid !== "null";
   
   return new Response(JSON.stringify({
     success: true,
     isValid,
-    gamertag: isValid ? data.people[0].gamertag : null
+    gamertag: isValid ? gamertag : null
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status: 200,
