@@ -37,9 +37,19 @@ const Auth = () => {
       navigate('/');
     }
     
+    // Debug: Log all URL parameters
+    console.log('URL search params:', Object.fromEntries(searchParams.entries()));
+    
     // Check if this is a password reset flow
     const type = searchParams.get('type');
-    if (type === 'recovery') {
+    const accessToken = searchParams.get('access_token');
+    const refreshToken = searchParams.get('refresh_token');
+    
+    console.log('Auth params:', { type, accessToken: !!accessToken, refreshToken: !!refreshToken });
+    
+    // Check for password reset parameters
+    if (type === 'recovery' || (accessToken && refreshToken)) {
+      console.log('Password reset detected, showing reset form');
       setIsResettingPassword(true);
     }
   }, [user, navigate, searchParams]);
