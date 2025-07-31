@@ -18,6 +18,7 @@ const XboxIntegrationTest: React.FC = () => {
   };
 
   const runCompleteTest = async () => {
+    console.log('🎮 Test button clicked - starting test...');
     setIsRunning(true);
     const results: any = {};
 
