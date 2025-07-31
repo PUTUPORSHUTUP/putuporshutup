@@ -95,7 +95,16 @@ async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
     }
   });
 
+  console.log(`Xbox API response status: ${response.status}`);
+  
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Xbox API error: ${response.status} ${response.statusText}, Body: ${errorText}`);
+    
+    if (response.status === 403) {
+      throw new Error("Xbox API authentication failed. Please check your API key.");
+    }
+    
     throw new Error(`Xbox API error: ${response.status} ${response.statusText}`);
   }
 
