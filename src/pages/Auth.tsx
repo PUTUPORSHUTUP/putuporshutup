@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +15,9 @@ import { validatePasswordStrength, checkPasswordBreach } from '@/lib/passwordSec
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [resetForm, setResetForm] = useState({ password: '', confirmPassword: '' });
   const [signupForm, setSignupForm] = useState({ 
     email: '', 
     password: '', 
@@ -28,12 +30,19 @@ const Auth = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (user) {
       navigate('/');
     }
-  }, [user, navigate]);
+    
+    // Check if this is a password reset flow
+    const type = searchParams.get('type');
+    if (type === 'recovery') {
+      setIsResettingPassword(true);
+    }
+  }, [user, navigate, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,8 +209,126 @@ const Auth = () => {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (resetForm.password !== resetForm.confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please ensure both passwords are identical.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Password strength validation
+    const passwordValidation = validatePasswordStrength(resetForm.password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Password Too Weak",
+        description: passwordValidation.issues[0],
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: resetForm.password
+      });
+
+      if (error) {
+        toast({
+          title: "Password Reset Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Password Updated!",
+        description: "Your password has been successfully updated.",
+      });
+      
+      // Redirect to home after successful password reset
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Password Reset Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (user) {
     return null; // Will redirect via useEffect
+  }
+
+  // Show password reset form if user came from reset email
+  if (isResettingPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center">
+              <GamepadIcon className="h-12 w-12 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
+            <CardDescription>
+              Enter your new password below
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasswordReset} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-password">New Password</Label>
+                <Input
+                  id="reset-password"
+                  type="password"
+                  placeholder="Enter your new password"
+                  value={resetForm.password}
+                  onChange={(e) => setResetForm({ ...resetForm, password: e.target.value })}
+                  required
+                />
+                <PasswordStrengthIndicator 
+                  password={resetForm.password}
+                  showBreachCheck={true}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="reset-confirm">Confirm New Password</Label>
+                <Input
+                  id="reset-confirm"
+                  type="password"
+                  placeholder="Confirm your new password"
+                  value={resetForm.confirmPassword}
+                  onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Update Password
+              </Button>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => setIsResettingPassword(false)}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
