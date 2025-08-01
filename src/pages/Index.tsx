@@ -58,9 +58,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Live Platform Notice */}
-      <div className="bg-green-600 text-white py-3 text-center">
+      <div className="bg-orange-600 text-white py-3 text-center">
         <p className="font-orbitron text-sm sm:text-base font-semibold">
-          🚀 FULLY OPERATIONAL - Become one of the thousands competing for real prizes! Start your journey today!
+          🔧 MAINTENANCE - Preparing for Sunday Showdown! Check back soon for the ultimate gaming experience!
         </p>
       </div>
 
