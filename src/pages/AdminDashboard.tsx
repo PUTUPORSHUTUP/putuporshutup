@@ -470,6 +470,51 @@ const AdminDashboard = () => {
     }
   };
 
+  const cancelInsufficientTournaments = async () => {
+    try {
+      // Get tournaments that are in progress but don't have enough players
+      const { data: insufficientTournaments } = await supabase
+        .from('tournaments')
+        .select('id, title, current_participants, max_participants')
+        .eq('status', 'in_progress')
+        .lt('current_participants', 4); // Less than 4 players
+
+      if (!insufficientTournaments || insufficientTournaments.length === 0) {
+        toast({
+          title: "No Action Needed",
+          description: "All tournaments have sufficient participants.",
+        });
+        return;
+      }
+
+      // Cancel each insufficient tournament
+      for (const tournament of insufficientTournaments) {
+        await supabase.functions.invoke('emergency-tournament-stop', {
+          body: { 
+            tournamentId: tournament.id,
+            reason: 'Insufficient participants - cancelled by admin',
+            refundType: 'full'
+          }
+        });
+      }
+
+      toast({
+        title: "Tournaments Cancelled",
+        description: `Cancelled ${insufficientTournaments.length} tournaments with insufficient participants.`,
+      });
+
+      // Refresh tournament data
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error cancelling insufficient tournaments:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to cancel insufficient tournaments.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -770,6 +815,17 @@ const AdminDashboard = () => {
                   <Trophy className="w-5 h-5" />
                   Tournament Management
                 </CardTitle>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={cancelInsufficientTournaments}
+                    variant="destructive"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Cancel Insufficient Tournaments
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
