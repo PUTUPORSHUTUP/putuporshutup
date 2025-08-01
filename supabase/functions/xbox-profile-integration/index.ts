@@ -48,7 +48,8 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const xboxApiKey = Deno.env.get("XBOX_API_KEY"); // Still needed for linking/verification
+    // Get Xbox API key from database with fallback to environment
+    const xboxApiKey = await getXboxAPIKey(supabaseService);
 
     console.log(`Processing Xbox action: ${action}`);
 
@@ -81,6 +82,35 @@ serve(async (req) => {
     });
   }
 });
+
+// Helper function to get Xbox API key from database or environment
+async function getXboxAPIKey(supabase: any): Promise<string | null> {
+  try {
+    // First try to get from database
+    const { data: config, error } = await supabase
+      .from('api_configurations')
+      .select('config_value')
+      .eq('config_key', 'XBOX_API_KEY')
+      .single();
+    
+    if (!error && config?.config_value) {
+      console.log('Using Xbox API key from database');
+      return config.config_value;
+    }
+  } catch (dbError) {
+    console.log('Database API key lookup failed, falling back to environment variable');
+  }
+  
+  // Fallback to environment variable
+  const envKey = Deno.env.get('XBOX_API_KEY');
+  if (envKey) {
+    console.log('Using Xbox API key from environment variable');
+    return envKey;
+  }
+  
+  console.log('No Xbox API key found in database or environment');
+  return null;
+}
 
 async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
   console.log(`Looking up gamertag: ${gamertag} using XUID.io`);

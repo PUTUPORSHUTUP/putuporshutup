@@ -104,6 +104,36 @@ export type Database = {
         }
         Relationships: []
       }
+      api_configurations: {
+        Row: {
+          config_key: string
+          config_value: string
+          created_at: string
+          description: string | null
+          id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       api_verification_stats: {
         Row: {
           automated_verifications: number | null
