@@ -13,7 +13,6 @@ export function XboxAPIKeyManagement() {
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [isTestingKey, setIsTestingKey] = useState(false);
   const [newApiKey, setNewApiKey] = useState('');
-  const [isUpdatingKey, setIsUpdatingKey] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const { toast } = useToast();
 
@@ -55,7 +54,7 @@ export function XboxAPIKeyManagement() {
     }
   };
 
-  const updateXboxAPIKey = async () => {
+  const handleKeyUpdate = () => {
     if (!newApiKey.trim()) {
       toast({
         title: "Invalid Input",
@@ -65,36 +64,20 @@ export function XboxAPIKeyManagement() {
       return;
     }
 
-    setIsUpdatingKey(true);
-    try {
-      const { error } = await supabase.functions.invoke('update-xbox-api-key', {
-        body: { apiKey: newApiKey.trim() }
-      });
-
-      if (error) {
-        throw error;
-      }
-
+    // Copy to clipboard and show instructions
+    navigator.clipboard.writeText(newApiKey.trim()).then(() => {
       toast({
-        title: "API Key Updated",
-        description: "Xbox API key has been successfully updated",
+        title: "API Key Copied",
+        description: "The API key has been copied to your clipboard. Please update it in your Supabase project settings.",
       });
-      
       setNewApiKey('');
       setShowUpdateForm(false);
-      // Test the new key
-      setTimeout(() => testXboxAPIKey(), 1000);
-      
-    } catch (error) {
-      console.error('Failed to update Xbox API key:', error);
+    }).catch(() => {
       toast({
-        title: "Update Failed",
-        description: "Failed to update Xbox API key. Please try again.",
-        variant: "destructive",
+        title: "Copy the API Key",
+        description: "Please copy the API key and update it manually in your Supabase project settings.",
       });
-    } finally {
-      setIsUpdatingKey(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -180,21 +163,12 @@ export function XboxAPIKeyManagement() {
             
             <div className="flex gap-2">
               <Button 
-                onClick={updateXboxAPIKey}
-                disabled={isUpdatingKey || !newApiKey.trim()}
+                onClick={handleKeyUpdate}
+                disabled={!newApiKey.trim()}
                 size="sm"
               >
-                {isUpdatingKey ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save New Key
-                  </>
-                )}
+                <Save className="w-4 h-4 mr-2" />
+                Copy & Get Instructions
               </Button>
               
               <Button 
@@ -204,10 +178,16 @@ export function XboxAPIKeyManagement() {
                 }}
                 variant="outline"
                 size="sm"
-                disabled={isUpdatingKey}
               >
                 Cancel
               </Button>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm">
+              <p className="font-medium text-blue-800 mb-1">Instructions:</p>
+              <p className="text-blue-700">
+                After clicking "Copy & Get Instructions", go to your Supabase project settings → Functions → Secrets, and update the XBOX_API_KEY with your new key.
+              </p>
             </div>
           </div>
         )}
