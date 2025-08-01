@@ -67,6 +67,16 @@ export function XboxAPIKeyManagement() {
 
     setIsUpdatingKey(true);
     try {
+      console.log('Attempting to save Xbox API key...');
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('Authentication required. Please sign in again.');
+      }
+
+      console.log('User authenticated, updating API configuration...');
+      
       // Update the API key in the database
       const { error } = await supabase
         .from('api_configurations')
@@ -74,16 +84,19 @@ export function XboxAPIKeyManagement() {
           config_key: 'XBOX_API_KEY',
           config_value: newApiKey.trim(),
           description: 'Xbox Live API key for gamertag verification and stat retrieval',
-          updated_by: (await supabase.auth.getUser()).data.user?.id
+          updated_by: user.id
         });
 
       if (error) {
-        throw error;
+        console.error('Database error:', error);
+        throw new Error(`Database error: ${error.message}`);
       }
 
+      console.log('Xbox API key successfully saved to database');
+      
       toast({
         title: "API Key Updated",
-        description: "Xbox API key has been successfully updated in the system",
+        description: "Xbox API key has been successfully saved in the system",
       });
       
       setNewApiKey('');
@@ -95,7 +108,7 @@ export function XboxAPIKeyManagement() {
       console.error('Failed to update Xbox API key:', error);
       toast({
         title: "Update Failed",
-        description: "Failed to update Xbox API key. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update Xbox API key. Please try again.",
         variant: "destructive",
       });
     } finally {
