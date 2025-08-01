@@ -69,7 +69,7 @@ interface AdminAnalytics {
   active_premium_users: number;
   total_users: number;
   total_tournaments: number;
-  total_wagers: number;
+  total_challenges: number;
   transactions_today: number;
   tournaments_this_week: number;
   new_users_this_week: number;
@@ -683,8 +683,8 @@ const AdminDashboard = () => {
                       <Badge className="bg-yellow-600">{analytics?.active_premium_users || 0}</Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">Total Wagers</span>
-                      <Badge variant="outline">{analytics?.total_wagers || 0}</Badge>
+                      <span className="text-sm">Total Challenges</span>
+                      <Badge variant="outline">{analytics?.total_challenges || 0}</Badge>
                     </div>
                   </div>
                 </CardContent>

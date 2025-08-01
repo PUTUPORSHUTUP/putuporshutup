@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,15 +8,44 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Download, Share2, Eye, Code, Image, Trophy, Calendar, DollarSign, Users, Zap, Star } from 'lucide-react';
+import { Copy, Download, Share2, Eye, Code, Image, Trophy, Calendar, DollarSign, Users, Zap, Star, Crown, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { PremiumSubscription } from '@/components/profile/PremiumSubscription';
 
 const Promotion = () => {
+  const { user } = useAuth();
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedTournament, setSelectedTournament] = useState<string>('');
+
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await supabase.functions.invoke('check-premium-subscription');
+        setSubscriptionStatus(data);
+      } catch (error) {
+        console.error('Subscription check error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user]);
+
+  const isSubscribed = subscriptionStatus?.subscribed || false;
+
   const [bannerConfig, setBannerConfig] = useState({
     title: 'High Noon Showdown',
     subtitle: 'Elite Tournament',
@@ -207,13 +236,118 @@ const Promotion = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSubscribed) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-center mb-4 flex items-center justify-center gap-2">
+            <Crown className="w-8 h-8 text-yellow-600" />
+            Premium Promotion Tools
+          </h1>
+          <p className="text-lg text-muted-foreground text-center max-w-2xl mx-auto">
+            Unlock powerful promotional tools to market your tournaments and grow your gaming community.
+          </p>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          <Card className="mb-8 border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-yellow-600/10">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-2xl">
+                <Lock className="w-6 h-6 text-yellow-600" />
+                Premium Feature
+              </CardTitle>
+              <CardDescription className="text-lg">
+                Tournament promotion tools are exclusive to premium members
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">What you get with Premium:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Image className="w-4 h-4 text-yellow-600" />
+                      <span>Custom tournament banners</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Code className="w-4 h-4 text-yellow-600" />
+                      <span>Embeddable widgets</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-yellow-600" />
+                      <span>Social media integration</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-600" />
+                      <span>Advanced analytics</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Perfect for:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-yellow-600" />
+                      <span>Tournament organizers</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-yellow-600" />
+                      <span>Community builders</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Star className="w-4 h-4 text-yellow-600" />
+                      <span>Content creators</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-yellow-600" />
+                      <span>Sponsors & brands</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <PremiumSubscription 
+                onSubscriptionUpdate={() => {
+                  // Refresh subscription status
+                  supabase.functions.invoke('check-premium-subscription').then(({ data }) => {
+                    setSubscriptionStatus(data);
+                  });
+                }}
+                currentSubscription={subscriptionStatus}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-center mb-4">Tournament Promotion Tools</h1>
+        <h1 className="text-4xl font-bold text-center mb-4 flex items-center justify-center gap-2">
+          <Crown className="w-8 h-8 text-yellow-600" />
+          Premium Promotion Tools
+        </h1>
         <p className="text-lg text-muted-foreground text-center max-w-2xl mx-auto">
           Create stunning promotional materials for your tournaments. Generate banners, embed widgets, and share across social media.
         </p>
+        <div className="flex justify-center mt-4">
+          <Badge className="bg-yellow-600 text-white">Premium Member</Badge>
+        </div>
       </div>
 
       <Tabs defaultValue="banners" className="w-full">
