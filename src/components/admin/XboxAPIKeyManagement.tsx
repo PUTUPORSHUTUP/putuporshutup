@@ -20,6 +20,8 @@ export function XboxAPIKeyManagement() {
   const testXboxAPIKey = async () => {
     setIsTestingKey(true);
     try {
+      console.log('Testing Xbox API key...');
+      
       const { data, error } = await supabase.functions.invoke('xbox-profile-integration', {
         body: {
           action: 'verify_gamertag',
@@ -27,13 +29,43 @@ export function XboxAPIKeyManagement() {
         }
       });
 
-      if (error && error.message?.includes('API key')) {
-        setKeyStatus('inactive');
-        toast({
-          title: "Xbox API Key Invalid",
-          description: "The Xbox API key is not configured or invalid",
-          variant: "destructive",
-        });
+      console.log('Xbox API test response:', { data, error });
+
+      if (error) {
+        console.error('Xbox API test error:', error);
+        
+        if (error.message?.includes('API key') || error.message?.includes('401') || error.message?.includes('unauthorized')) {
+          setKeyStatus('inactive');
+          toast({
+            title: "Xbox API Key Invalid",
+            description: `API key issue: ${error.message}`,
+            variant: "destructive",
+          });
+        } else {
+          setKeyStatus('error');
+          toast({
+            title: "Connection Error",
+            description: `Test failed: ${error.message}`,
+            variant: "destructive",
+          });
+        }
+      } else if (data?.error) {
+        console.error('Xbox API data error:', data.error);
+        
+        if (data.error.includes('API key') || data.error.includes('401') || data.error.includes('unauthorized')) {
+          setKeyStatus('inactive');
+          toast({
+            title: "Xbox API Key Invalid", 
+            description: `API authentication failed: ${data.error}`,
+            variant: "destructive",
+          });
+        } else {
+          setKeyStatus('active');
+          toast({
+            title: "Xbox API Key Active",
+            description: "Xbox API integration is working correctly (expected test failure for non-existent gamertag)",
+          });
+        }
       } else {
         setKeyStatus('active');
         toast({
@@ -42,11 +74,11 @@ export function XboxAPIKeyManagement() {
         });
       }
     } catch (error) {
-      console.error('Xbox API test error:', error);
+      console.error('Xbox API test exception:', error);
       setKeyStatus('error');
       toast({
         title: "Connection Error",
-        description: "Unable to test Xbox API connection",
+        description: `Unable to test Xbox API connection: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
