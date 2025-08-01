@@ -2,14 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Key, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Key, CheckCircle, XCircle, RefreshCw, Upload, Save } from 'lucide-react';
 
 export function XboxAPIKeyManagement() {
   const [keyStatus, setKeyStatus] = useState<'checking' | 'active' | 'inactive' | 'error'>('checking');
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [isTestingKey, setIsTestingKey] = useState(false);
+  const [newApiKey, setNewApiKey] = useState('');
+  const [isUpdatingKey, setIsUpdatingKey] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
   const { toast } = useToast();
 
   const testXboxAPIKey = async () => {
@@ -47,6 +52,48 @@ export function XboxAPIKeyManagement() {
     } finally {
       setIsTestingKey(false);
       setLastChecked(new Date());
+    }
+  };
+
+  const updateXboxAPIKey = async () => {
+    if (!newApiKey.trim()) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid API key",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdatingKey(true);
+    try {
+      const { error } = await supabase.functions.invoke('update-xbox-api-key', {
+        body: { apiKey: newApiKey.trim() }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "API Key Updated",
+        description: "Xbox API key has been successfully updated",
+      });
+      
+      setNewApiKey('');
+      setShowUpdateForm(false);
+      // Test the new key
+      setTimeout(() => testXboxAPIKey(), 1000);
+      
+    } catch (error) {
+      console.error('Failed to update Xbox API key:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update Xbox API key. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingKey(false);
     }
   };
 
@@ -108,7 +155,62 @@ export function XboxAPIKeyManagement() {
               </>
             )}
           </Button>
+          
+          <Button 
+            onClick={() => setShowUpdateForm(!showUpdateForm)} 
+            variant="secondary"
+            size="sm"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Update API Key
+          </Button>
         </div>
+
+        {showUpdateForm && (
+          <div className="border rounded-lg p-4 bg-muted/20 space-y-3">
+            <div>
+              <label className="text-sm font-medium mb-2 block">New Xbox API Key</label>
+              <Textarea
+                value={newApiKey}
+                onChange={(e) => setNewApiKey(e.target.value)}
+                placeholder="Enter your new Xbox API key here..."
+                className="min-h-[80px] font-mono text-xs"
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                onClick={updateXboxAPIKey}
+                disabled={isUpdatingKey || !newApiKey.trim()}
+                size="sm"
+              >
+                {isUpdatingKey ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save New Key
+                  </>
+                )}
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  setShowUpdateForm(false);
+                  setNewApiKey('');
+                }}
+                variant="outline"
+                size="sm"
+                disabled={isUpdatingKey}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="bg-muted/50 p-3 rounded-lg text-xs space-y-1">
           <p className="font-medium">Configuration Notes:</p>
