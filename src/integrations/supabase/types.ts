@@ -3262,7 +3262,7 @@ export type Database = {
           active_premium_users: number
           total_users: number
           total_tournaments: number
-          total_wagers: number
+          total_challenges: number
           transactions_today: number
           tournaments_this_week: number
           new_users_this_week: number
