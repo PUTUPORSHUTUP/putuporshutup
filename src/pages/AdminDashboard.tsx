@@ -61,6 +61,7 @@ import MockRevenueProjection from '@/components/admin/MockRevenueProjection';
 import { AutomationDashboard } from '@/components/admin/AutomationDashboard';
 import { ProfitMaximizer } from '@/components/admin/ProfitMaximizer';
 import SponsorDashboard from './SponsorDashboard';
+import { XboxAPIKeyManagement } from '@/components/admin/XboxAPIKeyManagement';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -1145,7 +1146,10 @@ const AdminDashboard = () => {
 
           {/* Xbox Live Integration Tab */}
           <TabsContent value="xbox-live" className="space-y-6">
-            <XboxLiveDashboard />
+            <div className="grid gap-6 md:grid-cols-2">
+              <XboxAPIKeyManagement />
+              <XboxLiveDashboard />
+            </div>
           </TabsContent>
 
           {/* Xbox Integration Test Tab */}
