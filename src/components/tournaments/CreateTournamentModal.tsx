@@ -126,6 +126,7 @@ export const CreateTournamentModal = ({
       name: 'Bronze Sponsor',
       cost: 100,
       multiplier: 2.0,
+      entryFee: 10, // Auto-calculated proportional entry fee
       features: ['2x Prize Multiplier', 'Sponsor Badge', 'Featured Listing'],
       color: 'from-amber-500 to-amber-600',
       description: '$50 to platform, $50 sponsor contribution'
@@ -135,6 +136,7 @@ export const CreateTournamentModal = ({
       name: 'Silver Sponsor', 
       cost: 200,
       multiplier: 2.5,
+      entryFee: 20, // Auto-calculated proportional entry fee
       features: ['2.5x Prize Multiplier', 'Premium Badge', 'Top Placement'],
       color: 'from-gray-400 to-gray-500',
       description: '$100 to platform, $100 sponsor contribution'
@@ -144,6 +146,7 @@ export const CreateTournamentModal = ({
       name: 'Gold Sponsor',
       cost: 400,
       multiplier: 3.0,
+      entryFee: 40, // Auto-calculated proportional entry fee
       features: ['3x Prize Multiplier', 'Gold Badge', 'Homepage Feature'],
       color: 'from-yellow-400 to-yellow-500',
       description: '$200 to platform, $200 sponsor contribution'
@@ -153,6 +156,7 @@ export const CreateTournamentModal = ({
       name: 'Platinum Sponsor',
       cost: 800,
       multiplier: 4.0,
+      entryFee: 80, // Auto-calculated proportional entry fee
       features: ['4x Prize Multiplier', 'Platinum Badge', 'Dedicated Tournament Page'],
       color: 'from-purple-400 to-purple-500',
       description: '$400 to platform, $400 sponsor contribution'
@@ -172,6 +176,16 @@ export const CreateTournamentModal = ({
       }));
     }
   }, [selectedGame]);
+
+  // Auto-set entry fee when sponsorship tier changes
+  useEffect(() => {
+    if (isSponsored) {
+      const tier = sponsorshipTiers.find(t => t.id === sponsorshipTier);
+      if (tier) {
+        setForm(prev => ({ ...prev, entryFee: tier.entryFee.toString() }));
+      }
+    }
+  }, [isSponsored, sponsorshipTier]);
 
   const loadGames = async () => {
     const { data } = await supabase
@@ -610,7 +624,14 @@ export const CreateTournamentModal = ({
           {/* Tournament Settings */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="entryFee">Entry Fee</Label>
+              <Label htmlFor="entryFee">
+                Entry Fee 
+                {isSponsored && (
+                  <Badge variant="secondary" className="ml-2">
+                    Auto-set by Sponsor Tier
+                  </Badge>
+                )}
+              </Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -619,12 +640,23 @@ export const CreateTournamentModal = ({
                   step="0.01"
                   min="1"
                   value={form.entryFee}
-                  onChange={(e) => setForm(prev => ({ ...prev, entryFee: e.target.value }))}
+                  onChange={(e) => !isSponsored && setForm(prev => ({ ...prev, entryFee: e.target.value }))}
                   className="pl-9"
-                  placeholder="25.00"
+                  placeholder={isSponsored ? "Auto-calculated" : "25.00"}
                   required
+                  disabled={isSponsored}
                 />
+                {isSponsored && (
+                  <div className="absolute right-3 top-3">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  </div>
+                )}
               </div>
+              {isSponsored && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Entry fee locked to {sponsorshipTiers.find(t => t.id === sponsorshipTier)?.name.toLowerCase()} tier (${sponsorshipTiers.find(t => t.id === sponsorshipTier)?.entryFee})
+                </p>
+              )}
             </div>
 
             <div>
