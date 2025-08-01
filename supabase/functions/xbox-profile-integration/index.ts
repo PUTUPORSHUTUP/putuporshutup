@@ -228,9 +228,12 @@ async function lookupGamertag(gamertag: string, apiKey: string, supabase: any) {
 }
 
 async function linkXboxProfile(gamertag: string, xuid: string, req: Request, supabase: any, apiKey: string) {
+  console.log(`Attempting to link Xbox profile: ${gamertag} with XUID: ${xuid}`);
+  
   // Get user from auth header
   const authHeader = req.headers.get('authorization');
   if (!authHeader) {
+    console.error("No authorization header found");
     throw new Error("Authentication required");
   }
 
@@ -238,32 +241,25 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   
   if (authError || !user) {
+    console.error("Authentication failed:", authError);
     throw new Error("Invalid authentication");
   }
 
-  // Verify the Xbox profile exists
-  const profileResponse = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
-    headers: {
-      "X-AUTH": apiKey,
-      "Content-Type": "application/json"
-    }
-  });
-
-  if (!profileResponse.ok) {
-    throw new Error("Xbox profile verification failed");
-  }
-
-  const xboxProfile = await profileResponse.json();
+  console.log(`User authenticated: ${user.id}`);
 
   // Check if Xbox profile is already linked to another user
-  const { data: existingLink } = await supabase
+  const { data: existingLink, error: linkCheckError } = await supabase
     .from("profiles")
     .select("user_id, xbox_gamertag")
     .eq("xbox_xuid", xuid)
-    .neq("user_id", user.id)
-    .single();
+    .neq("user_id", user.id);
 
-  if (existingLink) {
+  if (linkCheckError) {
+    console.error("Error checking existing links:", linkCheckError);
+  }
+
+  if (existingLink && existingLink.length > 0) {
+    console.log(`Xbox profile already linked to another user: ${existingLink[0].user_id}`);
     return new Response(JSON.stringify({
       success: false,
       error: "This Xbox profile is already linked to another account"
@@ -273,46 +269,88 @@ async function linkXboxProfile(gamertag: string, xuid: string, req: Request, sup
     });
   }
 
+  // Get additional profile data if Xbox API is available
+  let profileData = {
+    gamertag: gamertag,
+    profilePictureUrl: `https://avatar-ssl.xboxlive.com/avatar/${gamertag}/avatar-body.png`,
+    gamerScore: 0
+  };
+
+  if (apiKey) {
+    try {
+      console.log(`Fetching additional profile data from Xbox API for XUID: ${xuid}`);
+      const profileResponse = await fetch(`https://xboxapi.com/v2/profile/${xuid}`, {
+        headers: {
+          "X-AUTH": apiKey,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (profileResponse.ok) {
+        const xboxProfile = await profileResponse.json();
+        profileData = {
+          gamertag: xboxProfile.gamertag || gamertag,
+          profilePictureUrl: xboxProfile.gamerpic || profileData.profilePictureUrl,
+          gamerScore: xboxProfile.gamescore || 0
+        };
+        console.log(`Enhanced profile data retrieved: ${JSON.stringify(profileData)}`);
+      } else {
+        console.log(`Xbox API profile fetch failed: ${profileResponse.status}, using basic data`);
+      }
+    } catch (error) {
+      console.log(`Xbox API error, using basic profile data: ${error.message}`);
+    }
+  }
+
   // Update user profile with Xbox information
+  console.log(`Updating user profile with Xbox data`);
   const { error: updateError } = await supabase
     .from("profiles")
     .update({
-      xbox_gamertag: xboxProfile.gamertag,
+      xbox_gamertag: profileData.gamertag,
       xbox_xuid: xuid,
-      xbox_profile_picture: xboxProfile.gamerpic,
-      xbox_gamer_score: xboxProfile.gamescore,
+      xbox_profile_picture: profileData.profilePictureUrl,
+      xbox_gamer_score: profileData.gamerScore,
       xbox_linked_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
     .eq("user_id", user.id);
 
   if (updateError) {
+    console.error(`Failed to update profile: ${updateError.message}`);
     throw new Error(`Failed to link Xbox profile: ${updateError.message}`);
   }
 
+  console.log(`Profile updated successfully`);
+
   // Log the successful linking
-  await supabase
-    .from("activities")
-    .insert({
-      user_id: user.id,
-      activity_type: "xbox_profile_linked",
-      title: "Xbox Profile Linked",
-      description: `Successfully linked Xbox gamertag: ${xboxProfile.gamertag}`,
-      metadata: {
-        gamertag: xboxProfile.gamertag,
-        xuid: xuid,
-        gamerScore: xboxProfile.gamescore
-      }
-    });
+  try {
+    await supabase
+      .from("activities")
+      .insert({
+        user_id: user.id,
+        activity_type: "xbox_profile_linked",
+        title: "Xbox Profile Linked",
+        description: `Successfully linked Xbox gamertag: ${profileData.gamertag}`,
+        metadata: {
+          gamertag: profileData.gamertag,
+          xuid: xuid,
+          gamerScore: profileData.gamerScore
+        }
+      });
+    console.log(`Activity logged successfully`);
+  } catch (activityError) {
+    console.log(`Failed to log activity (non-critical): ${activityError.message}`);
+  }
 
   return new Response(JSON.stringify({
     success: true,
     message: "Xbox profile linked successfully",
     profile: {
-      gamertag: xboxProfile.gamertag,
+      gamertag: profileData.gamertag,
       xuid: xuid,
-      gamerScore: xboxProfile.gamescore,
-      profilePictureUrl: xboxProfile.gamerpic
+      gamerScore: profileData.gamerScore,
+      profilePictureUrl: profileData.profilePictureUrl
     }
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
