@@ -238,7 +238,7 @@ const Index = () => {
                 </p>
                 <Link to="/games">
                   <Button variant="outline" size="sm" className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
-                    View All Games
+                    View All Games →
                   </Button>
                 </Link>
               </CardContent>
