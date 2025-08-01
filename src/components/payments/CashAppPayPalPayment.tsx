@@ -106,8 +106,8 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
       <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-900/20">
         <Info className="w-4 h-4 text-blue-600" />
         <AlertDescription className="text-blue-800 dark:text-blue-300">
-          <strong>Temporary Payment Method:</strong> We're using Cash App and PayPal until our merchant account is approved. 
-          All deposits are manually processed within 24 hours.
+          <strong>Fast Payment Processing:</strong> Cash App and PayPal deposits are processed by our admin team. 
+          ⚡ Most deposits are approved within 1 hour during business hours!
         </AlertDescription>
       </Alert>
 
@@ -173,7 +173,7 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Minimum $5.00 • Processed within 24 hours
+              Minimum $5.00 • ⚡ Fast-tracked by admin (usually under 1 hour)
             </p>
           </div>
 
@@ -210,7 +210,7 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
                     <ol className="list-decimal list-inside mt-2 space-y-1 text-sm">
                       <li>Send exactly ${depositAmount} to the {paymentMethod} above</li>
                       <li>Include your username in the payment note</li>
-                      <li>Your deposit will be processed within 24 hours</li>
+                      <li>⚡ Your deposit will be processed within 1 hour (business hours)</li>
                       <li>You'll receive a notification when funds are added</li>
                     </ol>
                   </AlertDescription>

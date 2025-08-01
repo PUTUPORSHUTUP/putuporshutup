@@ -26,7 +26,8 @@ import {
   UserX,
   Loader2,
   Lightbulb,
-  Image
+  Image,
+  CreditCard
 } from 'lucide-react';
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
@@ -62,6 +63,7 @@ import { AutomationDashboard } from '@/components/admin/AutomationDashboard';
 import { ProfitMaximizer } from '@/components/admin/ProfitMaximizer';
 import SponsorDashboard from './SponsorDashboard';
 import { XboxAPIKeyManagement } from '@/components/admin/XboxAPIKeyManagement';
+import { FastPaymentProcessor } from '@/components/admin/FastPaymentProcessor';
 
 interface AdminAnalytics {
   total_deposits: number;
