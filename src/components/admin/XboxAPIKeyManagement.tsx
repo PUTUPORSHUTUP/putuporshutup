@@ -85,6 +85,8 @@ export function XboxAPIKeyManagement() {
           config_value: newApiKey.trim(),
           description: 'Xbox Live API key for gamertag verification and stat retrieval',
           updated_by: user.id
+        }, {
+          onConflict: 'config_key'
         });
 
       if (error) {
