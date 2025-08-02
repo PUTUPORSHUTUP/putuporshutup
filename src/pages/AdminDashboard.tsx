@@ -861,10 +861,19 @@ const AdminDashboard = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge 
-                              variant={tournament.status === 'completed' ? 'default' : 'secondary'}
-                              className="text-xs"
+                              variant={
+                                tournament.status === 'cancelled' ? 'destructive' :
+                                tournament.status === 'completed' ? 'default' : 
+                                tournament.status === 'in_progress' ? 'secondary' : 'outline'
+                              }
+                              className={`text-xs ${
+                                tournament.status === 'cancelled' ? 'bg-red-500 text-white font-bold' :
+                                tournament.status === 'in_progress' ? 'bg-yellow-500 text-black font-semibold' : ''
+                              }`}
                             >
-                              {tournament.status}
+                              {tournament.status === 'cancelled' ? '❌ CANCELLED' :
+                               tournament.status === 'in_progress' ? '🔄 IN PROGRESS' :
+                               tournament.status.toUpperCase()}
                             </Badge>
                             
                             {/* Admin Actions */}
