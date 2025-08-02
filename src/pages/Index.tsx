@@ -193,23 +193,7 @@ const Index = () => {
               </Button>
             </div>
             
-            {/* Tournament Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
-              {[
-                { icon: "🏆", label: "Active Tournaments", value: "12", color: "text-yellow-500" },
-                { icon: "👥", label: "Players Online", value: "1,247", color: "text-blue-500" },
-                { icon: "💰", label: "Prize Pool Today", value: "$15,420", color: "text-green-500" },
-                { icon: "⚡", label: "Matches Completed", value: "89", color: "text-purple-500" },
-              ].map((stat, index) => (
-                <Card key={index} className="text-center bg-background/50 backdrop-blur border-primary/20">
-                  <CardContent className="pt-6">
-                    <div className="text-3xl mb-2">{stat.icon}</div>
-                    <div className="text-2xl font-bold font-orbitron">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground font-orbitron">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {/* Tournament Stats Grid - Removed fake numbers */}
           </div>
         </div>
       </section>
