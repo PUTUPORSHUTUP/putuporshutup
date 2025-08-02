@@ -209,6 +209,53 @@ export type Database = {
         }
         Relationships: []
       }
+      automated_tournaments: {
+        Row: {
+          auto_created: boolean | null
+          automation_schedule: Json
+          created_at: string | null
+          id: string
+          next_execution: string | null
+          participant_target: number | null
+          revenue_target: number | null
+          status: string | null
+          tournament_id: string | null
+          xbox_server_assigned: boolean | null
+        }
+        Insert: {
+          auto_created?: boolean | null
+          automation_schedule: Json
+          created_at?: string | null
+          id?: string
+          next_execution?: string | null
+          participant_target?: number | null
+          revenue_target?: number | null
+          status?: string | null
+          tournament_id?: string | null
+          xbox_server_assigned?: boolean | null
+        }
+        Update: {
+          auto_created?: boolean | null
+          automation_schedule?: Json
+          created_at?: string | null
+          id?: string
+          next_execution?: string | null
+          participant_target?: number | null
+          revenue_target?: number | null
+          status?: string | null
+          tournament_id?: string | null
+          xbox_server_assigned?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automated_tournaments_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_config: {
         Row: {
           automation_type: string
@@ -1542,6 +1589,42 @@ export type Database = {
         }
         Relationships: []
       }
+      passive_income_metrics: {
+        Row: {
+          automation_efficiency_score: number | null
+          created_at: string | null
+          date: string | null
+          hourly_revenue: number | null
+          id: string
+          matches_facilitated: number | null
+          total_daily_revenue: number | null
+          tournaments_created: number | null
+          xbox_uptime_hours: number | null
+        }
+        Insert: {
+          automation_efficiency_score?: number | null
+          created_at?: string | null
+          date?: string | null
+          hourly_revenue?: number | null
+          id?: string
+          matches_facilitated?: number | null
+          total_daily_revenue?: number | null
+          tournaments_created?: number | null
+          xbox_uptime_hours?: number | null
+        }
+        Update: {
+          automation_efficiency_score?: number | null
+          created_at?: string | null
+          date?: string | null
+          hourly_revenue?: number | null
+          id?: string
+          matches_facilitated?: number | null
+          total_daily_revenue?: number | null
+          tournaments_created?: number | null
+          xbox_uptime_hours?: number | null
+        }
+        Relationships: []
+      }
       payout_requests: {
         Row: {
           amount: number
@@ -1761,6 +1844,50 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_automation: {
+        Row: {
+          auto_adjust: boolean | null
+          base_entry_fee: number | null
+          created_at: string | null
+          current_price: number | null
+          demand_factor: number | null
+          game_id: string | null
+          id: string
+          last_adjustment: string | null
+          peak_multiplier: number | null
+        }
+        Insert: {
+          auto_adjust?: boolean | null
+          base_entry_fee?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          demand_factor?: number | null
+          game_id?: string | null
+          id?: string
+          last_adjustment?: string | null
+          peak_multiplier?: number | null
+        }
+        Update: {
+          auto_adjust?: boolean | null
+          base_entry_fee?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          demand_factor?: number | null
+          game_id?: string | null
+          id?: string
+          last_adjustment?: string | null
+          peak_multiplier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_automation_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1914,6 +2041,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      revenue_automation: {
+        Row: {
+          automation_type: string
+          created_at: string | null
+          current_revenue_rate: number | null
+          id: string
+          is_active: boolean | null
+          optimization_rules: Json | null
+          target_revenue_per_hour: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          automation_type: string
+          created_at?: string | null
+          current_revenue_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          optimization_rules?: Json | null
+          target_revenue_per_hour?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          automation_type?: string
+          created_at?: string | null
+          current_revenue_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          optimization_rules?: Json | null
+          target_revenue_per_hour?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       security_events: {
         Row: {
@@ -3023,6 +3183,48 @@ export type Database = {
         }
         Relationships: []
       }
+      xbox_automation_status: {
+        Row: {
+          automation_config: Json | null
+          created_at: string | null
+          current_lobbies: number | null
+          id: string
+          last_heartbeat: string | null
+          max_lobbies: number | null
+          revenue_generated_today: number | null
+          status: string | null
+          updated_at: string | null
+          uptime_hours: number | null
+          xbox_console_id: string
+        }
+        Insert: {
+          automation_config?: Json | null
+          created_at?: string | null
+          current_lobbies?: number | null
+          id?: string
+          last_heartbeat?: string | null
+          max_lobbies?: number | null
+          revenue_generated_today?: number | null
+          status?: string | null
+          updated_at?: string | null
+          uptime_hours?: number | null
+          xbox_console_id: string
+        }
+        Update: {
+          automation_config?: Json | null
+          created_at?: string | null
+          current_lobbies?: number | null
+          id?: string
+          last_heartbeat?: string | null
+          max_lobbies?: number | null
+          revenue_generated_today?: number | null
+          status?: string | null
+          updated_at?: string | null
+          uptime_hours?: number | null
+          xbox_console_id?: string
+        }
+        Relationships: []
+      }
       xbox_leaderboard_stats: {
         Row: {
           avg_kd_ratio: number | null
@@ -3241,6 +3443,10 @@ export type Database = {
       detect_suspicious_stats: {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
+      }
+      generate_automated_tournaments: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       generate_secure_otp: {
         Args: {
