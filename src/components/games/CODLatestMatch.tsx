@@ -98,37 +98,26 @@ export const CODLatestMatch = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
-          <Input
+          <input
             type="text"
             placeholder="Enter Xbox Gamertag"
             value={gamertag}
-            onChange={(e) => {
-              console.log('COD Input typing:', e.target.value);
-              setGamertag(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              console.log('COD Key pressed:', e.key);
-              if (e.key === 'Enter' && !loading) {
-                fetchLatestMatch();
-              }
-            }}
-            onInput={(e) => console.log('COD onInput event:', (e.target as HTMLInputElement).value)}
-            onFocus={() => console.log('COD Input focused')}
-            onBlur={() => console.log('COD Input blurred')}
+            onChange={(e) => setGamertag(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !loading && fetchLatestMatch()}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             autoComplete="off"
-            tabIndex={0}
           />
-          <Button 
+          <button 
             onClick={fetchLatestMatch} 
             disabled={loading}
-            size="sm"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               'Fetch'
             )}
-          </Button>
+          </button>
         </div>
 
         {matchData && (
