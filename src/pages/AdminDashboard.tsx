@@ -32,6 +32,7 @@ import {
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
 import { GameManagement } from '@/components/admin/GameManagement';
+import { ProjectExportModal } from '@/components/admin/ProjectExportModal';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
 import ComprehensiveSystemTest from '@/components/admin/ComprehensiveSystemTest';
@@ -574,6 +575,9 @@ const AdminDashboard = () => {
               ADMIN DASHBOARD
             </h1>
             <p className="text-muted-foreground mt-2">Platform management and analytics</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <ProjectExportModal />
           </div>
         </div>
 
