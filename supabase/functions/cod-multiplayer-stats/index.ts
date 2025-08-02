@@ -60,16 +60,33 @@ Deno.serve(async (req) => {
         headers: {
           'Cookie': codSessionCookie,
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       }
     )
 
     if (!response.ok) {
+      const responseText = await response.text()
+      console.error(`COD API error: ${response.status} ${response.statusText}, Response: ${responseText.substring(0, 500)}`)
       throw new Error(`COD API error: ${response.status} ${response.statusText}`)
     }
 
-    const data = await response.json()
+    const responseText = await response.text()
+    
+    // Check if response is HTML (indicating authentication failure)
+    if (responseText.startsWith('<!DOCTYPE') || responseText.startsWith('<html')) {
+      console.error('COD API returned HTML instead of JSON - session cookie likely expired')
+      throw new Error('COD API authentication failed - session cookie may be expired')
+    }
+
+    let data
+    try {
+      data = JSON.parse(responseText)
+    } catch (parseError) {
+      console.error('Failed to parse COD API response:', responseText.substring(0, 500))
+      throw new Error('Invalid JSON response from COD API')
+    }
     
     if (!data.data || data.status !== 'success') {
       throw new Error('Invalid COD API response')
