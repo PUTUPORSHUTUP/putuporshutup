@@ -22,13 +22,24 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // First, get the actual game UUID from the game name
+    const { data: gameData, error: gameError } = await supabaseService
+      .from("games")
+      .select("id")
+      .eq("name", gameId)
+      .single();
+
+    if (gameError || !gameData) {
+      throw new Error(`Game not found: ${gameId}`);
+    }
+
     // Create the live challenge
     const { data: challenge, error: challengeError } = await supabaseService
       .from("challenges")
       .insert({
         title: `Live Match - ${stakeTier} Tier`,
         description: "AI-Generated live match with instant matchmaking",
-        game_id: gameId,
+        game_id: gameData.id,
         platform: "Xbox",
         stake_amount: getStakeAmount(stakeTier),
         challenge_type: "live_match",
