@@ -19,6 +19,7 @@ import { SponsorCarousel } from '@/components/ui/sponsor-carousel';
 import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
 import { LiveGameStatus } from '@/components/realtime/LiveGameStatus';
 import { KillRaceChallenge } from '@/components/games/KillRaceChallenge';
+import { LiveTournamentFeed } from '@/components/tournaments/LiveTournamentFeed';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -153,69 +154,70 @@ const Index = () => {
           )}
         </div>
       </nav>
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('/lovable-uploads/3f2b1827-906a-40f5-b33e-a7bd8db103de.png')`
-          }}
-        >
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
-        
-        {/* Hero Content */}
-        <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-orbitron font-semibold mb-6 md:mb-8 text-neon-green">
-            DON'T BRAG. COMPETE AND LOSE. COMPETE. WIN. BRAG!
-          </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-gray-200 max-w-2xl mx-auto font-orbitron">
-            Prove your skills in head-to-head video game challenges. Real competition. Real rewards. No luck — just skill.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
-            {user ? (
-              <Link to="/games" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-semibold">
-                  PUT UP OR SHUT UP
-                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/auth" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-semibold">
-                    Enter the Arena
-                    <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
-                  </Button>
-                </Link>
-                <Link to="/games" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron font-semibold">
-                    Browse Games
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-          
-          {/* Rules of Engagement Button - Made prominent for mobile visibility */}
-          <div className="mt-8 flex flex-col gap-4 max-w-md mx-auto">
-            <Button
-              variant="outline" 
-              size="lg"
-              onClick={() => setRulesModalOpen(true)}
-              className="w-full border-neon-green text-neon-green hover:bg-neon-green hover:text-black text-lg py-6 font-orbitron font-bold bg-black/60 backdrop-blur-sm"
-            >
-              <BookOpen className="w-5 h-5 mr-2" />
-              Rules of Engagement
-            </Button>
+      {/* Hero Section - Tournament Engine */}
+      <section className="relative py-20 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10" />
+        <div className="container relative z-10 mx-auto px-4">
+          <div className="text-center space-y-6">
+            <Badge variant="secondary" className="text-sm px-4 py-2 font-orbitron">
+              🔥 TOURNAMENT ENGINE LIVE - New matches every 20 minutes
+            </Badge>
             
-            <ShareButton 
-              variant="outline" 
-              size="lg"
-              className="w-full border-white text-white hover:bg-white hover:text-black text-lg py-6"
-            />
+            <h1 className="text-4xl md:text-6xl font-orbitron font-bold text-neon-green">
+              ENDLESS TOURNAMENTS
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-orbitron">
+              No Subscriptions. No Waiting. Just Skill + Cash.
+            </p>
+            
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto font-orbitron">
+              Join automated tournaments every 20 minutes. Entry fees only. Winners get paid instantly. The platform that runs itself.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {user ? (
+                <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
+                  🎮 JOIN NEXT TOURNAMENT
+                </Button>
+              ) : (
+                <Link to="/auth">
+                  <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
+                    🚀 GET STARTED NOW
+                  </Button>
+                </Link>
+              )}
+              
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
+                🔥 HOW IT WORKS
+              </Button>
+            </div>
+            
+            {/* Tournament Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
+              {[
+                { icon: "🏆", label: "Active Tournaments", value: "12", color: "text-yellow-500" },
+                { icon: "👥", label: "Players Online", value: "1,247", color: "text-blue-500" },
+                { icon: "💰", label: "Prize Pool Today", value: "$15,420", color: "text-green-500" },
+                { icon: "⚡", label: "Matches Completed", value: "89", color: "text-purple-500" },
+              ].map((stat, index) => (
+                <Card key={index} className="text-center bg-background/50 backdrop-blur border-primary/20">
+                  <CardContent className="pt-6">
+                    <div className="text-3xl mb-2">{stat.icon}</div>
+                    <div className="text-2xl font-bold font-orbitron">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground font-orbitron">{stat.label}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Live Tournament Feed */}
+      <section className="py-16 bg-muted/20">
+        <div className="container mx-auto px-4">
+          <LiveTournamentFeed />
         </div>
       </section>
 
