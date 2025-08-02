@@ -26,8 +26,7 @@ Deno.serve(async (req) => {
         // Update automation status
         await supabase
           .from('xbox_automation_status')
-          .upsert({
-            id: 1,
+          .update({
             is_active: true,
             last_updated: new Date().toISOString(),
             revenue_today: 0,
@@ -40,6 +39,7 @@ Deno.serve(async (req) => {
               peak_hour_pricing: true
             }
           })
+          .eq('xbox_console_id', 'xbox-series-x-main')
 
         // Log the automation start
         await supabase
@@ -58,8 +58,7 @@ Deno.serve(async (req) => {
         // Update automation status
         await supabase
           .from('xbox_automation_status')
-          .upsert({
-            id: 1,
+          .update({
             is_active: false,
             last_updated: new Date().toISOString(),
             automation_config: {
@@ -70,6 +69,7 @@ Deno.serve(async (req) => {
               peak_hour_pricing: false
             }
           })
+          .eq('xbox_console_id', 'xbox-series-x-main')
 
         // Log the automation stop
         await supabase
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
             active_lobbies: lobbyCount,
             last_updated: new Date().toISOString()
           })
-          .eq('id', 1)
+          .eq('xbox_console_id', 'xbox-series-x-main')
 
         // Log lobby creation
         await supabase

@@ -3188,39 +3188,51 @@ export type Database = {
       }
       xbox_automation_status: {
         Row: {
+          active_lobbies: number | null
           automation_config: Json | null
           created_at: string | null
           current_lobbies: number | null
           id: string
+          is_active: boolean | null
           last_heartbeat: string | null
+          last_updated: string | null
           max_lobbies: number | null
           revenue_generated_today: number | null
+          revenue_today: number | null
           status: string | null
           updated_at: string | null
           uptime_hours: number | null
           xbox_console_id: string
         }
         Insert: {
+          active_lobbies?: number | null
           automation_config?: Json | null
           created_at?: string | null
           current_lobbies?: number | null
           id?: string
+          is_active?: boolean | null
           last_heartbeat?: string | null
+          last_updated?: string | null
           max_lobbies?: number | null
           revenue_generated_today?: number | null
+          revenue_today?: number | null
           status?: string | null
           updated_at?: string | null
           uptime_hours?: number | null
           xbox_console_id: string
         }
         Update: {
+          active_lobbies?: number | null
           automation_config?: Json | null
           created_at?: string | null
           current_lobbies?: number | null
           id?: string
+          is_active?: boolean | null
           last_heartbeat?: string | null
+          last_updated?: string | null
           max_lobbies?: number | null
           revenue_generated_today?: number | null
+          revenue_today?: number | null
           status?: string | null
           updated_at?: string | null
           uptime_hours?: number | null
