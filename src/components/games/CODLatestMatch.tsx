@@ -99,11 +99,24 @@ export const CODLatestMatch = () => {
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Input
+            type="text"
             placeholder="Enter Xbox Gamertag"
             value={gamertag}
-            onChange={(e) => setGamertag(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !loading && fetchLatestMatch()}
+            onChange={(e) => {
+              console.log('COD Input typing:', e.target.value);
+              setGamertag(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              console.log('COD Key pressed:', e.key);
+              if (e.key === 'Enter' && !loading) {
+                fetchLatestMatch();
+              }
+            }}
+            onInput={(e) => console.log('COD onInput event:', (e.target as HTMLInputElement).value)}
+            onFocus={() => console.log('COD Input focused')}
+            onBlur={() => console.log('COD Input blurred')}
             autoComplete="off"
+            tabIndex={0}
           />
           <Button 
             onClick={fetchLatestMatch} 
