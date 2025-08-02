@@ -146,11 +146,11 @@ export const MatchManagement = () => {
           games!inner (
             display_name
           ),
-          creator_profile:profiles!challenges_creator_id_fkey (
+          creator_profile:profiles!creator_id (
             display_name,
             username
           ),
-          winner_profile:profiles!challenges_winner_id_fkey (
+          winner_profile:profiles!winner_id (
             display_name,
             username
           )
