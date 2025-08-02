@@ -64,6 +64,7 @@ import { ProfitMaximizer } from '@/components/admin/ProfitMaximizer';
 import SponsorDashboard from './SponsorDashboard';
 import { XboxAPIKeyManagement } from '@/components/admin/XboxAPIKeyManagement';
 import { FastPaymentProcessor } from '@/components/admin/FastPaymentProcessor';
+import { PassiveIncomeController } from '@/components/admin/PassiveIncomeController';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -577,8 +578,9 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-15 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-16 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="passive-income" className="text-xs sm:text-sm">💰 Passive Income</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
             <TabsTrigger value="roles" className="text-xs sm:text-sm">Roles</TabsTrigger>
@@ -721,6 +723,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Passive Income Tab */}
+          <TabsContent value="passive-income" className="space-y-6">
+            <PassiveIncomeController />
           </TabsContent>
 
           {/* Matches Tab */}
