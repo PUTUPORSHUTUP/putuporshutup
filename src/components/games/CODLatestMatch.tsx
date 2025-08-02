@@ -101,15 +101,9 @@ export const CODLatestMatch = () => {
           <Input
             placeholder="Enter Xbox Gamertag"
             value={gamertag}
-            onChange={(e) => {
-              console.log('COD Input changed:', e.target.value);
-              setGamertag(e.target.value);
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && fetchLatestMatch()}
-            onFocus={() => console.log('COD Input focused')}
-            onBlur={() => console.log('COD Input blurred')}
+            onChange={(e) => setGamertag(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !loading && fetchLatestMatch()}
             autoComplete="off"
-            disabled={loading}
           />
           <Button 
             onClick={fetchLatestMatch} 
