@@ -2947,6 +2947,7 @@ export type Database = {
           collectible_series: string | null
           cover_art_url: string | null
           created_at: string
+          created_by_automation: boolean | null
           creator_id: string
           current_participants: number | null
           custom_rules: string | null
@@ -2980,6 +2981,7 @@ export type Database = {
           collectible_series?: string | null
           cover_art_url?: string | null
           created_at?: string
+          created_by_automation?: boolean | null
           creator_id: string
           current_participants?: number | null
           custom_rules?: string | null
@@ -3013,6 +3015,7 @@ export type Database = {
           collectible_series?: string | null
           cover_art_url?: string | null
           created_at?: string
+          created_by_automation?: boolean | null
           creator_id?: string
           current_participants?: number | null
           custom_rules?: string | null
