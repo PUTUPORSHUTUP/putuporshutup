@@ -102,7 +102,8 @@ export const CODLatestMatch = () => {
             placeholder="Enter Xbox Gamertag"
             value={gamertag}
             onChange={(e) => setGamertag(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && fetchLatestMatch()}
+            onKeyDown={(e) => e.key === 'Enter' && fetchLatestMatch()}
+            autoComplete="off"
           />
           <Button 
             onClick={fetchLatestMatch} 
