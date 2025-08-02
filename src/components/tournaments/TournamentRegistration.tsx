@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trophy, Clock, DollarSign, Crown } from "lucide-react";
+import { Users, Trophy, Clock, DollarSign, Crown, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { TournamentPayment } from "./TournamentPayment";
 
 interface TournamentRegistrationProps {
   tournament: any;
@@ -23,6 +24,8 @@ export const TournamentRegistration = ({
   const [isRegistering, setIsRegistering] = useState(false);
   const [isUnregistering, setIsUnregistering] = useState(false);
   const [teamName, setTeamName] = useState("");
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -62,9 +65,11 @@ export const TournamentRegistration = ({
         throw new Error('Premium membership required for tournaments with $10+ entry fees');
       }
 
-      // Check wallet balance
+      // Check wallet balance - if insufficient, offer manual payment
       if (profile.wallet_balance < entryFee) {
-        throw new Error(`Insufficient funds. You need $${entryFee.toFixed(2)} to register.`);
+        setUserProfile(profile);
+        setShowPaymentOptions(true);
+        return;
       }
 
       // Register for tournament
@@ -266,8 +271,52 @@ export const TournamentRegistration = ({
           </div>
         )}
 
+        {/* Manual Payment Option */}
+        {showPaymentOptions && userProfile && (
+          <div className="space-y-4">
+            <div className="p-4 border border-orange-500 rounded-lg bg-orange-50 dark:bg-orange-950/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-orange-600" />
+                <span className="font-semibold text-orange-800 dark:text-orange-200">
+                  Insufficient Wallet Balance
+                </span>
+              </div>
+              <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                Your wallet balance: ${userProfile.wallet_balance.toFixed(2)} | Entry fee: ${tournament.entry_fee}
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowPaymentOptions(false)}
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => window.open('/profile', '_blank')}
+                  size="sm"
+                  variant="secondary"
+                >
+                  Add Funds to Wallet
+                </Button>
+              </div>
+            </div>
+            
+            <TournamentPayment 
+              tournament={tournament}
+              onPaymentComplete={() => {
+                setShowPaymentOptions(false);
+                toast({
+                  title: "Payment Request Submitted",
+                  description: "Your tournament entry payment is being processed. You'll be notified when verified.",
+                });
+              }}
+            />
+          </div>
+        )}
+
         {/* Registration Form */}
-        {!isUserRegistered && !registrationClosed && spotsRemaining > 0 && user && (
+        {!isUserRegistered && !registrationClosed && spotsRemaining > 0 && user && !showPaymentOptions && (
           <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
             <div className="space-y-2">
               <Label htmlFor="teamName">Team Name (Optional)</Label>
