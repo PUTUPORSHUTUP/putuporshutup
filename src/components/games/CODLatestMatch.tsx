@@ -8,13 +8,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface CODMatchData {
-  gamertag: string;
+  username: string;
   platform: string;
-  mode: string;
-  kills: number;
-  deaths: number;
-  kdRatio: number;
-  matchDate: number;
+  overallStats: {
+    kills: number;
+    deaths: number;
+    kdRatio: number;
+    wins: number;
+    gamesPlayed: number;
+  };
+  recentMatches: any[];
+  isFallback?: boolean;
   lastUpdated: string;
 }
 
@@ -36,8 +40,12 @@ export const CODLatestMatch = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('cod-latest-match', {
-        body: { gamertag: gamertag.trim() }
+      const { data, error } = await supabase.functions.invoke('cod-multiplayer-stats', {
+        body: { 
+          user_id: '00000000-0000-0000-0000-000000000000', // Placeholder for testing
+          username: gamertag.trim(),
+          platform: 'xbox'
+        }
       });
 
       if (error) {
@@ -46,9 +54,14 @@ export const CODLatestMatch = () => {
 
       if (data?.success) {
         setMatchData(data.data);
+        const statusMsg = data.data.isFallback 
+          ? `Showing cached data for ${gamertag} (API temporarily unavailable)`
+          : `Latest stats fetched for ${gamertag}`;
+        
         toast({
-          title: "Success",
-          description: `Latest match data fetched for ${gamertag}`,
+          title: data.data.isFallback ? "Using Cached Data" : "Success",
+          description: statusMsg,
+          variant: data.data.isFallback ? "default" : "default",
         });
       } else {
         throw new Error(data?.error || 'Failed to fetch match data');
@@ -106,14 +119,20 @@ export const CODLatestMatch = () => {
 
         {matchData && (
           <div className="space-y-3 mt-4">
+            {matchData.isFallback && (
+              <Badge variant="outline" className="w-full justify-center mb-2">
+                📡 Using Cached Data
+              </Badge>
+            )}
+            
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Player:</span>
-              <Badge variant="secondary">{matchData.gamertag}</Badge>
+              <Badge variant="secondary">{matchData.username}</Badge>
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Mode:</span>
-              <span className="text-sm">{matchData.mode}</span>
+              <span className="text-sm font-medium">Platform:</span>
+              <span className="text-sm capitalize">{matchData.platform}</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -121,30 +140,40 @@ export const CODLatestMatch = () => {
                 <div className="flex items-center justify-center mb-1">
                   <Trophy className="w-4 h-4 text-green-600" />
                 </div>
-                <div className="text-lg font-bold text-green-600">{matchData.kills}</div>
-                <div className="text-xs text-muted-foreground">Kills</div>
+                <div className="text-lg font-bold text-green-600">{matchData.overallStats.kills}</div>
+                <div className="text-xs text-muted-foreground">Total Kills</div>
               </div>
 
               <div className="text-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
                 <div className="flex items-center justify-center mb-1">
                   <Skull className="w-4 h-4 text-red-600" />
                 </div>
-                <div className="text-lg font-bold text-red-600">{matchData.deaths}</div>
-                <div className="text-xs text-muted-foreground">Deaths</div>
+                <div className="text-lg font-bold text-red-600">{matchData.overallStats.deaths}</div>
+                <div className="text-xs text-muted-foreground">Total Deaths</div>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">K/D Ratio:</span>
-              <Badge variant={matchData.kdRatio >= 1 ? "default" : "secondary"}>
-                {matchData.kdRatio.toFixed(2)}
+              <Badge variant={matchData.overallStats.kdRatio >= 1 ? "default" : "secondary"}>
+                {matchData.overallStats.kdRatio.toFixed(2)}
               </Badge>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Date:</span>
+              <span className="text-sm font-medium">Wins:</span>
+              <span className="text-sm font-semibold text-green-600">{matchData.overallStats.wins}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Games Played:</span>
+              <span className="text-sm">{matchData.overallStats.gamesPlayed}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Last Updated:</span>
               <span className="text-sm text-muted-foreground">
-                {formatDate(matchData.matchDate)}
+                {new Date(matchData.lastUpdated).toLocaleString()}
               </span>
             </div>
           </div>
