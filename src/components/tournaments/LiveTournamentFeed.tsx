@@ -44,7 +44,7 @@ export const LiveTournamentFeed = () => {
           id, title, entry_fee, max_participants, current_participants, 
           start_time, status, description, created_by_automation
         `)
-        .eq("status", "open")
+        .in("status", ["open", "in_progress", "cancelled"])
         .order("start_time", { ascending: true })
         .limit(6);
 
@@ -234,9 +234,20 @@ export const LiveTournamentFeed = () => {
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg leading-tight">{tournament.title}</CardTitle>
-                    <Badge variant="secondary" className="ml-2">
-                      {tournament.game_mode}
-                    </Badge>
+                    <div className="flex gap-2 ml-2">
+                      <Badge 
+                        variant={tournament.status === 'cancelled' ? 'destructive' : 
+                                tournament.status === 'in_progress' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {tournament.status === 'cancelled' ? 'CANCELLED' :
+                         tournament.status === 'in_progress' ? 'IN PROGRESS' :
+                         tournament.status === 'open' ? 'OPEN' : tournament.status.toUpperCase()}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {tournament.game_mode}
+                      </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -258,11 +269,14 @@ export const LiveTournamentFeed = () => {
 
                   <Button 
                     onClick={() => joinTournament(tournament.id, tournament.entry_fee)}
-                    disabled={joining === tournament.id}
+                    disabled={joining === tournament.id || tournament.status !== 'open'}
                     className="w-full"
                     size="sm"
+                    variant={tournament.status === 'cancelled' ? 'destructive' : 'default'}
                   >
-                    {joining === tournament.id ? "Joining..." : `Join for $${tournament.entry_fee}`}
+                    {tournament.status === 'cancelled' ? 'CANCELLED' :
+                     tournament.status === 'in_progress' ? 'IN PROGRESS' :
+                     joining === tournament.id ? "Joining..." : `Join for $${tournament.entry_fee}`}
                   </Button>
                 </CardContent>
               </Card>

@@ -192,6 +192,9 @@ export const TournamentRegistration = ({
   };
 
   const getStatusBadge = () => {
+    if (tournament.status === 'cancelled') {
+      return <Badge variant="destructive">CANCELLED</Badge>;
+    }
     if (tournamentStarted) {
       return <Badge variant="destructive">Tournament Started</Badge>;
     }
@@ -316,7 +319,7 @@ export const TournamentRegistration = ({
         )}
 
         {/* Registration Form */}
-        {!isUserRegistered && !registrationClosed && spotsRemaining > 0 && user && !showPaymentOptions && (
+        {!isUserRegistered && !registrationClosed && spotsRemaining > 0 && user && !showPaymentOptions && tournament.status !== 'cancelled' && (
           <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
             <div className="space-y-2">
               <Label htmlFor="teamName">Team Name (Optional)</Label>
@@ -392,7 +395,15 @@ export const TournamentRegistration = ({
         )}
 
         {/* Status Messages */}
-        {!user && (
+        {tournament.status === 'cancelled' && (
+          <div className="text-center p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-700 dark:text-red-300 font-semibold">
+              This tournament has been cancelled. All entry fees have been refunded.
+            </p>
+          </div>
+        )}
+
+        {!user && tournament.status !== 'cancelled' && (
           <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
             <p className="text-sm text-blue-700 dark:text-blue-300">
               Please sign in to register for tournaments
