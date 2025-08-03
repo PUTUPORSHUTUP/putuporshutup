@@ -188,22 +188,29 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-col items-center space-y-6">
-                  {/* Large, Clear QR Code for scanning */}
+                  {/* Payment App Style QR Code */}
                   <div className="text-center">
-                    <div className="bg-white p-6 rounded-lg shadow-lg inline-block mb-4">
-                      <img 
-                        src={paymentInfo[paymentMethod].qrCode} 
-                        alt={`${paymentMethod} QR Code`}
-                        className="w-48 h-48 mx-auto"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <p className="font-bold text-2xl">{paymentInfo[paymentMethod].name}</p>
-                      <Badge variant="outline" className="text-xl px-4 py-2 font-mono">
-                        {paymentInfo[paymentMethod].handle}
-                      </Badge>
-                      <p className="text-lg text-muted-foreground capitalize font-medium">{paymentMethod} Payment</p>
-                      <p className="text-lg font-bold text-primary">Send exactly ${depositAmount}</p>
+                    <div className="space-y-4">
+                      <h3 className="text-3xl font-bold tracking-wide">{paymentInfo[paymentMethod].name.toUpperCase()}</h3>
+                      
+                      {/* QR Code Container matching app proportions */}
+                      <div className="bg-white p-8 rounded-2xl shadow-xl inline-block">
+                        <img 
+                          src={paymentInfo[paymentMethod].qrCode} 
+                          alt={`${paymentMethod} QR Code`}
+                          className="w-64 h-64 mx-auto"
+                        />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <p className="text-xl font-medium text-muted-foreground">
+                          Scan to pay {paymentInfo[paymentMethod].name.toUpperCase()}
+                        </p>
+                        <Badge variant="outline" className="text-lg px-4 py-2 font-mono bg-muted">
+                          {paymentInfo[paymentMethod].handle}
+                        </Badge>
+                        <p className="text-2xl font-bold text-primary">Send exactly ${depositAmount}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
