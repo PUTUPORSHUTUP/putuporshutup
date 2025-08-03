@@ -37,7 +37,7 @@ const Index = () => {
     try {
       const { data } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, is_premium')
         .eq('user_id', user?.id)
         .single();
       
@@ -55,6 +55,12 @@ const Index = () => {
       console.error('Error loading profile:', error);
     }
   };
+
+  // Remove legacy $19.99 ads on component mount
+  useEffect(() => {
+    const legacyAd = document.querySelector('.membership-legacy-banner');
+    if (legacyAd) legacyAd.remove();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -201,6 +207,25 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* VIP Status Banners */}
+      {user && (
+        <div className="container mx-auto px-4 -mt-8 relative z-20">
+          {!profile?.is_premium && (
+            <div className="rounded-xl bg-yellow-100 dark:bg-yellow-900/40 p-4 shadow-md text-black dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+              <strong className="block text-lg mb-1 font-orbitron">Join nonstop $5 tournaments</strong>
+              <p className="text-sm font-orbitron">No subscription needed. Play when you want. Win what you earn.</p>
+            </div>
+          )}
+
+          {profile?.is_premium && (
+            <div className="rounded-xl bg-blue-100 dark:bg-blue-900/40 p-4 shadow-md text-black dark:text-blue-100 border border-blue-300 dark:border-blue-700">
+              <strong className="block text-lg mb-1 font-orbitron">Welcome VIP!</strong>
+              <p className="text-sm font-orbitron">You now have access to $10+ high-stakes matches and exclusive perks.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Live Tournament Feed */}
       <section className="py-16 bg-muted/20">
