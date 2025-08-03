@@ -53,7 +53,7 @@ export default function SponsorAdminPanel() {
     }
   }
 
-  async function updateStatus(id: string, status: 'active' | 'archived') {
+  async function updateStatus(id: string, status: 'active' | 'rejected') {
     try {
       console.log(`Updating sponsor ${id} to status: ${status}`);
       
@@ -90,7 +90,7 @@ export default function SponsorAdminPanel() {
   const filtered = {
     pending: sponsors.filter(s => s.status === 'pending'),
     active: sponsors.filter(s => s.status === 'active'),
-    archived: sponsors.filter(s => s.status === 'archived'),
+    rejected: sponsors.filter(s => s.status === 'rejected'),
   };
 
   if (loading) {
@@ -103,7 +103,7 @@ export default function SponsorAdminPanel() {
 
       <Section title="🕓 Pending Sponsors" data={filtered.pending} onUpdateStatus={updateStatus} actions />
       <Section title="✅ Active Sponsors" data={filtered.active} onUpdateStatus={updateStatus} />
-      <Section title="📦 Archived Sponsors" data={filtered.archived} onUpdateStatus={updateStatus} />
+      <Section title="📦 Rejected Sponsors" data={filtered.rejected} onUpdateStatus={updateStatus} />
     </div>
   );
 }
@@ -111,7 +111,7 @@ export default function SponsorAdminPanel() {
 interface SectionProps {
   title: string;
   data: Sponsor[];
-  onUpdateStatus: (id: string, status: 'active' | 'archived') => void;
+  onUpdateStatus: (id: string, status: 'active' | 'rejected') => void;
   actions?: boolean;
 }
 
@@ -183,7 +183,7 @@ function Section({ title, data, onUpdateStatus, actions = false }: SectionProps)
                     </Button>
                     <Button 
                       variant="destructive" 
-                      onClick={() => onUpdateStatus(sponsor.id, 'archived')}
+                      onClick={() => onUpdateStatus(sponsor.id, 'rejected')}
                       className="flex-1"
                     >
                       Reject
