@@ -30,7 +30,7 @@ serve(async (req) => {
     await supabaseClient.rpc('cleanup_expired_queue_entries');
     logStep("Cleaned up expired queue entries");
 
-    // Get all users currently searching for matches
+    // Get all users currently searching for matches with skill ratings
     const { data: searchingUsers, error: searchError } = await supabaseClient
       .from('match_queue')
       .select(`
@@ -64,19 +64,39 @@ serve(async (req) => {
       });
     }
 
-    logStep("Found users in queue", { count: searchingUsers.length });
+    // Enrich users with skill rating data
+    const enrichedUsers = await Promise.all(searchingUsers.map(async (user) => {
+      const { data: skillData } = await supabaseClient
+        .from('player_skill_ratings')
+        .select('skill_tier, skill_rating, win_rate, matches_played')
+        .eq('user_id', user.user_id)
+        .eq('game_id', user.game_id)
+        .single();
+      
+      return {
+        ...user,
+        skill_data: skillData || {
+          skill_tier: 'novice',
+          skill_rating: 1000,
+          win_rate: 0,
+          matches_played: 0
+        }
+      };
+    }));
+
+    logStep("Found users in queue", { count: enrichedUsers.length });
 
     let matchesMade = 0;
 
     // Try to match users
-    for (let i = 0; i < searchingUsers.length - 1; i++) {
-      const user1 = searchingUsers[i];
+    for (let i = 0; i < enrichedUsers.length - 1; i++) {
+      const user1 = enrichedUsers[i];
       
       // Skip if user1 is already matched
       if (user1.queue_status !== 'searching') continue;
 
-      for (let j = i + 1; j < searchingUsers.length; j++) {
-        const user2 = searchingUsers[j];
+      for (let j = i + 1; j < enrichedUsers.length; j++) {
+        const user2 = enrichedUsers[j];
         
         // Skip if user2 is already matched
         if (user2.queue_status !== 'searching') continue;
@@ -179,6 +199,38 @@ function checkCompatibility(user1: any, user2: any): boolean {
   
   if (user1Balance < user1.stake_amount || user2Balance < user2.stake_amount) {
     return false;
+  }
+
+  // Fair Play Logic for $5 tournaments
+  if (user1.stake_amount === 5) {
+    const fairTiers = ['novice', 'regular', 'moderate'];
+    const user1Tier = user1.skill_data?.skill_tier || 'novice';
+    const user2Tier = user2.skill_data?.skill_tier || 'novice';
+    
+    // Only match players within fair tiers (no pros in $5 matches)
+    if (!fairTiers.includes(user1Tier) || !fairTiers.includes(user2Tier)) {
+      return false;
+    }
+    
+    // Further isolate by win rate within the fair tiers
+    const user1WinRate = user1.skill_data?.win_rate || 0;
+    const user2WinRate = user2.skill_data?.win_rate || 0;
+    const winRateDifference = Math.abs(user1WinRate - user2WinRate);
+    
+    // Don't match if win rates differ by more than 20%
+    if (winRateDifference > 0.2) {
+      return false;
+    }
+    
+    // Also check skill rating difference for fair matches
+    const user1Rating = user1.skill_data?.skill_rating || 1000;
+    const user2Rating = user2.skill_data?.skill_rating || 1000;
+    const ratingDifference = Math.abs(user1Rating - user2Rating);
+    
+    // Don't match if rating differs by more than 150 points in $5 matches
+    if (ratingDifference > 150) {
+      return false;
+    }
   }
 
   return true;
