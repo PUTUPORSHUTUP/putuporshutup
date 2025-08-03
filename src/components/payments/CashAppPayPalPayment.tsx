@@ -177,7 +177,7 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
             </p>
           </div>
 
-          {/* Payment Instructions */}
+          {/* Payment Instructions with QR Code */}
           {showInstructions && (
             <Card className="border-muted bg-muted/10">
               <CardHeader className="pb-3">
@@ -187,40 +187,22 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Cash App QR */}
+                <div className="flex flex-col items-center space-y-4">
+                  {/* QR Code for selected payment method */}
                   <div className="text-center">
                     <div className="bg-white p-4 rounded-lg inline-block mb-3">
                       <img 
-                        src={paymentInfo.cashapp.qrCode} 
-                        alt="Cash App QR Code"
-                        className="w-24 h-24 mx-auto"
+                        src={paymentInfo[paymentMethod].qrCode} 
+                        alt={`${paymentMethod} QR Code`}
+                        className="w-32 h-32 mx-auto"
                       />
                     </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-sm">{paymentInfo.cashapp.name}</p>
-                      <Badge variant="outline" className="text-sm px-2 py-1">
-                        {paymentInfo.cashapp.handle}
+                    <div className="space-y-2">
+                      <p className="font-bold text-lg">{paymentInfo[paymentMethod].name}</p>
+                      <Badge variant="outline" className="text-base px-3 py-1">
+                        {paymentInfo[paymentMethod].handle}
                       </Badge>
-                      <p className="text-xs text-muted-foreground">Cash App</p>
-                    </div>
-                  </div>
-
-                  {/* PayPal QR */}
-                  <div className="text-center">
-                    <div className="bg-white p-4 rounded-lg inline-block mb-3">
-                      <img 
-                        src={paymentInfo.paypal.qrCode} 
-                        alt="PayPal QR Code"
-                        className="w-24 h-24 mx-auto"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-sm">{paymentInfo.paypal.name}</p>
-                      <Badge variant="outline" className="text-sm px-2 py-1">
-                        {paymentInfo.paypal.handle}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">PayPal</p>
+                      <p className="text-sm text-muted-foreground capitalize">{paymentMethod}</p>
                     </div>
                   </div>
                 </div>
