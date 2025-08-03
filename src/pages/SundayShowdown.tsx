@@ -5,12 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-const posters = [
-  "/lovable-uploads/4e3b5b2c-0ba4-4d1b-988c-245b68239da1.png", // Current week's poster
-  "/lovable-uploads/tournament-poster-elite-001.jpg",
-  "/lovable-uploads/tournament-poster-masters-001.jpg", 
-  "/lovable-uploads/tournament-poster-pro-001.jpg",
-];
+// Posters will be fetched from database
 
 const getWeekNumber = (date: Date) => {
   const firstJan = new Date(date.getFullYear(), 0, 1);
@@ -20,7 +15,7 @@ const getWeekNumber = (date: Date) => {
 
 export default function SundayShowdown() {
   const { user } = useAuth();
-  const [poster, setPoster] = useState(posters[0]);
+  const [poster, setPoster] = useState("");
   const [players, setPlayers] = useState<any[]>([]);
   const [map, setMap] = useState("Random Map will be revealed at 6:45 PM EST");
   const [recaps, setRecaps] = useState<any[]>([]);
@@ -33,9 +28,26 @@ export default function SundayShowdown() {
   const TOURNAMENT_ID = "sunday-showdown-aug3";
 
   useEffect(() => {
-    // Rotation Logic
-    const weekIndex = getWeekNumber(new Date()) % posters.length;
-    setPoster(posters[weekIndex]);
+    // Fetch posters from database and rotate them
+    const fetchPosters = async () => {
+      const { data } = await supabase
+        .from("posters")
+        .select("image_url")
+        .eq("event_type", "sunday_showdown")
+        .eq("is_active", true)
+        .eq("is_archived", false)
+        .order("display_order");
+      
+      if (data && data.length > 0) {
+        const weekIndex = getWeekNumber(new Date()) % data.length;
+        setPoster(data[weekIndex].image_url);
+      } else {
+        // Fallback to uploaded poster
+        setPoster("/lovable-uploads/4e3b5b2c-0ba4-4d1b-988c-245b68239da1.png");
+      }
+    };
+    
+    fetchPosters();
 
     // Fetch registered players
     const fetchPlayers = async () => {

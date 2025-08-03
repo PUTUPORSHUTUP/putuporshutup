@@ -69,6 +69,7 @@ import { XboxAPIKeyManagement } from '@/components/admin/XboxAPIKeyManagement';
 import { FastPaymentProcessor } from '@/components/admin/FastPaymentProcessor';
 import { PassiveIncomeController } from '@/components/admin/PassiveIncomeController';
 import SponsorAdminPanel from '@/components/admin/SponsorAdminPanel';
+import PosterManagement from '@/components/admin/PosterManagement';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -632,6 +633,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">🎮 Xbox Live</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">🧪 Xbox Test</TabsTrigger>
             <TabsTrigger value="system-test" className="text-xs sm:text-sm">🚀 Full Test</TabsTrigger>
+            <TabsTrigger value="posters" className="text-xs sm:text-sm">🖼️ Posters</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1243,6 +1245,11 @@ const AdminDashboard = () => {
           {/* Comprehensive System Test Tab */}
           <TabsContent value="system-test" className="space-y-6">
             <ComprehensiveSystemTest />
+          </TabsContent>
+
+          {/* Poster Management Tab */}
+          <TabsContent value="posters" className="space-y-6">
+            <PosterManagement />
           </TabsContent>
         </Tabs>
       </div>

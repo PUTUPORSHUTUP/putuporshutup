@@ -1847,6 +1847,48 @@ export type Database = {
         }
         Relationships: []
       }
+      posters: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_order: number | null
+          event_type: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          is_archived: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          event_type?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          is_archived?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          event_type?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          is_archived?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pricing_automation: {
         Row: {
           auto_adjust: boolean | null
