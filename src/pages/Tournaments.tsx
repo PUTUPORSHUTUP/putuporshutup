@@ -110,6 +110,7 @@ const Tournaments = () => {
           game:games(*),
           tournament_posters(*)
         `)
+        .eq('status', 'in_progress')
         .order('created_at', { ascending: false });
 
       if (error) {
