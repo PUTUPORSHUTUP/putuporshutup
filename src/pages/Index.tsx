@@ -307,26 +307,24 @@ const Index = () => {
       <section className="py-20 bg-muted/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-orbitron font-bold mb-4">Featured Tournament</h2>
+            <h2 className="text-4xl font-orbitron font-bold mb-4 text-neon-green">🎯 Featured Tournament</h2>
             <p className="text-xl text-muted-foreground font-orbitron">
-              Click to view all upcoming tournaments
+              Live this Sunday @ 7 PM EST
             </p>
           </div>
           
           {/* Sunday Showdown Poster - Clickable */}
           <div className="flex justify-center mb-16">
-            <Link to="/tournaments" className="w-full max-w-2xl">
-              <div className="cursor-pointer hover:opacity-90 transition-opacity">
-                <img 
-                  src="/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png"
-                  alt="Sunday Showdown Championship"
-                  className="w-full h-auto rounded-lg shadow-2xl"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              </div>
+            <Link to="/tournaments/sunday-showdown-aug3" className="w-full max-w-md">
+              <img
+                src="/assets/sunday-showdown-qr1.png"
+                alt="Sunday Showdown Poster"
+                className="w-full max-w-md mx-auto rounded-xl shadow-lg border-2 border-orange-500 hover:scale-105 transition duration-300"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
             </Link>
           </div>
         </div>
