@@ -32,45 +32,10 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const handleUpgradeToBasic = async () => {
+  const handleSubscribe = async () => {
     if (!user) return;
 
     setLoading(prev => ({ ...prev, basic: true }));
-    try {
-      const { data, error } = await supabase.functions.invoke('create-basic-subscription');
-
-      if (error) {
-        toast({
-          title: "Subscription Error",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (data.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecting to Checkout",
-          description: "Complete your basic subscription in the new tab.",
-        });
-      }
-    } catch (error) {
-      console.error('Basic subscription error:', error);
-      toast({
-        title: "Subscription Error",
-        description: "Unable to process subscription request.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(prev => ({ ...prev, basic: false }));
-    }
-  };
-
-  const handleUpgradeToPremium = async () => {
-    if (!user) return;
-
-    setLoading(prev => ({ ...prev, premium: true }));
     try {
       const { data, error } = await supabase.functions.invoke('create-premium-subscription');
 
@@ -87,18 +52,18 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
         window.open(data.url, '_blank');
         toast({
           title: "Redirecting to Checkout",
-          description: "Complete your premium subscription in the new tab.",
+          description: "Complete your subscription in the new tab.",
         });
       }
     } catch (error) {
-      console.error('Premium subscription error:', error);
+      console.error('Subscription error:', error);
       toast({
         title: "Subscription Error",
         description: "Unable to process subscription request.",
         variant: "destructive",
       });
     } finally {
-      setLoading(prev => ({ ...prev, premium: false }));
+      setLoading(prev => ({ ...prev, basic: false }));
     }
   };
 
@@ -123,18 +88,12 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
     }
   };
 
-  const basicFeatures = [
-    { icon: Zap, title: "50% Off Platform Fees", description: "Save on deposits (tournament entries still apply)" },
-    { icon: Star, title: "Priority Entry", description: "Skip the queue in tournaments" },
-    { icon: Shield, title: "Basic Support", description: "Enhanced customer service" }
-  ];
-
-  const premiumFeatures = [
-    { icon: Zap, title: "No Platform Fees", description: "Zero fees on deposits (challenges only)" },
-    { icon: Trophy, title: "10+ Tournaments Access", description: "Compete in premium tournaments with exclusive prizes" },
-    { icon: Star, title: "VIP Priority", description: "First access to everything" },
-    { icon: Shield, title: "Premium Support", description: "24/7 priority customer service" },
-    { icon: Crown, title: "Elite Status", description: "Special badges and recognition" }
+  const subscriptionFeatures = [
+    { icon: Zap, title: "Access to $10+ Matches", description: "Compete in high-stakes VIP matches and tournaments" },
+    { icon: Trophy, title: "Premium Tournament Access", description: "Enter exclusive tournaments with bigger prizes" },
+    { icon: Star, title: "Priority Support", description: "Get priority customer service" },
+    { icon: Shield, title: "7-Day Free Trial", description: "Try it risk-free for a full week" },
+    { icon: Crown, title: "VIP Badge", description: "Special recognition and status" }
   ];
 
   const isSubscribed = currentSubscription?.subscribed;
@@ -143,8 +102,8 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Choose Your Membership</h2>
-        <p className="text-muted-foreground">Unlock exclusive benefits and save on fees</p>
+        <h2 className="text-2xl font-bold mb-2">VIP Membership</h2>
+        <p className="text-muted-foreground">Unlock $10+ matches with 7-day free trial</p>
       </div>
 
       {/* Current Status */}
@@ -178,26 +137,29 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
         </div>
       )}
 
-      {/* Subscription Tiers */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Basic Tier */}
-        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-600/10 border-blue-500/20 relative">
+      {/* Single Subscription Card */}
+      <div className="max-w-md mx-auto">
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 relative">
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <Badge className="bg-primary text-primary-foreground px-3 py-1">7-DAY FREE TRIAL</Badge>
+          </div>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="w-6 h-6 text-blue-600" />
-              Basic
+            <CardTitle className="flex items-center gap-2 justify-center">
+              <Crown className="w-6 h-6 text-primary" />
+              VIP Membership
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">$9.99</div>
+              <div className="text-3xl font-bold text-primary">$9.99</div>
               <p className="text-sm text-muted-foreground">per month</p>
+              <p className="text-xs text-primary font-medium mt-1">Start with 7 days FREE</p>
             </div>
 
             <div className="space-y-3">
-              {basicFeatures.map((feature, index) => (
+              {subscriptionFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <feature.icon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <feature.icon className="w-4 h-4 text-primary flex-shrink-0" />
                   <div>
                     <p className="font-medium text-sm">{feature.title}</p>
                     <p className="text-xs text-muted-foreground">{feature.description}</p>
@@ -207,67 +169,23 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
             </div>
 
             <Button 
-              onClick={handleUpgradeToBasic}
+              onClick={handleSubscribe}
               disabled={loading.basic || isSubscribed}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {loading.basic ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (
-                <Star className="w-4 h-4 mr-2" />
-              )}
-              {isSubscribed ? "Current Plan" : "Choose Basic"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Premium Tier */}
-        <Card className="bg-gradient-to-br from-yellow-500/5 to-yellow-600/10 border-yellow-500/20 relative">
-          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <Badge className="bg-yellow-600 text-white px-3 py-1">BEST VALUE</Badge>
-          </div>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Crown className="w-6 h-6 text-yellow-600" />
-              Premium
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600">$19.99</div>
-              <p className="text-sm text-muted-foreground">per month</p>
-            </div>
-
-            <div className="space-y-3">
-              {premiumFeatures.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <feature.icon className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-sm">{feature.title}</p>
-                    <p className="text-xs text-muted-foreground">{feature.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Button 
-              onClick={handleUpgradeToPremium}
-              disabled={loading.premium || isSubscribed}
-              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
-            >
-              {loading.premium ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
                 <Crown className="w-4 h-4 mr-2" />
               )}
-              {isSubscribed ? "Current Plan" : "Choose Premium"}
+              {isSubscribed ? "Currently Subscribed" : "Start Free Trial"}
             </Button>
           </CardContent>
         </Card>
       </div>
 
       <p className="text-xs text-center text-muted-foreground">
-        Cancel anytime. No hidden fees.
+        Free trial for 7 days, then $9.99/month. Cancel anytime. No hidden fees.
       </p>
     </div>
   );
