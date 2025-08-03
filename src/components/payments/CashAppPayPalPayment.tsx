@@ -187,22 +187,23 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-col items-center space-y-4">
-                  {/* QR Code for selected payment method */}
+                <div className="flex flex-col items-center space-y-6">
+                  {/* Large, Clear QR Code for scanning */}
                   <div className="text-center">
-                    <div className="bg-white p-4 rounded-lg inline-block mb-3">
+                    <div className="bg-white p-6 rounded-lg shadow-lg inline-block mb-4">
                       <img 
                         src={paymentInfo[paymentMethod].qrCode} 
                         alt={`${paymentMethod} QR Code`}
-                        className="w-32 h-32 mx-auto"
+                        className="w-48 h-48 mx-auto"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <p className="font-bold text-lg">{paymentInfo[paymentMethod].name}</p>
-                      <Badge variant="outline" className="text-base px-3 py-1">
+                    <div className="space-y-3">
+                      <p className="font-bold text-2xl">{paymentInfo[paymentMethod].name}</p>
+                      <Badge variant="outline" className="text-xl px-4 py-2 font-mono">
                         {paymentInfo[paymentMethod].handle}
                       </Badge>
-                      <p className="text-sm text-muted-foreground capitalize">{paymentMethod}</p>
+                      <p className="text-lg text-muted-foreground capitalize font-medium">{paymentMethod} Payment</p>
+                      <p className="text-lg font-bold text-primary">Send exactly ${depositAmount}</p>
                     </div>
                   </div>
                 </div>
