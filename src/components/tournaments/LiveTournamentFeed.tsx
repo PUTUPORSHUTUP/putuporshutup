@@ -44,9 +44,10 @@ export const LiveTournamentFeed = () => {
           id, title, entry_fee, max_participants, current_participants, 
           start_time, status, description, created_by_automation
         `)
-        .in("status", ["open", "in_progress", "cancelled"])
+        .eq("title", "Sunday Showdown") // Only show Sunday Showdown
+        .in("status", ["open", "in_progress"])
         .order("start_time", { ascending: true })
-        .limit(6);
+        .limit(1);
 
       if (error) throw error;
       
@@ -58,12 +59,12 @@ export const LiveTournamentFeed = () => {
       
       setActiveTournaments(tournamentsWithMode);
 
-      // Mock engine status for now
+      // Zero out all fake numbers for live launch
       setEngineStatus({
-        is_running: true,
+        is_running: false,
         next_tournament_scheduled_at: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
-        tournaments_created_today: 12,
-        total_revenue_today: 2400
+        tournaments_created_today: 0,
+        total_revenue_today: 0
       });
     } catch (error) {
       console.error("Error fetching tournaments:", error);
