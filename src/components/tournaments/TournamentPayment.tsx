@@ -149,8 +149,15 @@ export const TournamentPayment = ({
                 </Button>
               </div>
             </div>
+            
+            <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
+              <Info className="w-4 h-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800 dark:text-yellow-300">
+                <strong>IMPORTANT:</strong> Include your <strong>GAMERTAG</strong> in the payment note/memo to ensure quick credit before the tournament begins!
+              </AlertDescription>
+            </Alert>
 
-            <Button 
+            <Button
               onClick={handleSubmitPaymentRequest}
               disabled={processing}
               className="w-full bg-green-600 hover:bg-green-700"

@@ -221,7 +221,12 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
                     <strong>Next Steps:</strong>
                     <ol className="list-decimal list-inside mt-2 space-y-1 text-sm">
                       <li>Send exactly ${depositAmount} to the {paymentMethod} above</li>
-                      <li>Include your username in the payment note</li>
+                      <li>
+                        <strong>IMPORTANT:</strong> Include your <strong>GAMERTAG</strong> in the payment note/memo 
+                        <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                          ℹ️ Helps admin credit you before matches begin
+                        </span>
+                      </li>
                       <li>⚡ Your deposit will be processed within 1 hour (business hours)</li>
                       <li>You'll receive a notification when funds are added</li>
                     </ol>

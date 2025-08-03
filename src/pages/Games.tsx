@@ -423,7 +423,7 @@ const Games = () => {
                     </div>
                     <div className="text-center">
                       <Badge variant="secondary" className="font-orbitron">
-                        {wagers.filter(w => w.game.id === game.id).length} Active Wagers
+                        {wagers.filter(w => w.game.id === game.id).length} Active Challenges
                       </Badge>
                     </div>
                   </CardContent>
@@ -440,7 +440,7 @@ const Games = () => {
                   Ready to Compete?
                 </h3>
                 <p className="text-muted-foreground mb-6 font-orbitron">
-                  Join thousands of gamers putting their skills to the test. Create wagers, accept challenges, and win real money.
+                  Join thousands of gamers putting their skills to the test. Create challenges, accept matches, and win real money.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button 
@@ -475,7 +475,7 @@ const Games = () => {
         <div className="space-y-4 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-gaming text-primary">GAMES & WAGERS</h1>
+              <h1 className="text-3xl sm:text-4xl font-gaming text-primary">GAMES & CHALLENGES</h1>
               <p className="text-muted-foreground mt-2">Challenge players and win big</p>
             </div>
             
@@ -487,7 +487,7 @@ const Games = () => {
                 size="lg"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                CREATE WAGER
+                CREATE CHALLENGE
               </Button>
               <div className="flex gap-2">
                 <Button 
@@ -533,7 +533,7 @@ const Games = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">{wagers.length}</p>
-                <p className="text-sm text-muted-foreground">Active Wagers</p>
+                <p className="text-sm text-muted-foreground">Active Challenges</p>
               </div>
             </CardContent>
           </Card>
