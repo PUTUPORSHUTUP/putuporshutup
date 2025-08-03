@@ -32,34 +32,44 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const handleSubscribe = async () => {
-    if (!user) return;
+  const handleFreeTrialClick = async () => {
+    if (!user) {
+      console.warn("Anonymous user attempted to start trial — skipping subscription.");
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to start your free trial.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(prev => ({ ...prev, basic: true }));
     try {
       const { data, error } = await supabase.functions.invoke('create-premium-subscription');
 
       if (error) {
+        console.error('Subscription error:', error);
         toast({
           title: "Subscription Error",
-          description: error.message,
+          description: error.message || "Unable to start free trial.",
           variant: "destructive",
         });
         return;
       }
 
       if (data.url) {
+        // Open Stripe checkout in a new tab
         window.open(data.url, '_blank');
         toast({
           title: "Redirecting to Checkout",
-          description: "Complete your subscription in the new tab.",
+          description: "Complete your 7-day free trial signup in the new tab.",
         });
       }
     } catch (error) {
-      console.error('Subscription error:', error);
+      console.error('Free trial error:', error);
       toast({
-        title: "Subscription Error",
-        description: "Unable to process subscription request.",
+        title: "Trial Error", 
+        description: "Internal error while starting trial.",
         variant: "destructive",
       });
     } finally {
@@ -169,7 +179,7 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
             </div>
 
             <Button 
-              onClick={handleSubscribe}
+              onClick={handleFreeTrialClick}
               disabled={loading.basic || isSubscribed}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >

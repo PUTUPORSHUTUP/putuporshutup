@@ -70,8 +70,8 @@ serve(async (req) => {
       throw new Error("User already has an active premium subscription");
     }
 
-    // Create Stripe Price for Premium Monthly ($19.99)
-    let priceId = "price_premium_monthly";
+    // Create Stripe Price for VIP Monthly ($9.99 with 7-day trial)
+    let priceId = "price_vip_monthly";
     
     try {
       // Try to retrieve existing price
@@ -79,19 +79,18 @@ serve(async (req) => {
     } catch (error) {
       // Create price if it doesn't exist
       const price = await stripe.prices.create({
-        unit_amount: 1999, // $19.99
+        unit_amount: 999, // $9.99
         currency: "usd",
         recurring: { interval: "month" },
         product_data: {
-          name: "Gaming Platform Premium",
-          description: "No fees ever, exclusive tournaments, VIP priority, 24/7 support, elite status"
+          name: "VIP Membership"
         },
-        lookup_key: "premium_monthly",
+        lookup_key: "vip_monthly",
       });
       priceId = price.id;
     }
 
-    // Create subscription session
+    // Create subscription session with 7-day free trial
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{
@@ -99,17 +98,18 @@ serve(async (req) => {
         quantity: 1,
       }],
       mode: "subscription",
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: {
+          user_id: user.id,
+          plan: "vip_monthly"
+        }
+      },
       success_url: `${req.headers.get("origin")}/profile?subscription=success`,
       cancel_url: `${req.headers.get("origin")}/profile?subscription=cancelled`,
       metadata: {
         user_id: user.id,
-        plan: "premium_monthly"
-      },
-      subscription_data: {
-        metadata: {
-          user_id: user.id,
-          plan: "premium_monthly"
-        }
+        plan: "vip_monthly"
       }
     });
 
