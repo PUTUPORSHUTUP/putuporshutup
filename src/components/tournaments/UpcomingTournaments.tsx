@@ -40,7 +40,7 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
 
   const loadUpcomingTournaments = async () => {
     try {
-      // Get upcoming tournaments (open status and future start times)
+      // Get upcoming tournaments (open status and future start times, exclude cancelled)
       const { data, error } = await supabase
         .from('tournaments')
         .select(`
@@ -48,6 +48,7 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
           game:games(*)
         `)
         .eq('status', 'open')
+        .neq('status', 'cancelled')
         .order('start_time', { ascending: true })
         .limit(showAll ? 100 : maxItems);
 
