@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Archive, Upload, Edit, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import PosterUploader from "./PosterUploader";
 
 interface Poster {
   id: string;
@@ -177,6 +178,10 @@ export default function PosterManagement() {
     }
   };
 
+  const handleImageUploaded = (url: string) => {
+    setNewPoster({ ...newPoster, image_url: url });
+  };
+
   if (loading) {
     return (
       <Card>
@@ -223,13 +228,17 @@ export default function PosterManagement() {
             </div>
           </div>
           
+          {/* Image Upload Section */}
+          <PosterUploader onUploaded={handleImageUploaded} />
+          
           <div>
-            <Label htmlFor="image_url">Image URL</Label>
+            <Label htmlFor="image_url">Image URL (or upload above)</Label>
             <Input
               id="image_url"
               value={newPoster.image_url}
               onChange={(e) => setNewPoster({ ...newPoster, image_url: e.target.value })}
-              placeholder="/lovable-uploads/your-image.jpg"
+              placeholder="Auto-filled after upload or paste URL manually"
+              className="bg-muted/50"
             />
           </div>
           
