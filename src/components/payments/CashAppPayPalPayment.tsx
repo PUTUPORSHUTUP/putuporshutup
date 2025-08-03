@@ -103,9 +103,9 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
 
   return (
     <div className="space-y-6">
-      <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-900/20">
-        <Info className="w-4 h-4 text-blue-600" />
-        <AlertDescription className="text-blue-800 dark:text-blue-300">
+      <Alert className="border-muted bg-muted/20">
+        <Info className="w-4 h-4 text-muted-foreground" />
+        <AlertDescription className="text-foreground">
           <strong>Fast Payment Processing:</strong> Cash App and PayPal deposits are processed by our admin team. 
           ⚡ Most deposits are approved within 1 hour during business hours!
         </AlertDescription>
@@ -138,7 +138,7 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
                 onClick={() => setPaymentMethod('paypal')}
                 className="h-12"
               >
-                <span className="font-bold text-blue-600 mr-2">P</span>
+                <span className="font-bold text-secondary mr-2">P</span>
                 PayPal
               </Button>
             </div>
@@ -160,7 +160,7 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
               <Button 
                 onClick={handleSubmitPaymentRequest}
                 disabled={processing || !depositAmount}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-muted hover:bg-muted/80 text-foreground"
               >
                 {processing ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -179,9 +179,9 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
 
           {/* Payment Instructions */}
           {showInstructions && (
-            <Card className="border-green-500 bg-green-50 dark:bg-green-900/20">
+            <Card className="border-muted bg-muted/10">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-green-800 dark:text-green-300 flex items-center gap-2">
+                <CardTitle className="text-lg text-foreground flex items-center gap-2">
                   <QrCode className="w-5 h-5" />
                   Send Payment to Complete Deposit
                 </CardTitle>
