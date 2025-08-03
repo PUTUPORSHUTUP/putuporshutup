@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -154,6 +156,7 @@ const AdminDashboard = () => {
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [adminResponse, setAdminResponse] = useState('');
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [hideTestData, setHideTestData] = useState(true);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -163,6 +166,13 @@ const AdminDashboard = () => {
       checkAdminAccess();
     }
   }, [user]);
+
+  // Reload data when hideTestData changes
+  useEffect(() => {
+    if (user && analytics) {
+      loadDashboardData();
+    }
+  }, [hideTestData]);
 
   const checkAdminAccess = async () => {
     try {
@@ -196,8 +206,8 @@ const AdminDashboard = () => {
       
       const analyticsData = analyticsArray?.[0] || null;
 
-      // Load recent users
-      const { data: usersData } = await supabase
+      // Load recent users with test data filtering
+      let usersQuery = supabase
         .from('profiles')
         .select(`
           user_id,
@@ -213,9 +223,16 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      // Load recent tournaments - simplified query
+      // Apply test data filter if hideTestData is true - filter test accounts by username patterns
+      if (hideTestData) {
+        usersQuery = usersQuery.not('username', 'ilike', '%test%').not('display_name', 'ilike', '%test%');
+      }
+
+      const { data: usersData } = await usersQuery;
+
+      // Load recent tournaments - simplified query with test data filtering
       console.log('Loading tournaments...');
-      const { data: tournamentsData, error: tournamentsError } = await supabase
+      let tournamentsQuery = supabase
         .from('tournaments')
         .select(`
           id,
@@ -229,14 +246,21 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
+      // Apply test data filter if hideTestData is true - filter test tournaments by title patterns
+      if (hideTestData) {
+        tournamentsQuery = tournamentsQuery.not('title', 'ilike', '%test%');
+      }
+
+      const { data: tournamentsData, error: tournamentsError } = await tournamentsQuery;
+
       if (tournamentsError) {
         console.error('Tournament loading error:', tournamentsError);
       }
       
       console.log('Loaded tournaments:', tournamentsData);
 
-      // Load disputes with simpler query
-      const { data: disputesData } = await supabase
+      // Load disputes with test data filtering
+      let disputesQuery = supabase
         .from('disputes')
         .select(`
           id,
@@ -250,6 +274,13 @@ const AdminDashboard = () => {
         `)
         .order('created_at', { ascending: false })
         .limit(50);
+
+      // Apply test data filter if hideTestData is true - filter test disputes by title patterns
+      if (hideTestData) {
+        disputesQuery = disputesQuery.not('title', 'ilike', '%test%').not('description', 'ilike', '%test%');
+      }
+
+      const { data: disputesData } = await disputesQuery;
 
       // Get user profiles for disputes
       if (disputesData && disputesData.length > 0) {
@@ -1111,10 +1142,33 @@ const AdminDashboard = () => {
           <TabsContent value="analytics" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5" />
-                  Revenue Analytics
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    Revenue Analytics
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="hide-test-data" className="text-sm font-normal">
+                      Hide Test Data
+                    </Label>
+                    <Switch
+                      id="hide-test-data"
+                      checked={hideTestData}
+                      onCheckedChange={setHideTestData}
+                    />
+                  </div>
                 </CardTitle>
+                {!hideTestData && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Test Data Visible</span>
+                    </div>
+                    <p className="text-xs text-yellow-700 mt-1">
+                      Showing all data including test entries. Toggle to see production data only.
+                    </p>
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
