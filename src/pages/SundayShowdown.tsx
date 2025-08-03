@@ -1,21 +1,56 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+const posters = [
+  "/lovable-uploads/sunday-showdown.jpg", // Current week's poster
+  "/lovable-uploads/tournament-poster-elite-001.jpg",
+  "/lovable-uploads/tournament-poster-masters-001.jpg", 
+  "/lovable-uploads/tournament-poster-pro-001.jpg",
+];
+
+const getWeekNumber = (date: Date) => {
+  const firstJan = new Date(date.getFullYear(), 0, 1);
+  const days = Math.floor((date.getTime() - firstJan.getTime()) / (24 * 60 * 60 * 1000));
+  return Math.ceil((days + firstJan.getDay() + 1) / 7);
+};
+
 export default function SundayShowdown() {
   const { user } = useAuth();
+  const [poster, setPoster] = useState(posters[0]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [map, setMap] = useState("Random Map will be revealed at 6:45 PM EST");
+  const [recaps, setRecaps] = useState<any[]>([]);
   const [gamertag, setGamertag] = useState("");
   const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
+  const [isVisible, setIsVisible] = useState(true);
 
   const TOURNAMENT_ID = "sunday-showdown-aug3";
 
-  // Countdown Timer
   useEffect(() => {
+    // Rotation Logic
+    const weekIndex = getWeekNumber(new Date()) % posters.length;
+    setPoster(posters[weekIndex]);
+
+    // Fetch registered players
+    const fetchPlayers = async () => {
+      const { data } = await supabase
+        .from("tournament_entries")
+        .select("gamertag")
+        .eq("tournament_id", TOURNAMENT_ID);
+      
+      if (data) {
+        setPlayers(data);
+      }
+    };
+    fetchPlayers();
+
+    // Countdown Timer
     const interval = setInterval(() => {
       const now = new Date();
       const target = new Date();
@@ -31,7 +66,20 @@ export default function SundayShowdown() {
         const secs = Math.floor((diff % 60000) / 1000);
         setTimeLeft(`${hrs}h ${mins}m ${secs}s`);
       }
+
+      // Optional: Random map assignment before match
+      if (now.getHours() === 18 && now.getMinutes() >= 45) {
+        const maps = ["Nuketown", "Shipment", "Shoot House", "Rust"];
+        const randomMap = maps[Math.floor(Math.random() * maps.length)];
+        setMap(randomMap);
+      }
+
+      // Auto-hide after event (after 9 PM EST)
+      if (now.getHours() >= 21) {
+        setIsVisible(false);
+      }
     }, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -74,22 +122,48 @@ export default function SundayShowdown() {
 
     setAlreadyJoined(true);
     setStatusMsg("✅ Successfully joined!");
+    
+    // Refresh players list
+    const { data } = await supabase
+      .from("tournament_entries")
+      .select("gamertag")
+      .eq("tournament_id", TOURNAMENT_ID);
+    
+    if (data) {
+      setPlayers(data);
+    }
   };
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="container mx-auto px-4 py-20">
-        <Card className="max-w-xl mx-auto p-6 bg-card border-primary shadow-2xl rounded-2xl">
-          <CardContent className="space-y-6">
+        <Card className="max-w-2xl mx-auto bg-card border-primary shadow-2xl rounded-2xl">
+          <CardContent className="space-y-6 p-6">
+            <img src={poster} alt="Sunday Showdown Poster" className="w-full rounded-xl mb-4" />
+
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-primary mb-2">
-                🔥 Sunday Showdown - COD 6
-              </h1>
-              <p className="text-sm text-muted-foreground">Multiplayer Free-for-All</p>
-              <p className="text-sm text-muted-foreground">🕖 Sunday @ 7 PM EST</p>
-              <p className="text-sm text-green-500">Entry: $5 | 5–10 Players</p>
-              <p className="text-sm text-yellow-500 mb-4">Sponsored by PUOSU</p>
+              <h2 className="text-2xl font-bold text-primary mb-2">Sunday Showdown - COD 6</h2>
+              <p className="text-sm text-muted-foreground">🕖 Starts at 7PM EST</p>
+              <p className="text-sm text-green-500 mb-2">Entry: $5 | Max: 16 Players</p>
+              <p className="text-sm text-yellow-500 mb-4">📍 Map: {map}</p>
               <p className="text-yellow-500 font-bold mb-6">🕒 Starts in: {timeLeft}</p>
+            </div>
+
+            <div>
+              <h3 className="text-md font-bold text-foreground mb-2">✅ Registered Players:</h3>
+              <ul className="text-sm text-muted-foreground mb-4 max-h-32 overflow-y-auto">
+                {players.length > 0 ? (
+                  players.map((player, index) => (
+                    <li key={index}>🎮 {player.gamertag}</li>
+                  ))
+                ) : (
+                  <li className="text-muted-foreground">No players registered yet.</li>
+                )}
+              </ul>
             </div>
 
             {!user ? (
@@ -110,7 +184,7 @@ export default function SundayShowdown() {
                   className="bg-input text-foreground border-border"
                 />
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white" type="submit">
-                  Confirm & Join
+                  Join Tournament
                 </Button>
               </form>
             )}
@@ -118,6 +192,24 @@ export default function SundayShowdown() {
             {statusMsg && (
               <p className="text-center text-sm text-yellow-500">{statusMsg}</p>
             )}
+
+            {/* Recap & Rating Section */}
+            <div className="border-t border-border pt-4">
+              <h3 className="text-md font-bold text-foreground mb-2">📸 Match Recaps:</h3>
+              {recaps.length > 0 ? (
+                recaps.map((recap) => (
+                  <div key={recap.id} className="bg-secondary rounded-lg p-3 mb-2">
+                    <p className="text-sm text-foreground">{recap.gamertag} - {recap.placement} - {recap.kills} Kills</p>
+                    <img src={recap.screenshot_url} alt="Proof" className="w-full mt-2 rounded" />
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-sm">No recaps submitted yet.</p>
+              )}
+
+              <h3 className="text-md font-bold text-foreground mt-6 mb-2">⭐ Rate This Tournament:</h3>
+              <Input type="range" min="1" max="5" step="1" className="w-full" />
+            </div>
 
             <p className="text-xs text-muted-foreground text-center">
               Tournament ID: {TOURNAMENT_ID}
