@@ -177,9 +177,11 @@ const Index = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {user ? (
-                <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
-                  🎮 JOIN NEXT TOURNAMENT
-                </Button>
+                <Link to="/tournaments">
+                  <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
+                    🎮 JOIN NEXT TOURNAMENT
+                  </Button>
+                </Link>
               ) : (
                 <Link to="/auth">
                   <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
@@ -188,9 +190,11 @@ const Index = () => {
                 </Link>
               )}
               
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
-                🔥 HOW IT WORKS
-              </Button>
+              <Link to="/how-it-works">
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
+                  🔥 HOW IT WORKS
+                </Button>
+              </Link>
             </div>
             
             {/* Tournament Stats Grid - Removed fake numbers */}
