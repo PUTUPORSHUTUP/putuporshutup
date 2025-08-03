@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 const posters = [
-  "/lovable-uploads/sunday-showdown.jpg", // Current week's poster
+  "/lovable-uploads/4e3b5b2c-0ba4-4d1b-988c-245b68239da1.png", // Current week's poster
   "/lovable-uploads/tournament-poster-elite-001.jpg",
   "/lovable-uploads/tournament-poster-masters-001.jpg", 
   "/lovable-uploads/tournament-poster-pro-001.jpg",
