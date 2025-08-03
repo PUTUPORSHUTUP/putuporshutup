@@ -604,10 +604,10 @@ const Education = () => {
               Our support team is here to help you succeed on the platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild>
-                <a href="mailto:support@putuporshutup.online">
-                  Contact Support
-                </a>
+              <Button 
+                onClick={() => window.location.href = 'mailto:support@puosu.com?subject=Support Request&body=Please describe your issue here...'}
+              >
+                Contact Support
               </Button>
               <Button variant="outline" asChild>
                 <Link to="/social">
