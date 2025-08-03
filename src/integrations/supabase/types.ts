@@ -3476,7 +3476,7 @@ export type Database = {
         }[]
       }
       get_admin_analytics: {
-        Args: Record<PropertyKey, never>
+        Args: { hide_test_data?: boolean }
         Returns: {
           total_deposits: number
           total_withdrawals: number

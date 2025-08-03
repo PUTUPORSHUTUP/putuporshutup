@@ -202,7 +202,7 @@ const AdminDashboard = () => {
     try {
       // Load analytics using the secure function
       const { data: analyticsArray } = await supabase
-        .rpc('get_admin_analytics');
+        .rpc('get_admin_analytics', { hide_test_data: hideTestData });
       
       const analyticsData = analyticsArray?.[0] || null;
 
