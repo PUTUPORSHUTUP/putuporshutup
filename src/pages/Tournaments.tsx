@@ -10,6 +10,7 @@ import { TournamentStats } from '@/components/tournaments/TournamentStats';
 import { TournamentCountdown } from '@/components/tournaments/TournamentCountdown';
 import { TournamentRegistration } from '@/components/tournaments/TournamentRegistration';
 import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
+import { TournamentList } from '@/components/tournaments/TournamentList';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,16 +118,8 @@ const Tournaments = () => {
         return;
       }
 
-      // Only show live and currently running tournaments
-      const now = new Date();
-      const liveTournaments = (data as Tournament[] || []).filter(tournament => {
-        const isLive = tournament.status === 'in_progress';
-        const hasStarted = new Date(tournament.start_time || '') <= now;
-        const notEnded = tournament.status !== 'completed';
-        return isLive && hasStarted && notEnded;
-      });
-
-      setTournaments(liveTournaments);
+      // Set all tournaments data for filtering in child components
+      setTournaments(data as Tournament[] || []);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -414,7 +407,7 @@ const Tournaments = () => {
                 Register now for these exciting upcoming competitions
               </p>
             </div>
-            <UpcomingTournaments showAll={true} />
+            <TournamentList tournaments={tournaments} />
           </TabsContent>
 
           <TabsContent value="browse" className="space-y-6">
