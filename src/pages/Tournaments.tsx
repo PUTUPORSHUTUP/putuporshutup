@@ -110,7 +110,6 @@ const Tournaments = () => {
           game:games(*),
           tournament_posters(*)
         `)
-        .eq('status', 'in_progress')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -118,7 +117,16 @@ const Tournaments = () => {
         return;
       }
 
-      setTournaments(data as Tournament[] || []);
+      // Only show live and currently running tournaments
+      const now = new Date();
+      const liveTournaments = (data as Tournament[] || []).filter(tournament => {
+        const isLive = tournament.status === 'in_progress';
+        const hasStarted = new Date(tournament.start_time || '') <= now;
+        const notEnded = tournament.status !== 'completed';
+        return isLive && hasStarted && notEnded;
+      });
+
+      setTournaments(liveTournaments);
     } catch (error) {
       console.error('Error:', error);
     } finally {
