@@ -66,6 +66,7 @@ import SponsorDashboard from './SponsorDashboard';
 import { XboxAPIKeyManagement } from '@/components/admin/XboxAPIKeyManagement';
 import { FastPaymentProcessor } from '@/components/admin/FastPaymentProcessor';
 import { PassiveIncomeController } from '@/components/admin/PassiveIncomeController';
+import SponsorAdminPanel from '@/components/admin/SponsorAdminPanel';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -596,6 +597,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
             <TabsTrigger value="projections" className="text-xs sm:text-sm">💰 Projections</TabsTrigger>
             <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
+            <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">🏢 Sponsor Admin</TabsTrigger>
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">🎮 Xbox Live</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">🧪 Xbox Test</TabsTrigger>
             <TabsTrigger value="system-test" className="text-xs sm:text-sm">🚀 Full Test</TabsTrigger>
@@ -1164,6 +1166,11 @@ const AdminDashboard = () => {
           {/* Sponsor Hub Tab */}
           <TabsContent value="sponsor-hub" className="space-y-6">
             <SponsorDashboard />
+          </TabsContent>
+
+          {/* Sponsor Admin Panel Tab */}
+          <TabsContent value="sponsor-admin" className="space-y-6">
+            <SponsorAdminPanel />
           </TabsContent>
 
           {/* Xbox Live Integration Tab */}
