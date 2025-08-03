@@ -55,13 +55,22 @@ export default function SponsorAdminPanel() {
 
   async function updateStatus(id: string, status: 'active' | 'archived') {
     try {
+      console.log(`Updating sponsor ${id} to status: ${status}`);
+      
       const { error } = await supabase
         .from('sponsors')
-        .update({ status })
+        .update({ 
+          status,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
+      console.log(`Successfully updated sponsor ${id} to ${status}`);
       await fetchSponsors();
       
       toast({
