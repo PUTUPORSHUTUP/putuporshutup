@@ -1419,6 +1419,7 @@ export type Database = {
           max_skill_gap: number | null
           max_stake: number
           min_stake: number
+          preferred_challenge_types: string[] | null
           preferred_games: string[]
           preferred_platforms: string[]
           preferred_tiers: Database["public"]["Enums"]["skill_tier"][] | null
@@ -1435,6 +1436,7 @@ export type Database = {
           max_skill_gap?: number | null
           max_stake?: number
           min_stake?: number
+          preferred_challenge_types?: string[] | null
           preferred_games?: string[]
           preferred_platforms?: string[]
           preferred_tiers?: Database["public"]["Enums"]["skill_tier"][] | null
@@ -1451,6 +1453,7 @@ export type Database = {
           max_skill_gap?: number | null
           max_stake?: number
           min_stake?: number
+          preferred_challenge_types?: string[] | null
           preferred_games?: string[]
           preferred_platforms?: string[]
           preferred_tiers?: Database["public"]["Enums"]["skill_tier"][] | null
