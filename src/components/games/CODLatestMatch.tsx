@@ -138,19 +138,19 @@ export const CODLatestMatch = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="text-center p-3 bg-muted/20 border border-muted rounded-lg">
                 <div className="flex items-center justify-center mb-1">
-                  <Trophy className="w-4 h-4 text-green-600" />
+                  <Trophy className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <div className="text-lg font-bold text-green-600">{matchData.overallStats.kills}</div>
+                <div className="text-lg font-bold text-foreground">{matchData.overallStats.kills}</div>
                 <div className="text-xs text-muted-foreground">Total Kills</div>
               </div>
 
-              <div className="text-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+              <div className="text-center p-3 bg-muted/20 border border-muted rounded-lg">
                 <div className="flex items-center justify-center mb-1">
-                  <Skull className="w-4 h-4 text-red-600" />
+                  <Skull className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <div className="text-lg font-bold text-red-600">{matchData.overallStats.deaths}</div>
+                <div className="text-lg font-bold text-foreground">{matchData.overallStats.deaths}</div>
                 <div className="text-xs text-muted-foreground">Total Deaths</div>
               </div>
             </div>
@@ -164,7 +164,7 @@ export const CODLatestMatch = () => {
 
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Wins:</span>
-              <span className="text-sm font-semibold text-green-600">{matchData.overallStats.wins}</span>
+              <span className="text-sm font-semibold text-foreground">{matchData.overallStats.wins}</span>
             </div>
 
             <div className="flex items-center justify-between">
