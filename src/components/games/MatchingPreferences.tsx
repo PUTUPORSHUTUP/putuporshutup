@@ -130,6 +130,9 @@ export const MatchingPreferences = ({ onPreferencesUpdate }: MatchingPreferences
           auto_match_enabled: preferences.auto_match_enabled,
           max_queue_time_minutes: preferences.max_queue_time_minutes,
           updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
         });
 
       if (error) throw error;
