@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ interface FeaturedPoster {
 export const FeaturedPoster = () => {
   const [featuredPoster, setFeaturedPoster] = useState<FeaturedPoster | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchFeaturedPoster();
@@ -43,10 +45,14 @@ export const FeaturedPoster = () => {
     }
   };
 
+  const handlePosterClick = () => {
+    navigate('/tournaments');
+  };
+
   if (loading) {
     return (
       <div className="animate-pulse">
-        <div className="bg-muted rounded-xl h-64 w-full max-w-md mx-auto"></div>
+        <div className="bg-muted rounded-xl h-96 w-full max-w-4xl mx-auto"></div>
       </div>
     );
   }
@@ -56,39 +62,42 @@ export const FeaturedPoster = () => {
   }
 
   return (
-    <Card className="max-w-md mx-auto bg-card/80 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
+    <Card 
+      className="w-full max-w-4xl mx-auto bg-card/80 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg cursor-pointer"
+      onClick={handlePosterClick}
+    >
       <CardContent className="p-0">
-        <div className="relative">
+        <div className="relative aspect-[16/9]">
           <img
             src={featuredPoster.image_url}
             alt={featuredPoster.title}
-            className="w-full h-64 object-cover rounded-t-xl"
+            className="w-full h-full object-contain rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = '/placeholder.svg';
             }}
           />
-          <div className="absolute top-3 right-3">
-            <Badge variant="default" className="bg-primary/90 text-primary-foreground flex items-center gap-1">
+          <div className="absolute top-4 right-4">
+            <Badge variant="default" className="bg-orange-500 text-white border-0 flex items-center gap-1">
               <Star className="w-3 h-3 fill-current" />
               Featured
             </Badge>
           </div>
-        </div>
-        
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-orbitron font-bold text-lg">{featuredPoster.title}</h3>
-            <Badge variant="secondary" className="text-xs">
-              {featuredPoster.event_type}
-            </Badge>
-          </div>
           
-          {featuredPoster.description && (
-            <p className="text-sm text-muted-foreground font-orbitron">
-              {featuredPoster.description}
-            </p>
-          )}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 rounded-b-xl">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-orbitron font-bold text-xl text-white">{featuredPoster.title}</h3>
+              <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+                {featuredPoster.event_type}
+              </Badge>
+            </div>
+            
+            {featuredPoster.description && (
+              <p className="text-sm text-white/90 font-orbitron">
+                {featuredPoster.description}
+              </p>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
