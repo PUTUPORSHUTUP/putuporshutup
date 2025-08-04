@@ -161,6 +161,8 @@ const XboxLiveDashboard: React.FC = () => {
   const testXboxConnection = async () => {
     try {
       setTestMode(true);
+      toast.info('Testing Xbox Live API connection...');
+      
       const { data, error } = await supabase.functions.invoke('xbox-profile-integration', {
         body: {
           action: 'verify_gamertag',
@@ -173,7 +175,7 @@ const XboxLiveDashboard: React.FC = () => {
       toast.success('Xbox Live API connection successful!');
     } catch (error) {
       console.error('Xbox connection test failed:', error);
-      toast.error('Xbox Live API connection failed');
+      toast.error(`Xbox Live API connection failed: ${error.message || 'Unknown error'}`);
     } finally {
       setTestMode(false);
     }
