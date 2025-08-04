@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Archive, Upload, Edit, Eye } from "lucide-react";
+import { Trash2, Archive, Upload, Edit, Eye, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import PosterUploader from "./PosterUploader";
@@ -19,6 +19,7 @@ interface Poster {
   display_order: number;
   event_type: string;
   created_at: string;
+  featured: boolean;
 }
 
 export default function PosterManagement() {
@@ -182,6 +183,38 @@ export default function PosterManagement() {
     setNewPoster({ ...newPoster, image_url: url });
   };
 
+  const setAsFeatured = async (id: string) => {
+    try {
+      // First, remove featured from all other posters
+      await supabase
+        .from("posters")
+        .update({ featured: false })
+        .neq("id", id);
+
+      // Then set this poster as featured
+      const { error } = await supabase
+        .from("posters")
+        .update({ featured: true })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Poster set as featured"
+      });
+
+      fetchPosters();
+    } catch (error) {
+      console.error("Error setting featured poster:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set featured poster",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -295,10 +328,20 @@ export default function PosterManagement() {
                     {poster.is_active ? "Active" : "Inactive"}
                   </Badge>
                   {poster.is_archived && <Badge variant="destructive">Archived</Badge>}
+                  {poster.featured && <Badge className="bg-yellow-500 text-yellow-900">Featured</Badge>}
                   <Badge variant="outline">{poster.event_type}</Badge>
                 </div>
                 
                 <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant={poster.featured ? "default" : "outline"}
+                    onClick={() => setAsFeatured(poster.id)}
+                    title="Set as Featured Poster"
+                  >
+                    <Star className={poster.featured ? "text-yellow-400" : ""} />
+                  </Button>
+                  
                   <Button
                     size="sm"
                     variant={poster.is_active ? "destructive" : "default"}

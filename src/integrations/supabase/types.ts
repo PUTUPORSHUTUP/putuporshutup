@@ -1854,6 +1854,7 @@ export type Database = {
           description: string | null
           display_order: number | null
           event_type: string | null
+          featured: boolean
           id: string
           image_url: string
           is_active: boolean
@@ -1867,6 +1868,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           event_type?: string | null
+          featured?: boolean
           id?: string
           image_url: string
           is_active?: boolean
@@ -1880,6 +1882,7 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           event_type?: string | null
+          featured?: boolean
           id?: string
           image_url?: string
           is_active?: boolean
