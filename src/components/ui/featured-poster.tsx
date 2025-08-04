@@ -71,7 +71,7 @@ export const FeaturedPoster = () => {
           <img
             src={featuredPoster.image_url}
             alt={featuredPoster.title}
-            className="w-full h-full object-contain rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5"
+            className="w-full h-full object-cover rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = '/placeholder.svg';
