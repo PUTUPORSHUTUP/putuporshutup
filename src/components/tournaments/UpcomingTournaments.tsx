@@ -118,23 +118,7 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tournaments.map((tournament, index) => 
-          index === 0 ? (
-            // Featured Sunday Showdown Tournament - Full poster
-            <div key={tournament.id} className="col-span-full flex justify-center mb-8">
-              <div className="w-full max-w-3xl">
-                <img 
-                  src={sundayShowdownImage}
-                  alt="Sunday Showdown Championship"
-                  className="w-full h-auto rounded-lg shadow-xl"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              </div>
-            </div>
-          ) : (
+        {tournaments.map((tournament, index) => (
             <Card 
               key={tournament.id} 
               className="hover:shadow-lg transition-shadow"
