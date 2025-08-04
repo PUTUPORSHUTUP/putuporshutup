@@ -185,13 +185,13 @@ export default function PosterManagement() {
 
   const setAsFeatured = async (id: string) => {
     try {
-      // First, remove featured from all other posters
+      // First, unfeatured all posters
       await supabase
         .from("posters")
         .update({ featured: false })
         .neq("id", id);
 
-      // Then set this poster as featured
+      // Then, set the selected poster as featured
       const { error } = await supabase
         .from("posters")
         .update({ featured: true })
@@ -209,11 +209,12 @@ export default function PosterManagement() {
       console.error("Error setting featured poster:", error);
       toast({
         title: "Error",
-        description: "Failed to set featured poster",
+        description: "Failed to set poster as featured",
         variant: "destructive"
       });
     }
   };
+
 
   if (loading) {
     return (
