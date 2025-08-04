@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Users, DollarSign, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { FeaturedPoster } from '@/components/ui/featured-poster';
 const sundayShowdownImage = '/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png';
 
 interface UpcomingTournament {
@@ -111,6 +112,11 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
 
   return (
     <div className="space-y-6">
+      {/* Featured Poster Section */}
+      <div className="mb-8">
+        <FeaturedPoster />
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tournaments.map((tournament, index) => 
           index === 0 ? (
