@@ -180,6 +180,38 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Success Stories */}
+      <section className="bg-background py-6 px-4 border-t border-border">
+        <div className="max-w-3xl mx-auto">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            ⭐ Success Stories
+          </h3>
+          <div className="space-y-3 text-sm">
+            <div className="p-3 bg-card rounded border border-border">
+              <p className="mb-2">"Just won $50 in 3 automated COD matches while at work. This system is insane!"</p>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>- TacticalGamer23</span>
+                <span>🟢 Currently Playing</span>
+              </div>
+            </div>
+            <div className="p-3 bg-card rounded border border-border">
+              <p className="mb-2">"Made $120 this week on autopilot. My Xbox stays grinding while I sleep."</p>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>- NightShiftWins</span>
+                <span>💰 $340 Total Earnings</span>
+              </div>
+            </div>
+            <div className="p-3 bg-card rounded border border-border">
+              <p className="mb-2">"Linked my gamertag, set it to auto-queue, now I'm making money from gaming!"</p>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>- ProGamerMike</span>
+                <span>🎯 15 Win Streak</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* QR Code Section */}
       <section className="bg-muted py-6 px-4">
         <div className="max-w-3xl mx-auto text-center">
