@@ -125,6 +125,76 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Mini Leaderboard */}
+      <section className="bg-muted py-6 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            🏆 Top Players
+          </h3>
+          <ol className="space-y-2 text-sm">
+            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
+              <span>1. BigJudah007</span>
+              <span className="text-primary font-semibold">57 Wins</span>
+            </li>
+            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
+              <span>2. SharpAim95</span>
+              <span className="text-primary font-semibold">44 Wins</span>
+            </li>
+            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
+              <span>3. iSnipe4Cash</span>
+              <span className="text-primary font-semibold">38 Wins</span>
+            </li>
+          </ol>
+          <div className="mt-4">
+            <a href="/leaderboards" className="text-primary hover:underline text-sm">
+              View Full Leaderboard →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="bg-background py-6 px-4 border-t border-border">
+        <div className="max-w-3xl mx-auto">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            💡 How It Works
+          </h3>
+          <ol className="space-y-2 text-sm">
+            <li className="flex items-center gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">1</span>
+              <span>Link your gamertag</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              <span>Fund your wallet ($5+)</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">3</span>
+              <span>Auto-join the next match</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">4</span>
+              <span>Win and get paid instantly</span>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      {/* QR Code Section */}
+      <section className="bg-muted py-6 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h4 className="text-md font-semibold mb-4 flex items-center justify-center gap-2">
+            📲 Scan to Play
+          </h4>
+          <div className="inline-block p-4 bg-card rounded-lg border border-border">
+            <div className="w-24 h-24 bg-muted-foreground/10 rounded flex items-center justify-center mx-auto mb-2">
+              <span className="text-xs text-muted-foreground">QR Code</span>
+            </div>
+            <p className="text-xs text-muted-foreground">putuporshutup.online</p>
+          </div>
+        </div>
+      </section>
+
       {/* Additional Stats Section */}
       <section className="py-12 px-4 bg-background">
         <div className="max-w-3xl mx-auto text-center">
@@ -153,16 +223,11 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted py-8 px-4 text-center border-t border-border">
+      <footer className="bg-muted py-4 px-4 text-center border-t border-border">
         <div className="max-w-3xl mx-auto">
-          <p className="text-muted-foreground mb-4">
-            Put Up or Shut Up - Automated Gaming Platform
+          <p className="text-muted-foreground text-xs">
+            © 2025 Put Up or Shut Up™ – All Rights Reserved
           </p>
-          <div className="flex justify-center gap-4 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-primary">Terms</a>
-            <a href="#" className="text-muted-foreground hover:text-primary">Privacy</a>
-            <a href="#" className="text-muted-foreground hover:text-primary">Support</a>
-          </div>
         </div>
       </footer>
     </div>
