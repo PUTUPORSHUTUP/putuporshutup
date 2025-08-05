@@ -136,11 +136,13 @@ const Index = () => {
       {/* QR Code Block */}
       <section className="bg-black py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h4 className="text-md font-semibold mb-2">📲 Scan to Play</h4>
-          <div className="mx-auto w-24 h-24 bg-white rounded flex items-center justify-center">
-            <QrCode className="w-16 h-16 text-black" />
-          </div>
-          <p className="text-xs text-gray-500 mt-2">putuporshutup.online</p>
+          <h4 className="text-md font-semibold mb-3">📲 Scan to Join PUOSU</h4>
+          <img 
+            src="https://api.qrserver.com/v1/create-qr-code/?data=https://putuporshutup.online&size=200x200&margin=10" 
+            alt="QR Code to PUOSU"
+            className="mx-auto w-48 h-48 border-4 border-white rounded shadow-md"
+          />
+          <p className="text-xs text-gray-400 mt-3">Visit: <br /> https://putuporshutup.online</p>
         </div>
       </section>
 
