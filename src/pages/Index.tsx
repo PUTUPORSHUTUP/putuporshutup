@@ -49,7 +49,7 @@ const Index = () => {
       {/* Hero Banner */}
       <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-gray-900 text-white">
         <h1 className="text-3xl md:text-5xl font-bold mb-2">No excuses. Just winners.</h1>
-        <p className="text-lg md:text-xl text-gray-300">Automated console matches. Earn cash. Dominate 24/7.</p>
+        <p className="text-lg md:text-xl text-gray-300">Join automated matches every 30 minutes. No subscriptions. No waiting. Just skill + cash.</p>
       </section>
 
       {/* Live Match Preview */}
