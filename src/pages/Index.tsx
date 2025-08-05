@@ -39,6 +39,19 @@ const Index = () => {
         match.game.toLowerCase().includes(selectedMode.toLowerCase().replace(" ", ""))
       );
 
+  const handleJoinMatch = () => {
+    const isVerified = window.localStorage.getItem('is_verified_gamertag') === 'true';
+    const walletBalance = parseFloat(window.localStorage.getItem('wallet_balance') || '0');
+
+    if (!isVerified || walletBalance < 5) {
+      alert('You must have a verified gamertag and at least $5 in your wallet to queue.');
+      return;
+    }
+
+    // Redirect to games page for now (since /queue route doesn't exist)
+    window.location.href = '/games';
+  };
+
   return (
     <div className="min-h-screen bg-background">
 
@@ -57,8 +70,11 @@ const Index = () => {
           <p className="text-sm text-gray-400 mt-2">
             ⏰ Starts in: <span className="font-mono text-green-400">00:30:00</span>
           </p>
-          <div className="mt-4">
-            <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl">
+          <div id="join-queue-container">
+            <button 
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl"
+              onClick={handleJoinMatch}
+            >
               Join Match Queue
             </button>
           </div>
