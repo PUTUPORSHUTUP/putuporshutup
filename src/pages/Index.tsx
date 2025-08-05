@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Gamepad2 } from "lucide-react";
+import { QRCodeGenerator } from "@/components/payments/QRCodeGenerator";
 
 const Index = () => {
   const [matchCountdown, setMatchCountdown] = useState({ minutes: 3, seconds: 12 });
@@ -219,9 +220,11 @@ const Index = () => {
             📲 Scan to Play
           </h4>
           <div className="inline-block p-4 bg-card rounded-lg border border-border">
-            <div className="w-24 h-24 bg-muted-foreground/10 rounded flex items-center justify-center mx-auto mb-2">
-              <span className="text-xs text-muted-foreground">QR Code</span>
-            </div>
+            <QRCodeGenerator 
+              value="https://putuporshutup.online" 
+              size={96} 
+              className="mx-auto mb-2" 
+            />
             <p className="text-xs text-muted-foreground">putuporshutup.online</p>
           </div>
         </div>
