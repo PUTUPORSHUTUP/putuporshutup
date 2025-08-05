@@ -39,17 +39,17 @@ const Index = () => {
         match.game.toLowerCase().includes(selectedMode.toLowerCase().replace(" ", ""))
       );
 
-  const handleJoinMatch = () => {
-    const isVerified = window.localStorage.getItem('is_verified_gamertag') === 'true';
-    const walletBalance = parseFloat(window.localStorage.getItem('wallet_balance') || '0');
+  const joinMatch = () => {
+    const isVerified = localStorage.getItem('is_verified_gamertag') === 'true';
+    const walletBalance = parseFloat(localStorage.getItem('wallet_balance') || '0');
 
     if (!isVerified || walletBalance < 5) {
-      alert('You must have a verified gamertag and at least $5 in your wallet to queue.');
+      alert('❌ You must verify your gamertag and have at least $5 in your wallet to join a match.');
       return;
     }
 
-    // Redirect to games page for now (since /queue route doesn't exist)
-    window.location.href = '/games';
+    // ✅ Redirect to queue or trigger Supabase logic
+    window.location.href = '/queue';
   };
 
   return (
@@ -70,10 +70,10 @@ const Index = () => {
           <p className="text-sm text-gray-400 mt-2">
             ⏰ Starts in: <span className="font-mono text-green-400">00:30:00</span>
           </p>
-          <div id="join-queue-container">
+          <div className="text-center mt-4">
             <button 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl"
-              onClick={handleJoinMatch}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md"
+              onClick={joinMatch}
             >
               Join Match Queue
             </button>
