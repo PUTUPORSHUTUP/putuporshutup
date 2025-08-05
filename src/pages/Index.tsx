@@ -55,7 +55,7 @@ const Index = () => {
         <div className="max-w-3xl mx-auto text-center text-foreground">
           <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
             <Gamepad2 className="w-5 h-5" />
-            Next Match: <span className="text-primary">Call of Duty 6 – Kill Race</span>
+            Next Match: <span className="text-primary">Call of Duty – Team Deathmatch</span>
           </h2>
           <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mt-2">
             <Clock className="w-4 h-4" />
@@ -81,7 +81,7 @@ const Index = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Matches</SelectItem>
-              <SelectItem value="killrace">Kill Race</SelectItem>
+              <SelectItem value="tdm">Team Deathmatch</SelectItem>
               <SelectItem value="apex">Apex Legends</SelectItem>
               <SelectItem value="nba">NBA 2K25</SelectItem>
               <SelectItem value="madden">Madden</SelectItem>

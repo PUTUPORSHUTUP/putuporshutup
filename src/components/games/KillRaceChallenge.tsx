@@ -107,7 +107,7 @@ export const KillRaceChallenge = ({ onChallengeCreate, gameId }: KillRaceChallen
     if (!hasXboxLink) {
       toast({
         title: "Xbox Required",
-        description: "Link your Xbox account to create kill race challenges",
+        description: "Link your Xbox account to create multiplayer challenges",
         variant: "destructive"
       });
       return;
@@ -133,7 +133,7 @@ export const KillRaceChallenge = ({ onChallengeCreate, gameId }: KillRaceChallen
     onChallengeCreate?.(challengeData);
     
     toast({
-      title: "Kill Race Challenge Created!",
+      title: "Multiplayer Challenge Created!",
       description: `First to ${killTarget} kills in ${gameMode} wins $${stakeAmount}`,
     });
   };
@@ -156,7 +156,7 @@ export const KillRaceChallenge = ({ onChallengeCreate, gameId }: KillRaceChallen
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sword className="w-5 h-5" />
-          COD Kill Race Challenge
+          COD Multiplayer Challenge
           {hasXboxLink && <Shield className="w-4 h-4 text-green-500" />}
         </CardTitle>
       </CardHeader>
@@ -165,7 +165,7 @@ export const KillRaceChallenge = ({ onChallengeCreate, gameId }: KillRaceChallen
         {!hasXboxLink ? (
           <div className="bg-destructive/10 rounded-lg p-3">
             <p className="text-sm text-destructive font-medium">
-              Xbox account required for kill races
+              Xbox account required for multiplayer challenges
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Link your Xbox gamertag in profile settings
@@ -290,7 +290,7 @@ export const KillRaceChallenge = ({ onChallengeCreate, gameId }: KillRaceChallen
           disabled={!hasXboxLink || isLoadingStats}
         >
           <Trophy className="w-4 h-4 mr-2" />
-          Create Kill Race Challenge
+          Create Multiplayer Challenge
         </Button>
       </CardContent>
     </Card>
