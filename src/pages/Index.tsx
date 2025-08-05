@@ -61,16 +61,14 @@ const Index = () => {
         <p className="text-lg md:text-xl text-gray-300">Join automated matches every 30 minutes. No subscriptions. No waiting. Just skill + cash.</p>
       </section>
 
-      {/* Promotional Poster */}
-      <section className="w-full py-6 px-4 bg-black">
-        <div className="max-w-2xl mx-auto">
-          <img 
-            src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png"
-            alt="Put Up or Shut Up - Automated Matches, Cash Competition"
-            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-lg shadow-lg"
-            onClick={() => window.location.href = '/auth'}
-          />
-        </div>
+      {/* 🔥 PUOSU Daily Poster Block */}
+      <section className="py-6 px-4 bg-black text-center">
+        <img 
+          src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png"
+          alt="PUOSU Promo Poster" 
+          className="mx-auto rounded-lg shadow-lg w-full max-w-md cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => window.location.href = '/auth'}
+        />
       </section>
 
       {/* Live Match Preview */}
