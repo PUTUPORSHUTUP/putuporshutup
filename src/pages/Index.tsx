@@ -59,7 +59,7 @@ const Index = () => {
             🎮 Next Match: <span className="text-green-400">Call of Duty – Team Deathmatch</span>
           </h2>
           <p className="text-sm text-gray-400 mt-2">
-            ⏰ Starts in: <span className="font-mono text-green-400">{formatTime(matchCountdown.minutes, matchCountdown.seconds)}</span>
+            ⏰ Starts in: <span className="font-mono text-green-400">00:30:00</span>
           </p>
           <div className="mt-4">
             <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl">
