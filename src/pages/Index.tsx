@@ -41,10 +41,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 24/7 Live Banner */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-700 text-white text-center py-2 text-sm font-semibold tracking-wide shadow-md">
-        🟢 MATCHES LIVE NOW · Running 24/7 · New Match Every 30 Minutes
-      </div>
 
       {/* Hero Banner */}
       <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-gray-900 text-white">
