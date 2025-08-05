@@ -1,449 +1,170 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Trophy, Users, DollarSign, Gamepad2, ArrowRight, LogOut, Shield, BookOpen } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileNavigation } from '@/components/ui/mobile-navigation';
-import { supabase } from '@/integrations/supabase/client';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { ShareButton } from '@/components/ui/share-button';
-import { RealTimeStats } from '@/components/ui/real-time-stats';
-import { VisitorCounter } from '@/components/ui/visitor-counter';
-import { LiveGamingTrends } from '@/components/ui/live-gaming-trends';
-import { RulesOfEngagementModal } from '@/components/games/RulesOfEngagementModal';
-import { SponsorCarousel } from '@/components/ui/sponsor-carousel';
-import { UpcomingTournaments } from '@/components/tournaments/UpcomingTournaments';
-import { LiveGameStatus } from '@/components/realtime/LiveGameStatus';
-import { KillRaceChallenge } from '@/components/games/KillRaceChallenge';
-import { LiveTournamentFeed } from '@/components/tournaments/LiveTournamentFeed';
-import { FeaturedPoster } from '@/components/ui/featured-poster';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Clock, Gamepad2 } from "lucide-react";
 
 const Index = () => {
-  const { user, signOut } = useAuth();
-  const isMobile = useIsMobile();
-  const [profile, setProfile] = useState<any>(null);
-  const [rulesModalOpen, setRulesModalOpen] = useState(false);
+  const [matchCountdown, setMatchCountdown] = useState({ minutes: 3, seconds: 12 });
+  const [selectedMode, setSelectedMode] = useState("all");
+  const [recentMatches, setRecentMatches] = useState([
+    { id: 1, winner: "PlayerPro", loser: "GamerX", game: "Call of Duty 6", winnings: "$25", time: "2 min ago" },
+    { id: 2, winner: "ApexLegend", loser: "Noob123", game: "Apex Legends", winnings: "$15", time: "5 min ago" },
+    { id: 3, winner: "NBA_King", loser: "Baller2K", game: "NBA 2K25", winnings: "$35", time: "8 min ago" },
+    { id: 4, winner: "MaddenGod", loser: "RookiePlayer", game: "Madden", winnings: "$20", time: "12 min ago" },
+    { id: 5, winner: "FortniteAce", loser: "BuildMaster", game: "Fortnite", winnings: "$18", time: "15 min ago" },
+  ]);
 
   useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
-  }, [user]);
+    const timer = setInterval(() => {
+      setMatchCountdown(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { minutes: prev.minutes - 1, seconds: 59 };
+        } else {
+          return { minutes: 3, seconds: 12 }; // Reset countdown
+        }
+      });
+    }, 1000);
 
-  const loadProfile = async () => {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('is_admin, is_premium')
-        .eq('user_id', user?.id)
-        .single();
-      
-      // Check if user has moderator role
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user?.id)
-        .in('role', ['mod', 'admin']);
-      
-      const isModerator = roleData && roleData.length > 0;
-      
-      setProfile({ ...data, is_moderator: isModerator });
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (minutes: number, seconds: number) => {
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Remove legacy $19.99 ads on component mount
-  useEffect(() => {
-    const legacyAd = document.querySelector('.membership-legacy-banner');
-    if (legacyAd) legacyAd.remove();
-  }, []);
+  const filteredMatches = selectedMode === "all" 
+    ? recentMatches 
+    : recentMatches.filter(match => 
+        match.game.toLowerCase().includes(selectedMode.toLowerCase().replace(" ", ""))
+      );
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Live Platform Notice */}
-      <div className="bg-orange-600 text-white py-3 text-center">
-        <p className="font-orbitron text-sm sm:text-base font-semibold">
-          🔧 MAINTENANCE - Preparing for Sunday Showdown! Check back soon for the ultimate gaming experience!
-        </p>
-      </div>
+      {/* Hero Banner */}
+      <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-muted text-white">
+        <h1 className="text-3xl md:text-5xl font-bold mb-2">No excuses. Just winners.</h1>
+        <p className="text-lg md:text-xl text-muted-foreground">Automated console matches. Earn cash. Dominate 24/7.</p>
+      </section>
 
-      {/* Header Navigation */}
-      <header className="bg-neon-green text-black py-6 text-center">
-        <h1 className="font-orbitron text-2xl sm:text-4xl font-semibold tracking-wider">
-          Put Up or Shut Up
-        </h1>
-      </header>
-
-      {/* Navigation Bar */}
-      <nav className="bg-black/80 backdrop-blur-md border-b border-neon-green/20">
-        <div className="container mx-auto px-4 py-4">
-          {isMobile ? (
-            <div className="flex justify-end">
-              <MobileNavigation profile={profile} />
-            </div>
-          ) : (
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <ThemeToggle />
-                <NotificationCenter />
-                <Link to="/games">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Games
-                  </Button>
-                </Link>
-                <Link to="/tournaments">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Tournaments
-                  </Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Profile
-                  </Button>
-                </Link>
-                <Link to="/social">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Social
-                  </Button>
-                </Link>
-                <Link to="/leaderboards">
-                  <Button variant="ghost" className="text-white hover:bg-white/20">
-                    Leaderboards
-                  </Button>
-                </Link>
-                {profile?.is_admin && (
-                  <Link to="/admin">
-                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                {profile?.is_moderator && (
-                  <Link to="/moderator">
-                    <Button variant="ghost" className="text-white hover:bg-white/20 flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Moderator
-                    </Button>
-                  </Link>
-                )}
-              </div>
-              
-              {user ? (
-                <Button
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-black"
-                  onClick={signOut}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link to="/auth">
-                    <Button variant="ghost" className="text-white hover:bg-white/20">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link to="/auth">
-                    <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </nav>
-      {/* Hero Section - Tournament Engine */}
-      <section className="relative py-20 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10" />
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="text-center space-y-6">
-            <Badge variant="secondary" className="text-sm px-4 py-2 font-orbitron">
-              🔥 TOURNAMENT ENGINE LIVE - New matches every 20 minutes
-            </Badge>
-            
-            <h1 className="text-4xl md:text-6xl font-orbitron font-bold text-neon-green">
-              ENDLESS TOURNAMENTS
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-orbitron">
-              No Subscriptions. No Waiting. Just Skill + Cash.
-            </p>
-            
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto font-orbitron">
-              Join automated tournaments every 20 minutes. Entry fees only. Winners get paid instantly. The platform that runs itself.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {user ? (
-                <Link to="/tournaments">
-                  <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
-                    🎮 JOIN NEXT TOURNAMENT
-                  </Button>
-                </Link>
-              ) : (
-                <Link to="/auth">
-                  <Button size="lg" className="text-lg px-8 py-6 bg-neon-green text-black hover:bg-neon-green/90 font-orbitron font-bold">
-                    🚀 GET STARTED NOW
-                  </Button>
-                </Link>
-              )}
-              
-              <Link to="/how-it-works">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
-                  🔥 HOW IT WORKS
-                </Button>
-              </Link>
-            </div>
-            
-            {/* Tournament Stats Grid - Removed fake numbers */}
+      {/* Live Match Preview */}
+      <section className="bg-muted py-6 px-4">
+        <div className="max-w-3xl mx-auto text-center text-foreground">
+          <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
+            <Gamepad2 className="w-5 h-5" />
+            Next Match: <span className="text-primary">Call of Duty 6 – Kill Race</span>
+          </h2>
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mt-2">
+            <Clock className="w-4 h-4" />
+            Starts in: <span className="font-mono text-primary">{formatTime(matchCountdown.minutes, matchCountdown.seconds)}</span>
+          </p>
+          <div className="mt-4">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 rounded-xl">
+              Join Match Queue
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* VIP Status Banners */}
-      {user && (
-        <div className="container mx-auto px-4 -mt-8 relative z-20">
-          {!profile?.is_premium && (
-            <div className="rounded-xl bg-yellow-100 dark:bg-yellow-900/40 p-4 shadow-md text-black dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
-              <strong className="block text-lg mb-1 font-orbitron">Join nonstop $5 tournaments</strong>
-              <p className="text-sm font-orbitron">No subscription needed. Play when you want. Win what you earn.</p>
-            </div>
-          )}
-
-          {profile?.is_premium && (
-            <div className="rounded-xl bg-blue-100 dark:bg-blue-900/40 p-4 shadow-md text-black dark:text-blue-100 border border-blue-300 dark:border-blue-700">
-              <strong className="block text-lg mb-1 font-orbitron">Welcome VIP!</strong>
-              <p className="text-sm font-orbitron">You now have access to $10+ high-stakes matches and exclusive perks.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Live Tournament Feed */}
-      <section className="py-16 bg-muted/20">
-        <div className="container mx-auto px-4">
-          <LiveTournamentFeed />
+      {/* Match Mode Filter */}
+      <section className="bg-background py-4 px-4 border-b border-border">
+        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <label htmlFor="mode-filter" className="font-medium text-foreground">
+            Filter by Game Mode:
+          </label>
+          <Select value={selectedMode} onValueChange={setSelectedMode}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="Select mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Matches</SelectItem>
+              <SelectItem value="killrace">Kill Race</SelectItem>
+              <SelectItem value="apex">Apex Legends</SelectItem>
+              <SelectItem value="nba">NBA 2K25</SelectItem>
+              <SelectItem value="madden">Madden</SelectItem>
+              <SelectItem value="fortnite">Fortnite</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-orbitron font-bold mb-4">Features</h2>
-            <p className="text-xl text-muted-foreground font-orbitron">Everything you need to dominate the competition</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <Card className="text-center p-8 hover:shadow-lg transition-shadow border-2 border-neon-green bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-xl font-orbitron font-semibold mb-4">🎮 Supported Titles</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground font-orbitron mb-4">
-                  Madden 25, NBA 2K25, MLB The Show, Call of Duty, Fortnite — and more to come.
-                </p>
-                <Link to="/games">
-                  <Button variant="outline" size="sm" className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
-                    View All Games →
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-8 hover:shadow-lg transition-shadow border-2 border-neon-green bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-xl font-orbitron font-semibold mb-4">💰 Secure Entry Fees</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground font-orbitron">
-                  Your money is held safely in escrow until the match is complete. Winner receives prize pool after match verification.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-8 hover:shadow-lg transition-shadow border-2 border-neon-green bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-xl font-orbitron font-semibold mb-4">🛡️ No Cheaters</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground font-orbitron">
-                  Advanced rules + manual review + auto-ban for foul play. Cheaters forfeit deposits.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Link to="/education">
-              <Card className="text-center p-8 hover:shadow-lg transition-all border-2 border-neon-green bg-card/50 cursor-pointer hover:border-neon-green/80 hover:bg-card/70">
-                <CardHeader>
-                  <CardTitle className="text-xl font-orbitron font-semibold mb-4 flex items-center justify-center gap-2">
-                    📱 Easy to Use
-                    <BookOpen className="w-5 h-5" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground font-orbitron mb-4">
-                    Link gamertag, create or accept a challenge, submit result. We handle the rest.
-                  </p>
-                  <Button variant="outline" size="sm" className="border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-orbitron">
-                    Learn More →
-                  </Button>
+      {/* Match Results Feed */}
+      <section className="bg-muted/50 py-6 px-4 text-foreground">
+        <div className="max-w-3xl mx-auto">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            🔥 Recent Match Results
+          </h3>
+          <div className="space-y-3">
+            {filteredMatches.map((match) => (
+              <Card key={match.id} className="bg-card border-border">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-primary">{match.winner}</span>
+                      <span className="text-muted-foreground">vs</span>
+                      <span className="text-muted-foreground">{match.loser}</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">{match.game}</span>
+                      <span className="text-primary font-semibold">{match.winnings}</span>
+                      <span className="text-muted-foreground">{match.time}</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Poster Section */}
-      <section className="py-20 bg-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-orbitron font-bold mb-4 text-neon-green">🎯 Featured Event</h2>
-            <p className="text-xl text-muted-foreground font-orbitron">
-              Don't miss our latest tournament announcements
-            </p>
+            ))}
           </div>
           
-          <div className="flex justify-center">
-            <FeaturedPoster />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-gaming font-bold mb-4">THE NUMBERS DON'T LIE</h2>
-            <p className="text-xl text-muted-foreground">Join thousands of competitive gamers</p>
-          </div>
-          
-          <RealTimeStats />
-          
-      {/* Live Gaming Trends & Game Status */}
-      <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        <div className="flex justify-center">
-          <LiveGamingTrends />
-        </div>
-        <div className="flex justify-center">
-          <LiveGameStatus showAllUsers={true} maxUsers={5} />
-        </div>
-      </div>
-      
-      {/* Kill Race Feature Showcase */}
-      <div className="mt-16 flex justify-center">
-        <div className="max-w-md">
-          <h3 className="text-2xl font-orbitron font-bold mb-4 text-center">Try Kill Race Challenges</h3>
-          <p className="text-center text-muted-foreground mb-6 text-sm">
-            Auto-verified COD multiplayer challenges using Xbox Live APIs
-          </p>
-          <KillRaceChallenge onChallengeCreate={(data) => {
-            console.log('Demo challenge created:', data);
-          }} />
-        </div>
-      </div>
-          
-          {/* Visitor Counter */}
-          <div className="mt-16">
-            <h3 className="text-2xl font-orbitron font-bold mb-8 text-center">Live Stats & Traffic</h3>
-            <VisitorCounter />
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground font-orbitron">
-                📊 Real-time stat tracking coming soon! Challenge results will be automatically tracked and displayed live.
-              </p>
+          {filteredMatches.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No matches found for selected filter.</p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* Sponsor Carousel Section */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-orbitron font-bold mb-4">Our Partners</h2>
-            <p className="text-lg text-muted-foreground font-orbitron">
-              Trusted by leading gaming brands
-            </p>
-          </div>
-          <SponsorCarousel />
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-neon-green">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-gaming font-bold text-black mb-6">
-            READY TO PUT UP OR SHUT UP?
-          </h2>
-          <p className="text-xl text-black/80 mb-8 max-w-2xl mx-auto font-gaming">
-            Stop talking. Start proving. Earn rewards by winning skill-based matches.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {user ? (
-              <Link to="/games">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-black text-black hover:bg-black hover:text-neon-green font-gaming font-bold">
-                  BROWSE CHALLENGES
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/auth">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-black text-black hover:bg-black hover:text-neon-green font-gaming font-bold">
-                    JOIN THE BATTLE
-                  </Button>
-                </Link>
-                <Link to="/games">
-                  <Button size="lg" className="text-lg px-8 py-6 bg-black text-neon-green hover:bg-black/80 font-gaming font-bold">
-                    BROWSE CHALLENGES
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Disclaimer Section */}
-      <section className="py-8 px-4 bg-muted/30 border-t border-muted-foreground/20">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center">
-            <h3 className="font-orbitron font-semibold text-lg mb-3 text-foreground">
-              Disclaimer:
-            </h3>
-            <p className="font-orbitron text-muted-foreground leading-relaxed">
-              Put Up or Shut Up is a skill-based video game competition platform. This service does not offer gambling, fantasy sports, or games of chance. All matches are based solely on user performance.
-            </p>
+      {/* Additional Stats Section */}
+      <section className="py-12 px-4 bg-background">
+        <div className="max-w-3xl mx-auto text-center">
+          <h3 className="text-2xl font-bold mb-6">Platform Stats</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-primary mb-2">247</div>
+                <div className="text-sm text-muted-foreground">Matches Today</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-primary mb-2">$12,580</div>
+                <div className="text-sm text-muted-foreground">Total Winnings</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-primary mb-2">1,432</div>
+                <div className="text-sm text-muted-foreground">Active Players</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 text-center text-muted-foreground">
-        <div className="container mx-auto">
-          <p className="font-orbitron text-sm">
-            &copy; 2025 Put Up or Shut Up. All rights reserved.
+      <footer className="bg-muted py-8 px-4 text-center border-t border-border">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-muted-foreground mb-4">
+            Put Up or Shut Up - Automated Gaming Platform
           </p>
-          <p className="font-orbitron text-sm mt-2">
-            Need help? Contact us at support@putuporshutup.online
-          </p>
+          <div className="flex justify-center gap-4 text-sm">
+            <a href="#" className="text-muted-foreground hover:text-primary">Terms</a>
+            <a href="#" className="text-muted-foreground hover:text-primary">Privacy</a>
+            <a href="#" className="text-muted-foreground hover:text-primary">Support</a>
+          </div>
         </div>
       </footer>
-
-      {/* Rules of Engagement Modal */}
-      <RulesOfEngagementModal 
-        open={rulesModalOpen}
-        onOpenChange={setRulesModalOpen}
-      />
     </div>
   );
 };
