@@ -2,18 +2,15 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock, Gamepad2 } from "lucide-react";
-import { QRCodeGenerator } from "@/components/payments/QRCodeGenerator";
+import { Clock, Gamepad2, QrCode } from "lucide-react";
 
 const Index = () => {
   const [matchCountdown, setMatchCountdown] = useState({ minutes: 3, seconds: 12 });
   const [selectedMode, setSelectedMode] = useState("all");
   const [recentMatches, setRecentMatches] = useState([
-    { id: 1, winner: "PlayerPro", loser: "GamerX", game: "Call of Duty 6", winnings: "$25", time: "2 min ago" },
-    { id: 2, winner: "ApexLegend", loser: "Noob123", game: "Apex Legends", winnings: "$15", time: "5 min ago" },
-    { id: 3, winner: "NBA_King", loser: "Baller2K", game: "NBA 2K25", winnings: "$35", time: "8 min ago" },
-    { id: 4, winner: "MaddenGod", loser: "RookiePlayer", game: "Madden", winnings: "$20", time: "12 min ago" },
-    { id: 5, winner: "FortniteAce", loser: "BuildMaster", game: "Fortnite", winnings: "$18", time: "15 min ago" },
+    { id: 1, player: "SharpAim95", amount: 5, game: "Apex Team Deathmatch", result: "won" },
+    { id: 2, player: "BigJudah007", amount: 8, game: "2K25 Street Match", result: "won" },
+    { id: 3, player: "ClutchSniper88", amount: 12, game: "COD6 Blitz", result: "won" },
   ]);
 
   useEffect(() => {
@@ -45,41 +42,37 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Banner */}
-      <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-muted text-white">
-        <h1 className="text-3xl md:text-5xl font-bold mb-2">You can now join matches 24/7</h1>
-        <p className="text-lg md:text-xl text-muted-foreground">Automated console matches. Earn cash. Dominate 24/7.</p>
+      <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-gray-900 text-white">
+        <h1 className="text-3xl md:text-5xl font-bold mb-2">No excuses. Just winners.</h1>
+        <p className="text-lg md:text-xl text-gray-300">Automated console matches. Earn cash. Dominate 24/7.</p>
       </section>
 
       {/* Live Match Preview */}
-      <section className="bg-muted py-6 px-4">
-        <div className="max-w-3xl mx-auto text-center text-foreground">
-          <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
-            <Gamepad2 className="w-5 h-5" />
-            Next Match: <span className="text-primary">Call of Duty – Team Deathmatch</span>
+      <section className="bg-zinc-950 py-6 px-4">
+        <div className="max-w-3xl mx-auto text-center text-white">
+          <h2 className="text-xl font-semibold">
+            🎮 Next Match: <span className="text-green-400">Call of Duty – Team Deathmatch</span>
           </h2>
-          <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mt-2">
-            <Clock className="w-4 h-4" />
-            Starts in: <span className="font-mono text-primary">{formatTime(matchCountdown.minutes, matchCountdown.seconds)}</span>
+          <p className="text-sm text-gray-400 mt-2">
+            ⏰ Starts in: <span className="font-mono text-green-400">{formatTime(matchCountdown.minutes, matchCountdown.seconds)}</span>
           </p>
           <div className="mt-4">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 rounded-xl">
+            <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl">
               Join Match Queue
-            </Button>
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Match Mode Filter */}
-      <section className="bg-background py-4 px-4 border-b border-border">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <label htmlFor="mode-filter" className="font-medium text-foreground">
-            Filter by Game Mode:
-          </label>
+      {/* Match Mode Filter Dropdown */}
+      <section className="bg-black py-4 px-4 text-white">
+        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <label htmlFor="mode-filter" className="mb-2 sm:mb-0 font-medium">Filter by Game Mode:</label>
           <Select value={selectedMode} onValueChange={setSelectedMode}>
-            <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectTrigger className="bg-zinc-900 text-white border-zinc-700 w-full sm:w-[200px]">
               <SelectValue placeholder="Select mode" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-900 text-white border-zinc-700">
               <SelectItem value="all">All Matches</SelectItem>
               <SelectItem value="tdm">Team Deathmatch</SelectItem>
               <SelectItem value="apex">Apex Legends</SelectItem>
@@ -92,178 +85,63 @@ const Index = () => {
       </section>
 
       {/* Match Results Feed */}
-      <section className="bg-muted/50 py-6 px-4 text-foreground">
+      <section className="bg-zinc-900 py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            🔥 Recent Match Results
-          </h3>
-          <div className="space-y-3">
-            {filteredMatches.map((match) => (
-              <Card key={match.id} className="bg-card border-border">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-primary">{match.winner}</span>
-                      <span className="text-muted-foreground">vs</span>
-                      <span className="text-muted-foreground">{match.loser}</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm">
-                      <span className="text-muted-foreground">{match.game}</span>
-                      <span className="text-primary font-semibold">{match.winnings}</span>
-                      <span className="text-muted-foreground">{match.time}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <h3 className="text-lg font-semibold mb-2">🔥 Recent Match Results</h3>
+          <ul className="space-y-2 text-sm">
+            {filteredMatches.map((match, index) => (
+              <li key={index} className="flex items-center justify-between">
+                <span>
+                  {match.result === 'won' ? '🎯' : '💀'} {match.player} {match.result === 'won' ? 'won' : 'lost'} ${match.amount} in {match.game}
+                </span>
+              </li>
             ))}
-          </div>
-          
-          {filteredMatches.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No matches found for selected filter.</p>
-            </div>
-          )}
+          </ul>
         </div>
       </section>
 
       {/* Mini Leaderboard */}
-      <section className="bg-muted py-6 px-4">
+      <section className="bg-zinc-950 py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            🏆 Top Players
-          </h3>
-          <ol className="space-y-2 text-sm">
-            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
-              <span>1. BigJudah007</span>
-              <span className="text-primary font-semibold">57 Wins</span>
-            </li>
-            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
-              <span>2. SharpAim95</span>
-              <span className="text-primary font-semibold">44 Wins</span>
-            </li>
-            <li className="flex justify-between items-center p-2 bg-card rounded border-border border">
-              <span>3. iSnipe4Cash</span>
-              <span className="text-primary font-semibold">38 Wins</span>
-            </li>
+          <h3 className="text-lg font-semibold mb-2">🏆 Top Players</h3>
+          <ol className="list-decimal list-inside text-sm space-y-1">
+            <li>BigJudah007 – 57 Wins</li>
+            <li>SharpAim95 – 44 Wins</li>
+            <li>iSnipe4Cash – 38 Wins</li>
           </ol>
-          <div className="mt-4">
-            <a href="/leaderboards" className="text-primary hover:underline text-sm">
-              View Full Leaderboard →
-            </a>
+          <div className="mt-2">
+            <a href="/leaderboards" className="text-blue-400 hover:underline text-sm">View Full Leaderboard →</a>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="bg-background py-6 px-4 border-t border-border">
+      <section className="bg-black py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            💡 How It Works
-          </h3>
-          <ol className="space-y-2 text-sm">
-            <li className="flex items-center gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">1</span>
-              <span>Link your gamertag</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">2</span>
-              <span>Fund your wallet ($5+)</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">3</span>
-              <span>Auto-join the next match</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">4</span>
-              <span>Win and get paid instantly</span>
-            </li>
+          <h3 className="text-lg font-semibold mb-2">💡 How It Works</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm">
+            <li>Link your gamertag</li>
+            <li>Fund your wallet ($5+)</li>
+            <li>Auto-join the next match</li>
+            <li>Win and get paid instantly</li>
           </ol>
         </div>
       </section>
 
-      {/* Success Stories */}
-      <section className="bg-background py-6 px-4 border-t border-border">
-        <div className="max-w-3xl mx-auto">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            ⭐ Success Stories
-          </h3>
-          <div className="space-y-3 text-sm">
-            <div className="p-3 bg-card rounded border border-border">
-              <p className="mb-2">"Just won $50 in 3 automated COD matches while at work. This system is insane!"</p>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>- TacticalGamer23</span>
-                <span>🟢 Currently Playing</span>
-              </div>
-            </div>
-            <div className="p-3 bg-card rounded border border-border">
-              <p className="mb-2">"Made $120 this week on autopilot. My Xbox stays grinding while I sleep."</p>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>- NightShiftWins</span>
-                <span>💰 $340 Total Earnings</span>
-              </div>
-            </div>
-            <div className="p-3 bg-card rounded border border-border">
-              <p className="mb-2">"Linked my gamertag, set it to auto-queue, now I'm making money from gaming!"</p>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>- ProGamerMike</span>
-                <span>🎯 15 Win Streak</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* QR Code Section */}
-      <section className="bg-muted py-6 px-4">
+      {/* QR Code Block */}
+      <section className="bg-black py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h4 className="text-md font-semibold mb-4 flex items-center justify-center gap-2">
-            📲 Scan to Play
-          </h4>
-          <div className="inline-block p-4 bg-card rounded-lg border border-border">
-            <QRCodeGenerator 
-              value="https://putuporshutup.online" 
-              size={96} 
-              className="mx-auto mb-2" 
-            />
-            <p className="text-xs text-muted-foreground">putuporshutup.online</p>
+          <h4 className="text-md font-semibold mb-2">📲 Scan to Play</h4>
+          <div className="mx-auto w-24 h-24 bg-white rounded flex items-center justify-center">
+            <QrCode className="w-16 h-16 text-black" />
           </div>
-        </div>
-      </section>
-
-      {/* Additional Stats Section */}
-      <section className="py-12 px-4 bg-background">
-        <div className="max-w-3xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-6">Platform Stats</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-card border-border">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-2">10 out of 24</div>
-                <div className="text-sm text-muted-foreground">Matches 24/7</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-2">$12,580</div>
-                <div className="text-sm text-muted-foreground">Total Winnings</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-2">1,432</div>
-                <div className="text-sm text-muted-foreground">Active Players</div>
-              </CardContent>
-            </Card>
-          </div>
+          <p className="text-xs text-gray-500 mt-2">putuporshutup.online</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted py-4 px-4 text-center border-t border-border">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-muted-foreground text-xs">
-            © 2025 Put Up or Shut Up™ – All Rights Reserved
-          </p>
-        </div>
+      <footer className="bg-zinc-900 py-4 px-4 text-center text-gray-500 text-xs">
+        © 2025 Put Up or Shut Up™ – All Rights Reserved
       </footer>
     </div>
   );
