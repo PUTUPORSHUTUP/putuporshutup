@@ -91,15 +91,27 @@ serve(async (req) => {
 
     console.log("Processing payment completion for amount:", amount);
 
-    // Update transaction status
-    await supabaseService
+    // Get transaction ID for secure update
+    const { data: transactionData } = await supabaseService
       .from("transactions")
-      .update({
-        status: "completed",
-        stripe_payment_intent: session.payment_intent,
-        updated_at: new Date().toISOString()
-      })
-      .eq("stripe_session_id", session_id);
+      .select("id")
+      .eq("stripe_session_id", session_id)
+      .single();
+
+    if (!transactionData) {
+      throw new Error("Transaction not found");
+    }
+
+    // Use secure transaction update function
+    const { error: updateError } = await supabaseService
+      .rpc("secure_update_transaction_status", {
+        p_transaction_id: transactionData.id,
+        p_new_status: "completed"
+      });
+
+    if (updateError) {
+      throw new Error(`Failed to update transaction: ${updateError.message}`);
+    }
 
     // Update user's wallet balance
     const { data: profile } = await supabaseService

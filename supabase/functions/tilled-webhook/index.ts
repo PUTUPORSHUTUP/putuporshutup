@@ -32,18 +32,26 @@ serve(async (req) => {
         // ✅ Entry fee paid
         console.log('✅ Charge succeeded:', event.data.id);
         
-        // Update transaction status to completed
-        const { error: chargeError } = await supabaseService
+        // Get transaction ID for secure update
+        const { data: transactionData } = await supabaseService
           .from('transactions')
-          .update({ 
-            status: 'completed',
-            stripe_payment_intent: event.data.id 
-          })
-          .eq('stripe_payment_intent', event.data.id);
+          .select('id')
+          .eq('stripe_payment_intent', event.data.id)
+          .single();
 
-        if (chargeError) {
-          console.error("Error updating charge transaction:", chargeError);
+        if (transactionData) {
+          // Use secure transaction update function
+          const { error: chargeError } = await supabaseService
+            .rpc("secure_update_transaction_status", {
+              p_transaction_id: transactionData.id,
+              p_new_status: "completed"
+            });
+
+          if (chargeError) {
+            console.error("Error updating charge transaction:", chargeError);
+          }
         }
+
 
         // If this is for a challenge/wager, update status
         if (event.data.metadata?.challenge_id) {
@@ -88,18 +96,26 @@ serve(async (req) => {
         // 🔁 Refund confirmed
         console.log('🔁 Refund processed:', event.data.id);
         
-        // Update original transaction or create refund record
-        const { error: refundError } = await supabaseService
+        // Get transaction ID for secure update
+        const { data: refundTransactionData } = await supabaseService
           .from('transactions')
-          .update({ 
-            status: 'refunded',
-            description: `${event.data.metadata?.reason || 'Refunded'} - Tilled Webhook Confirmed`
-          })
-          .eq('stripe_payment_intent', event.data.id);
+          .select('id')
+          .eq('stripe_payment_intent', event.data.id)
+          .single();
 
-        if (refundError) {
-          console.error("Error updating refund transaction:", refundError);
+        if (refundTransactionData) {
+          // Use secure transaction update function
+          const { error: refundError } = await supabaseService
+            .rpc("secure_update_transaction_status", {
+              p_transaction_id: refundTransactionData.id,
+              p_new_status: "refunded"
+            });
+
+          if (refundError) {
+            console.error("Error updating refund transaction:", refundError);
+          }
         }
+
 
         // Log refund and update challenge status
         if (event.data.metadata?.challenge_id) {
