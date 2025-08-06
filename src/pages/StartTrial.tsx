@@ -29,7 +29,21 @@ const StartTrial = () => {
           console.error('Subscription error:', error);
           toast({
             title: "Subscription Error",
-            description: error.message || "Unable to start free trial.",
+            description: "Invalid Stripe configuration. Please contact support.",
+            variant: "destructive",
+          });
+          navigate('/vip-required');
+          return;
+        }
+
+        // Check if data has an error (from the edge function response)
+        if (data?.error) {
+          console.error('Edge function error:', data.error);
+          toast({
+            title: "Subscription Error", 
+            description: data.error.includes('Invalid API Key') 
+              ? "Payment system configuration error. Please contact support."
+              : data.error,
             variant: "destructive",
           });
           navigate('/vip-required');
