@@ -41,6 +41,9 @@ const App = () => {
               <div className="min-h-screen bg-background font-gaming">
                 <Toaster />
                 <Sonner />
+                <div className="w-full bg-blue-900 text-center text-blue-300 py-2 text-sm font-semibold">
+                  🔴 Live System Test Happening Tonight. Expect temporary resets or rapid matches. Thank you for helping us build!
+                </div>
           <BrowserRouter>
             <AppHeader />
             <Routes>
