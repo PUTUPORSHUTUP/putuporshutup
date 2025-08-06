@@ -272,7 +272,8 @@ const Index = () => {
           <img 
             src="https://api.qrserver.com/v1/create-qr-code/?data=https://putuporshutup.online&size=200x200&margin=10" 
             alt="QR Code to PUOSU"
-            className="mx-auto w-48 h-48 border-4 border-white rounded shadow-md"
+            className="mx-auto w-48 h-48 border-4 border-white rounded shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => window.location.href = '/auth'}
           />
           <p className="text-xs text-gray-400 mt-3">Visit: <br /> https://putuporshutup.online</p>
         </div>

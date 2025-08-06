@@ -46,7 +46,7 @@ export const FeaturedPoster = () => {
   };
 
   const handlePosterClick = () => {
-    navigate('/tournaments');
+    navigate('/auth');
   };
 
   if (loading) {
