@@ -20,6 +20,8 @@ import SundayShowdown from "./pages/SundayShowdown";
 import HowItWorks from "./pages/HowItWorks";
 import Education from "./pages/Education";
 import Promotion from "./pages/Promotion";
+import VIP from "./pages/VIP";
+import VIPRequired from "./pages/VIPRequired";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -83,6 +85,16 @@ const App = () => {
               <Route path="/promotion" element={
                 <ProtectedRoute>
                   <Promotion />
+                </ProtectedRoute>
+              } />
+              <Route path="/vip" element={
+                <ProtectedRoute>
+                  <VIP />
+                </ProtectedRoute>
+              } />
+              <Route path="/vip-required" element={
+                <ProtectedRoute>
+                  <VIPRequired />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
