@@ -1628,6 +1628,45 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_automation_log: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          error_message: string | null
+          event_type: string
+          id: string
+          payout_amount: number | null
+          processed_at: string | null
+          status: string
+          winner_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payout_amount?: number | null
+          processed_at?: string | null
+          status?: string
+          winner_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payout_amount?: number | null
+          processed_at?: string | null
+          status?: string
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       payout_requests: {
         Row: {
           amount: number
