@@ -70,24 +70,33 @@ serve(async (req) => {
       throw new Error("User already has an active premium subscription");
     }
 
-    // Create Stripe Price for VIP Monthly ($9.99 with 7-day trial)
-    let priceId = "price_vip_monthly";
+    // Get or create Stripe Price for VIP Monthly ($9.99 with 7-day trial)
+    let priceId;
     
     try {
-      // Try to retrieve existing price
-      await stripe.prices.retrieve(priceId);
+      // Try to find existing price by lookup key
+      const prices = await stripe.prices.list({ lookup_keys: ["vip_monthly"], limit: 1 });
+      
+      if (prices.data.length > 0) {
+        priceId = prices.data[0].id;
+        console.log("Using existing price:", priceId);
+      } else {
+        // Create price if it doesn't exist
+        const price = await stripe.prices.create({
+          unit_amount: 999, // $9.99
+          currency: "usd",
+          recurring: { interval: "month" },
+          product_data: {
+            name: "VIP Membership"
+          },
+          lookup_key: "vip_monthly",
+        });
+        priceId = price.id;
+        console.log("Created new price:", priceId);
+      }
     } catch (error) {
-      // Create price if it doesn't exist
-      const price = await stripe.prices.create({
-        unit_amount: 999, // $9.99
-        currency: "usd",
-        recurring: { interval: "month" },
-        product_data: {
-          name: "VIP Membership"
-        },
-        lookup_key: "vip_monthly",
-      });
-      priceId = price.id;
+      console.error("Error handling price:", error);
+      throw new Error("Failed to create or retrieve subscription price");
     }
 
     // Create subscription session with 7-day free trial
