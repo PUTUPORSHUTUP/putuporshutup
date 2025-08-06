@@ -28,6 +28,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { NotificationProvider } from '@/components/notifications/NotificationProvider';
 import { GamertagWarning } from '@/components/GamertagWarning';
+import { ActiveMatchWarning } from '@/components/ActiveMatchWarning';
 import { AppHeader } from '@/components/layout/AppHeader';
 
 const App = () => {
@@ -46,6 +47,7 @@ const App = () => {
                   🔴 Live System Test Happening Tonight. Expect temporary resets or rapid matches. Thank you for helping us build!
                 </div>
                 <GamertagWarning />
+                <ActiveMatchWarning />
           <BrowserRouter>
             <AppHeader />
             <Routes>
