@@ -1948,14 +1948,17 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_premium: boolean | null
+          is_vip_trial: boolean | null
           payoneer_email: string | null
           premium_expires_at: string | null
           total_losses: number | null
           total_wagered: number | null
           total_wins: number | null
+          trial_start: string | null
           updated_at: string | null
           user_id: string
           username: string | null
+          vip_access: boolean | null
           wallet_balance: number | null
           xbox_gamer_score: number | null
           xbox_gamertag: string | null
@@ -1974,14 +1977,17 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_vip_trial?: boolean | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
           total_wagered?: number | null
           total_wins?: number | null
+          trial_start?: string | null
           updated_at?: string | null
           user_id: string
           username?: string | null
+          vip_access?: boolean | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
@@ -2000,14 +2006,17 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_vip_trial?: boolean | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
           total_wagered?: number | null
           total_wins?: number | null
+          trial_start?: string | null
           updated_at?: string | null
           user_id?: string
           username?: string | null
+          vip_access?: boolean | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
@@ -3625,6 +3634,10 @@ export type Database = {
           details: string
           severity: string
         }[]
+      }
+      start_vip_trial: {
+        Args: { user_id_param: string }
+        Returns: undefined
       }
       update_xbox_leaderboard_stats: {
         Args: {
