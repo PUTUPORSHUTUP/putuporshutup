@@ -27,6 +27,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { NotificationProvider } from '@/components/notifications/NotificationProvider';
+import { GamertagWarning } from '@/components/GamertagWarning';
 import { AppHeader } from '@/components/layout/AppHeader';
 
 const App = () => {
@@ -44,6 +45,7 @@ const App = () => {
                 <div className="w-full bg-blue-900 text-center text-blue-300 py-2 text-sm font-semibold">
                   🔴 Live System Test Happening Tonight. Expect temporary resets or rapid matches. Thank you for helping us build!
                 </div>
+                <GamertagWarning />
           <BrowserRouter>
             <AppHeader />
             <Routes>
