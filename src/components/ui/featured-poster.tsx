@@ -46,7 +46,7 @@ export const FeaturedPoster = () => {
   };
 
   const handlePosterClick = () => {
-    navigate('/auth');
+    navigate('/profile');
   };
 
   if (loading) {

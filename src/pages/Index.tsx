@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Gamepad2, QrCode } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [matchCountdown, setMatchCountdown] = useState({ minutes: 3, seconds: 12 });
   const [selectedMode, setSelectedMode] = useState("all");
   const [recentMatches, setRecentMatches] = useState([
@@ -97,7 +99,7 @@ const Index = () => {
           src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png"
           alt="PUOSU Promo Poster" 
           className="mx-auto rounded-lg shadow-lg w-full max-w-md cursor-pointer hover:opacity-90 transition-opacity"
-          onClick={() => window.location.href = '/auth'}
+          onClick={() => navigate('/profile')}
         />
       </section>
 
@@ -273,7 +275,7 @@ const Index = () => {
             src="https://api.qrserver.com/v1/create-qr-code/?data=https://putuporshutup.online&size=200x200&margin=10" 
             alt="QR Code to PUOSU"
             className="mx-auto w-48 h-48 border-4 border-white rounded shadow-md cursor-pointer hover:opacity-90 transition-opacity"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => navigate('/profile')}
           />
           <p className="text-xs text-gray-400 mt-3">Visit: <br /> https://putuporshutup.online</p>
         </div>
