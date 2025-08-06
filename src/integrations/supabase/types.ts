@@ -3594,6 +3594,10 @@ export type Database = {
           last_played: string
         }[]
       }
+      has_vip_access: {
+        Args: { user_id_param: string }
+        Returns: boolean
+      }
       increment_wallet_balance: {
         Args: { user_id_param: string; amount_param: number }
         Returns: undefined
