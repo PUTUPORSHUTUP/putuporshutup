@@ -1,30 +1,190 @@
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 export const VIPUpgrade = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [amount, setAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  const handleDepositRequest = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to make a deposit",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!amount || parseFloat(amount) < 5) {
+      toast({
+        title: "Invalid Amount",
+        description: "Minimum deposit is $5.00",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!paymentMethod) {
+      toast({
+        title: "Payment Method Required",
+        description: "Please select a payment method",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.from('manual_payment_requests').insert({
+        user_id: user.id,
+        amount: parseFloat(amount),
+        type: 'deposit',
+        payment_method: paymentMethod,
+        account_details: getAccountDetails(paymentMethod),
+        user_notes: `Wallet deposit of $${amount} via ${paymentMethod}`
+      });
+
+      if (error) throw error;
+
+      setShowInstructions(true);
+      toast({
+        title: "Deposit Request Submitted",
+        description: "Please complete the payment using the instructions below",
+      });
+    } catch (error) {
+      console.error('Deposit request error:', error);
+      toast({
+        title: "Request Failed",
+        description: "Failed to submit deposit request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAccountDetails = (method: string) => {
+    switch (method) {
+      case 'venmo': return '@Keith-White-339';
+      case 'cashapp': return '$BigKeith00';
+      case 'paypal': return 'paypal.me/puosu';
+      default: return '';
+    }
+  };
+
+  if (showInstructions) {
+    return (
+      <Card className="bg-black text-white max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl text-green-400 text-center">Complete Your Deposit</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center">
+          <p className="text-lg">Send <strong className="text-green-400">${amount}</strong> to:</p>
+          
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <p className="text-xl font-bold text-orange-500 mb-2">
+              {paymentMethod === 'venmo' && '💸 Venmo: @Keith-White-339'}
+              {paymentMethod === 'cashapp' && '💸 Cash App: $BigKeith00'} 
+              {paymentMethod === 'paypal' && '💸 PayPal: paypal.me/puosu'}
+            </p>
+          </div>
+
+          <div className="bg-gray-800 p-4 rounded-lg text-left space-y-2">
+            <p><strong>Important:</strong></p>
+            <p>• Include your username/email in the payment notes</p>
+            <p>• Amount: ${amount}</p>
+            <p>• Your deposit will be processed within 24 hours</p>
+          </div>
+
+          <Button 
+            onClick={() => {
+              setShowInstructions(false);
+              setAmount('');
+              setPaymentMethod('');
+            }}
+            variant="outline"
+            className="w-full"
+          >
+            Submit Another Request
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <section className="bg-black text-white px-6 py-10 max-w-2xl mx-auto text-center">
-      <h1 className="text-3xl font-bold text-orange-500 mb-3">Upgrade to Full VIP</h1>
-      <p className="text-gray-300 text-sm mb-6">Your trial may end, but your competitive edge doesn't have to.</p>
-      
-      <div className="mb-6">
-        <div className="text-4xl font-bold text-green-400 mb-2">$9.99</div>
-        <p className="text-gray-300">One-time payment for lifetime VIP access</p>
-      </div>
+    <Card className="bg-black text-white max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-3xl text-orange-500 text-center">Add Funds to Wallet</CardTitle>
+        <p className="text-gray-300 text-center">Deposit money to participate in challenges and tournaments</p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <Label htmlFor="amount" className="text-white">Deposit Amount</Label>
+          <Input
+            id="amount"
+            type="number"
+            min="5"
+            step="0.01"
+            placeholder="Enter amount (minimum $5)"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="bg-gray-800 border-gray-600 text-white"
+          />
+        </div>
 
-      <p className="mb-4">Send $9.99 via Venmo, Cash App, or PayPal and include your gamertag in the notes:</p>
+        <div>
+          <Label className="text-white mb-3 block">Select Payment Method</Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { id: 'venmo', name: 'Venmo', handle: '@Keith-White-339', icon: '💸' },
+              { id: 'cashapp', name: 'Cash App', handle: '$BigKeith00', icon: '💸' },
+              { id: 'paypal', name: 'PayPal', handle: 'paypal.me/puosu', icon: '💸' }
+            ].map((method) => (
+              <button
+                key={method.id}
+                onClick={() => setPaymentMethod(method.id)}
+                className={`p-4 rounded-lg border-2 transition-colors ${
+                  paymentMethod === method.id
+                    ? 'border-orange-500 bg-orange-500/10'
+                    : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                }`}
+              >
+                <div className="text-left">
+                  <div className="font-semibold">{method.icon} {method.name}</div>
+                  <div className="text-sm text-gray-400">{method.handle}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <div className="bg-gray-800 p-4 rounded mb-6 space-y-2">
-        <p>💸 <strong>Venmo:</strong> @Keith-White-339</p>
-        <p>💸 <strong>Cash App:</strong> $BigKeith00</p>
-        <p>💸 <strong>PayPal:</strong> paypal.me/puosu</p>
-      </div>
+        <Button 
+          onClick={handleDepositRequest}
+          disabled={loading || !amount || !paymentMethod}
+          className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3"
+        >
+          {loading ? "Processing..." : "Submit Deposit Request"}
+        </Button>
 
-      <div className="bg-gray-800 p-4 rounded mb-6">
-        <p className="mb-2">✅ Lifetime access to all premium features</p>
-        <p className="mb-2">🏆 Priority match making</p>
-        <p className="mb-2">🎯 Exclusive tournaments</p>
-        <p>📊 Advanced statistics</p>
-      </div>
-
-      <p className="text-xs text-gray-400">Once payment is received, VIP status will be activated within 24 hours.</p>
-    </section>
+        <div className="bg-gray-800 p-4 rounded-lg text-sm text-gray-300">
+          <p><strong>How it works:</strong></p>
+          <p>1. Enter the amount you want to deposit</p>
+          <p>2. Choose your preferred payment method</p>
+          <p>3. Complete the payment and include your account info</p>
+          <p>4. Funds will be added to your wallet within 24 hours</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
