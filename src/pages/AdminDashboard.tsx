@@ -70,6 +70,7 @@ import { FastPaymentProcessor } from '@/components/admin/FastPaymentProcessor';
 import { PassiveIncomeController } from '@/components/admin/PassiveIncomeController';
 import SponsorAdminPanel from '@/components/admin/SponsorAdminPanel';
 import PosterManagement from '@/components/admin/PosterManagement';
+import { ManualDepositProcessor } from '@/components/admin/ManualDepositProcessor';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -615,9 +616,10 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-16 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-17 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="passive-income" className="text-xs sm:text-sm">💰 Passive Income</TabsTrigger>
+            <TabsTrigger value="manual-deposits" className="text-xs sm:text-sm">💳 Manual Deposits</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
             <TabsTrigger value="roles" className="text-xs sm:text-sm">Roles</TabsTrigger>
@@ -767,6 +769,24 @@ const AdminDashboard = () => {
           {/* Passive Income Tab */}
           <TabsContent value="passive-income" className="space-y-6">
             <PassiveIncomeController />
+          </TabsContent>
+
+          {/* Manual Deposits Tab */}
+          <TabsContent value="manual-deposits" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Manual Deposit Processing
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  Process Venmo, Cash App, and PayPal deposits from users
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ManualDepositProcessor />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Matches Tab */}
