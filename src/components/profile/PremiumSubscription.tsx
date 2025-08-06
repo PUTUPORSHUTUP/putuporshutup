@@ -32,6 +32,8 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+
   const handleFreeTrialClick = async () => {
     if (!user) {
       console.warn("Anonymous user attempted to start trial — skipping subscription.");
@@ -43,38 +45,14 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
       return;
     }
 
-    setLoading(prev => ({ ...prev, basic: true }));
-    try {
-      const { data, error } = await supabase.functions.invoke('create-premium-subscription');
+    setShowPaymentOptions(true);
+  };
 
-      if (error) {
-        console.error('Subscription error:', error);
-        toast({
-          title: "Subscription Error",
-          description: error.message || "Unable to start free trial.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (data.url) {
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecting to Checkout",
-          description: "Complete your 7-day free trial signup in the new tab.",
-        });
-      }
-    } catch (error) {
-      console.error('Free trial error:', error);
-      toast({
-        title: "Trial Error", 
-        description: "Internal error while starting trial.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(prev => ({ ...prev, basic: false }));
-    }
+  const handleManualPayment = (method: string) => {
+    toast({
+      title: "Payment Instructions",
+      description: `Send $9.99 via ${method} using the QR code. You'll get VIP access within 24 hours after payment verification.`,
+    });
   };
 
   const checkSubscriptionStatus = async () => {
@@ -193,6 +171,93 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
           </CardContent>
         </Card>
       </div>
+
+      {/* QR Code Payment Options */}
+      {showPaymentOptions && (
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Choose Payment Method</CardTitle>
+              <p className="text-center text-sm text-muted-foreground">
+                Send $9.99 using any of these methods for instant VIP access
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Venmo */}
+                <div className="text-center space-y-3">
+                  <h3 className="font-semibold">Venmo</h3>
+                  <img 
+                    src="/lovable-uploads/614ba95f-d5a8-45c0-8be7-21124354ccc8.png" 
+                    alt="Venmo QR Code" 
+                    className="w-32 h-32 mx-auto rounded-lg"
+                  />
+                  <p className="text-sm text-muted-foreground">@Keith-White-339</p>
+                  <Button 
+                    onClick={() => handleManualPayment('Venmo')} 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full"
+                  >
+                    Payment Sent
+                  </Button>
+                </div>
+
+                {/* Cash App */}
+                <div className="text-center space-y-3">
+                  <h3 className="font-semibold">Cash App</h3>
+                  <img 
+                    src="/lovable-uploads/81b4ce6a-1bc5-43e5-ae0e-ed2e03fe7e02.png" 
+                    alt="Cash App QR Code" 
+                    className="w-32 h-32 mx-auto rounded-lg"
+                  />
+                  <p className="text-sm text-muted-foreground">$BigKeith00</p>
+                  <Button 
+                    onClick={() => handleManualPayment('Cash App')} 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full"
+                  >
+                    Payment Sent
+                  </Button>
+                </div>
+
+                {/* PayPal */}
+                <div className="text-center space-y-3">
+                  <h3 className="font-semibold">PayPal</h3>
+                  <img 
+                    src="/lovable-uploads/b715dd0a-2c87-45cb-8734-ada1261dd7a4.png" 
+                    alt="PayPal QR Code" 
+                    className="w-32 h-32 mx-auto rounded-lg"
+                  />
+                  <p className="text-sm text-muted-foreground">Keith White</p>
+                  <Button 
+                    onClick={() => handleManualPayment('PayPal')} 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full"
+                  >
+                    Payment Sent
+                  </Button>
+                </div>
+              </div>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  After payment, your VIP access will be activated within 24 hours
+                </p>
+                <Button 
+                  onClick={() => setShowPaymentOptions(false)} 
+                  variant="ghost" 
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <p className="text-xs text-center text-muted-foreground">
         Free trial for 7 days, then $9.99/month. Cancel anytime. No hidden fees.
