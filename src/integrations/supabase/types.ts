@@ -3630,6 +3630,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      secure_update_transaction_status: {
+        Args: { p_transaction_id: string; p_new_status: string }
+        Returns: undefined
+      }
       security_health_check: {
         Args: Record<PropertyKey, never>
         Returns: {
