@@ -55,10 +55,40 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Hero Banner */}
-      <section className="w-full text-center py-8 px-4 bg-gradient-to-r from-black to-gray-900 text-white">
-        <h1 className="text-3xl md:text-5xl font-bold mb-2">No excuses. Just winners.</h1>
-        <p className="text-lg md:text-xl text-gray-300">Join automated matches every 30 minutes. No subscriptions. No waiting. Just skill + cash.</p>
+      {/* Enhanced Mobile-Optimized Hero Section */}
+      <section className="w-full bg-black text-white py-8 px-4 md:px-10 rounded-lg shadow-lg">
+        {/* Promo Poster */}
+        <div className="mb-6">
+          <img 
+            src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png"
+            alt="Play to Win – PUOSU" 
+            className="w-full max-w-full h-auto rounded-xl shadow-md object-cover"
+          />
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-2xl md:text-4xl font-extrabold text-center text-orange-500 mb-2">
+          No Luck. No Excuses. Just Winners.
+        </h1>
+        <p className="text-center text-sm text-gray-300 mb-6">
+          Compete in real skill-based matches. Win real cash. Join your first $5 game right now — or start your 7-day VIP trial for exclusive perks.
+        </p>
+
+        {/* Call to Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
+          <button 
+            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
+            onClick={joinMatch}
+          >
+            ✅ Join Match Queue
+          </button>
+          <button 
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
+            onClick={() => window.location.href = '/auth'}
+          >
+            🎟️ Start Free VIP Trial
+          </button>
+        </div>
       </section>
 
       {/* 🔥 PUOSU Daily Poster Block */}
