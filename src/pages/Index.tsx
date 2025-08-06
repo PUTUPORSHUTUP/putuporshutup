@@ -54,9 +54,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Announcement Banner */}
-      <div className="w-full bg-money-green text-center text-accent-foreground py-2 text-sm font-bold">
-        ✅ Matches run 24/7 — join the next challenge now!
+      {/* Status Banner */}
+      <div className="w-full bg-destructive text-center text-destructive-foreground py-2 text-sm font-bold">
+        Matches closed · Reopens at 8AM
       </div>
 
       {/* Enhanced Mobile-Optimized Hero Section */}
