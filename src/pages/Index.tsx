@@ -54,10 +54,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Status Banner */}
-      <div className="w-full bg-destructive text-center text-destructive-foreground py-2 text-sm font-bold">
-        Matches closed · Reopens at 8AM
-      </div>
 
       {/* Enhanced Mobile-Optimized Hero Section */}
       <section className="w-full bg-black text-white py-8 px-4 md:px-10 rounded-lg shadow-lg">
