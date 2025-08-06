@@ -143,36 +143,48 @@ const Index = () => {
       </section>
 
       {/* VIP Membership Section */}
-      <section className="bg-zinc-900 py-8 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-4 text-orange-500">VIP Membership</h2>
-          <p className="text-center text-sm text-gray-300 mb-6">Unlock higher-stake matches with a 7-day free trial</p>
+      <section className="bg-black text-white py-10 px-4 sm:px-6 lg:px-8">
+        {/* Headline */}
+        <h2 className="text-3xl font-bold text-center text-orange-500 mb-2">VIP MEMBERSHIP</h2>
+        <p className="text-center text-gray-300 text-sm mb-6">
+          Start your 7-day free trial and get early access to what's coming next.
+        </p>
 
-          <div className="bg-gray-800 rounded-xl p-6 text-white shadow-md max-w-md mx-auto">
-            <div className="text-center mb-2 text-yellow-400 font-bold">🆓 7-DAY FREE TRIAL</div>
-            <h3 className="text-xl font-semibold text-center mb-2">VIP Membership</h3>
-            <p className="text-center text-lg mb-4">$9.99/month</p>
+        {/* Poster */}
+        <div className="text-center mb-6">
+          <img 
+            src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png" 
+            alt="VIP Membership Poster" 
+            className="mx-auto rounded-xl shadow-lg max-w-full" 
+            style={{maxWidth: '500px'}}
+          />
+        </div>
 
-            <ul className="text-sm text-gray-200 space-y-2 mb-6">
-              <li>🔓 Access to $10+ Matches</li>
-              <li>🏆 Exclusive VIP-Only Sunday Showdowns</li>
-              <li>💸 Bigger Payout Opportunities</li>
-              <li>⚡ 24/7 Queue Priority</li>
-              <li>👑 VIP Badge & Recognition</li>
-              <li>🆕 Early Access to New Game Modes</li>
-            </ul>
+        {/* Pricing + Benefits */}
+        <div className="bg-gray-800 rounded-xl p-6 text-white shadow-md max-w-md mx-auto">
+          <div className="text-center mb-2 text-yellow-400 font-bold">🆓 7-DAY FREE TRIAL</div>
+          <h3 className="text-xl font-semibold text-center mb-2">VIP Membership</h3>
+          <p className="text-center text-lg mb-4">$9.99/month</p>
 
-            <button 
-              className="bg-orange-500 hover:bg-orange-600 w-full py-2 rounded text-white font-semibold"
-              onClick={() => window.location.href = '/auth'}
-            >
-              Start Free Trial
-            </button>
+          <ul className="text-sm text-gray-200 space-y-2 mb-6">
+            <li>⚡ Priority Access to Match Queue</li>
+            <li>👑 VIP Badge & Recognition</li>
+            <li>🏆 Sunday Showdown Advantage</li>
+            <li>🚀 Early Access to $10+ Matches (Launching Soon)</li>
+            <li>🗓️ Reserved Spot in Future VIP Tournaments</li>
+          </ul>
 
-            <p className="text-xs text-center text-gray-400 mt-4">
-              Free for 7 days, then $9.99/month. Cancel anytime. No hidden fees.
-            </p>
-          </div>
+          <button 
+            className="bg-orange-500 hover:bg-orange-600 w-full py-2 rounded text-white font-semibold"
+            onClick={() => window.location.href = '/auth'}
+          >
+            Start Free Trial
+          </button>
+
+          <p className="text-xs text-center text-gray-400 mt-4">
+            Free for 7 days, then $9.99/month. Cancel anytime. No hidden fees.<br />
+            High-stakes matches are rolling out soon — VIPs get first access.
+          </p>
         </div>
       </section>
 
