@@ -84,7 +84,7 @@ const Index = () => {
           </button>
           <button 
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => window.location.href = '/start-trial'}
           >
             🎟️ Start Free VIP Trial
           </button>
