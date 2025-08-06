@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import Moderator from "./pages/Moderator";
 import NotFound from "./pages/NotFound";
 import StartTrial from "./pages/StartTrial";
+import VIPSuccess from "./pages/VIPSuccess";
 import Sponsor from "./pages/Sponsor";
 import SponsorSignup from "./pages/SponsorSignup";
 import SponsorDashboard from "./pages/SponsorDashboard";
@@ -109,8 +110,9 @@ const App = () => {
                 <ProtectedRoute>
                   <StartTrial />
                 </ProtectedRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+               } />
+               <Route path="/vip-success" element={<VIPSuccess />} />
+               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             </BrowserRouter>
