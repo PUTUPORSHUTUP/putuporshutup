@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Gamepad2, QrCode } from "lucide-react";
+import { FeaturedPoster } from "@/components/ui/featured-poster";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -93,14 +94,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 🔥 PUOSU Daily Poster Block */}
-      <section className="py-6 px-4 bg-black text-center">
-        <img 
-          src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png"
-          alt="PUOSU Promo Poster" 
-          className="mx-auto rounded-lg shadow-lg w-full max-w-md cursor-pointer hover:opacity-90 transition-opacity"
-          onClick={() => navigate('/profile')}
-        />
+      {/* Featured Poster Section */}
+      <section className="py-6 px-4">
+        <FeaturedPoster />
       </section>
 
       {/* Live Match Preview */}
