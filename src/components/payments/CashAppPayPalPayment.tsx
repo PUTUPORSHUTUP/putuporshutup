@@ -32,16 +32,16 @@ export const CashAppPayPalPayment = ({ onDepositComplete }: CashAppPayPalPayment
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Temporary payment info until Tilled provides merchant account
+  // Updated payment info with new QR codes
   const paymentInfo = {
     cashapp: {
-      handle: '$BigKeith00',
-      qrCode: '/lovable-uploads/1930f879-1b39-46b0-979f-fd849f770134.png',
+      handle: '$PUOSUCASH',
+      qrCode: '/lovable-uploads/f281d141-8e53-4ee2-8718-7c846e155f55.png',
       name: 'Keith White'
     },
     paypal: {
       handle: 'KEITH WHITE',
-      qrCode: '/lovable-uploads/aea2fe21-2dfc-4892-a6b7-c51889f74b09.png',
+      qrCode: '/lovable-uploads/95838ad7-77ab-4870-8d4a-47199b17b7f6.png',
       name: 'Keith White'
     }
   };

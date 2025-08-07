@@ -30,9 +30,9 @@ export const TournamentPayment = ({
   tournament, 
   onPaymentComplete,
   vendorInfo = {
-    cashapp: '$BigKeith00',
-    paypal: 'KEITH-WHITE',
-    venmo: 'Keith-White'
+    cashapp: '$PUOSUCASH',
+    paypal: 'KEITH WHITE',
+    venmo: '@PUTUPORSHUTUP2025'
   }
 }: TournamentPaymentProps) => {
   const [paymentMethod, setPaymentMethod] = useState<'cashapp' | 'paypal' | 'venmo'>('cashapp');
@@ -86,12 +86,14 @@ export const TournamentPayment = ({
     }
   };
 
-  const paymentUrl = generatePaymentURL(
-    paymentMethod,
-    vendorInfo[paymentMethod],
-    tournament.entry_fee,
-    `Tournament-${tournament.id}`
-  );
+  const getQRCodeImage = (method: string) => {
+    switch (method) {
+      case 'venmo': return '/lovable-uploads/d749df3e-de70-4e7f-89c3-95222b6896c6.png';
+      case 'cashapp': return '/lovable-uploads/f281d141-8e53-4ee2-8718-7c846e155f55.png';
+      case 'paypal': return '/lovable-uploads/95838ad7-77ab-4870-8d4a-47199b17b7f6.png';
+      default: return '';
+    }
+  };
 
   return (
     <Card className="border-blue-500 bg-blue-50 dark:bg-blue-900/20">
@@ -177,10 +179,10 @@ export const TournamentPayment = ({
               </div>
               
               <div className="bg-white p-4 rounded-lg inline-block">
-                <QRCodeGenerator 
-                  value={paymentUrl}
-                  size={200}
-                  className="mx-auto"
+                <img 
+                  src={getQRCodeImage(paymentMethod)}
+                  alt={`${paymentMethod} QR Code`}
+                  className="w-48 h-48 mx-auto"
                 />
               </div>
               

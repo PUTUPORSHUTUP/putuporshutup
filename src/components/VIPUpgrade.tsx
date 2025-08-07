@@ -78,7 +78,16 @@ export const VIPUpgrade = () => {
     switch (method) {
       case 'venmo': return '@PUTUPORSHUTUP2025';
       case 'cashapp': return '$PUOSUCASH';
-      case 'paypal': return 'paypal.me/puosu';
+      case 'paypal': return 'KEITH WHITE';
+      default: return '';
+    }
+  };
+
+  const getQRCodeImage = (method: string) => {
+    switch (method) {
+      case 'venmo': return '/lovable-uploads/d749df3e-de70-4e7f-89c3-95222b6896c6.png';
+      case 'cashapp': return '/lovable-uploads/f281d141-8e53-4ee2-8718-7c846e155f55.png';
+      case 'paypal': return '/lovable-uploads/95838ad7-77ab-4870-8d4a-47199b17b7f6.png';
       default: return '';
     }
   };
@@ -98,15 +107,10 @@ export const VIPUpgrade = () => {
               {paymentMethod === 'cashapp' && '💸 Cash App Payment'} 
               {paymentMethod === 'paypal' && '💸 PayPal Payment'}
             </p>
-            <QRCodeGenerator 
-              value={generatePaymentURL(
-                paymentMethod as 'cashapp' | 'paypal' | 'venmo',
-                paymentMethod === 'venmo' ? 'PUTUPORSHUTUP2025' : 
-                paymentMethod === 'cashapp' ? 'PUOSUCASH' : 'puosu',
-                parseFloat(amount)
-              )}
-              size={200}
-              className="bg-white p-2"
+            <img 
+              src={getQRCodeImage(paymentMethod)}
+              alt={`${paymentMethod} QR Code`}
+              className="w-64 h-64 mx-auto"
             />
           </div>
 
