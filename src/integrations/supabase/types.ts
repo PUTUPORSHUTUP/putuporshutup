@@ -1987,6 +1987,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_premium: boolean | null
+          is_test: boolean | null
           is_test_account: boolean | null
           is_vip: boolean | null
           is_vip_trial: boolean | null
@@ -2020,6 +2021,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_test?: boolean | null
           is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
@@ -2053,6 +2055,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_test?: boolean | null
           is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null

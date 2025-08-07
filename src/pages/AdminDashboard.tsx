@@ -34,6 +34,7 @@ import {
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
 import { GameManagement } from '@/components/admin/GameManagement';
+import { AdminSimPanel } from '@/components/AdminSimPanel';
 import { ProjectExportModal } from '@/components/admin/ProjectExportModal';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
@@ -630,6 +631,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
             <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
+            <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1283,6 +1285,11 @@ const AdminDashboard = () => {
               {/* Original Poster Management */}
               <PosterManagement />
             </div>
+          </TabsContent>
+
+          {/* Simulation Tab */}
+          <TabsContent value="simulation" className="space-y-6">
+            <AdminSimPanel />
           </TabsContent>
         </Tabs>
       </div>

@@ -26,24 +26,23 @@ export default function SmartBanner() {
           <Alert className="border-destructive/50 text-destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              You haven't linked your Xbox gamertag yet.{' '}
-              <Link to="/profile" className="underline hover:no-underline">
+              ⚠️ Link your Xbox gamertag to join automated matches.{' '}
+              <Link to="/profile" className="underline hover:no-underline font-semibold">
                 Link now
-              </Link>{' '}
-              to join matches.
+              </Link>
             </AlertDescription>
           </Alert>
         );
       } else if ((profile.wallet_balance ?? 0) < 5) {
         setBanner(
-          <Alert className="border-warning/50 text-warning">
+          <Alert className="border-yellow-500/50 text-yellow-700 dark:text-yellow-300">
             <Wallet className="h-4 w-4" />
             <AlertDescription>
-              Your wallet balance is low.{' '}
-              <Link to="/wallet" className="underline hover:no-underline">
+              💸 Your wallet balance is low (${(profile.wallet_balance ?? 0).toFixed(2)}).{' '}
+              <Link to="/wallet" className="underline hover:no-underline font-semibold">
                 Add funds
               </Link>{' '}
-              to stay in the game.
+              to stay in automated matches.
             </AlertDescription>
           </Alert>
         );
