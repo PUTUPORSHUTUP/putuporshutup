@@ -29,6 +29,26 @@ serve(async (req) => {
       auth: { persistSession: false } 
     });
 
+    // IDEMPOTENCY CHECK: Prevent double refunding
+    const { data: existingRefund } = await supabase
+      .from("payout_automation_log")
+      .select("id")
+      .eq("entity_id", matchId)
+      .eq("entity_type", "match")
+      .eq("event_type", "refund")
+      .eq("status", "processed")
+      .maybeSingle();
+    
+    if (existingRefund) {
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        message: "Match already refunded" 
+      }), { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Get participants to refund
     const { data: participants, error: partsErr } = await supabase
       .from("match_queue")
@@ -48,6 +68,8 @@ serve(async (req) => {
       const { error: refundErr } = await supabase.rpc("increment_wallet_balance", {
         user_id_param: participant.user_id,
         amount_param: amount,
+        reason_param: "match_refund",
+        match_id_param: matchId
       });
       
       if (refundErr) {

@@ -67,10 +67,12 @@ export const useWagerActions = () => {
       }
 
       // ATOMIC TRANSACTION: Join challenge and debit wallet in one operation
-      const { error: joinError } = await supabase.rpc('join_challenge_atomic', {
-        p_challenge_id: wagerId,
-        p_user_id: user.id,
-        p_stake_amount: stakeAmount
+      const { error: joinError } = await supabase.functions.invoke('join-challenge-atomic', {
+        body: {
+          challengeId: wagerId,
+          userId: user.id,
+          stakeAmount: stakeAmount
+        }
       });
 
       if (joinError) {

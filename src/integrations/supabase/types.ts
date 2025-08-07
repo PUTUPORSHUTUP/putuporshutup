@@ -3734,6 +3734,14 @@ export type Database = {
         Args: { user_uuid?: string }
         Returns: boolean
       }
+      join_challenge_atomic: {
+        Args: {
+          p_challenge_id: string
+          p_user_id: string
+          p_stake_amount: number
+        }
+        Returns: undefined
+      }
       log_security_event: {
         Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
         Returns: undefined

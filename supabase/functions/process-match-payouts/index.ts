@@ -29,6 +29,26 @@ serve(async (req) => {
       auth: { persistSession: false } 
     });
 
+    // IDEMPOTENCY CHECK: Prevent double processing
+    const { data: existingPayout } = await supabase
+      .from("payout_automation_log")
+      .select("id")
+      .eq("entity_id", matchId)
+      .eq("entity_type", "match")
+      .eq("event_type", "payout")
+      .eq("status", "processed")
+      .maybeSingle();
+    
+    if (existingPayout) {
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        message: "Match already processed" 
+      }), { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Get match details
     const { data: match, error: matchErr } = await supabase
       .from("matches")
@@ -96,11 +116,13 @@ serve(async (req) => {
       });
     }
 
-    // Process payouts
+    // CREDIT wallets atomically with audit trail
     for (const payout of payouts) {
       const { error: payoutErr } = await supabase.rpc("increment_wallet_balance", {
         user_id_param: payout.player_id,
         amount_param: payout.amount,
+        reason_param: "match_payout",
+        match_id_param: matchId
       });
       
       if (payoutErr) throw payoutErr;
