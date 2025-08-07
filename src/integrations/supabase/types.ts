@@ -1987,6 +1987,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_premium: boolean | null
+          is_test_account: boolean | null
           is_vip: boolean | null
           is_vip_trial: boolean | null
           payoneer_email: string | null
@@ -2019,6 +2020,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
           payoneer_email?: string | null
@@ -2051,6 +2053,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
           payoneer_email?: string | null
@@ -3694,6 +3697,10 @@ export type Database = {
           details: string
           severity: string
         }[]
+      }
+      setup_test_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       start_vip_trial: {
         Args: { user_id_param: string }
