@@ -120,56 +120,58 @@ const Index = () => {
       </section>
 
       {/* Enhanced Game & Mode Filter Section */}
-      <section className="bg-black text-white px-4 py-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-        {/* Section Title */}
-        <h2 className="text-2xl font-bold text-orange-500 text-center mb-1">Filter Active Matches</h2>
-        <p className="text-center text-sm text-gray-400 mb-6">
-          Quickly narrow down live matches by game or match type.
-        </p>
-
-        {/* Filter Dropdowns */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Filter by Game */}
-          <div>
-            <label className="text-white text-sm font-semibold mb-2 block">🎮 Filter by Game:</label>
-            <Select value={selectedMode} onValueChange={setSelectedMode}>
-              <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                <SelectValue placeholder="All Games" />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 text-white border-zinc-700">
-                <SelectItem value="all">All Games</SelectItem>
-                <SelectItem value="cod">Call of Duty 6</SelectItem>
-                <SelectItem value="apex">Apex Legends</SelectItem>
-                <SelectItem value="nba">NBA 2K25</SelectItem>
-                <SelectItem value="madden">Madden 25</SelectItem>
-                <SelectItem value="fortnite">Fortnite</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Filter by Mode */}
-          <div>
-            <label className="text-white text-sm font-semibold mb-2 block">🕹️ Filter by Game Mode:</label>
-            <Select value={selectedMode} onValueChange={setSelectedMode}>
-              <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-green-400">
-                <SelectValue placeholder="All Modes" />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 text-white border-zinc-700">
-                <SelectItem value="all">All Modes</SelectItem>
-                <SelectItem value="ffa">Free-for-All</SelectItem>
-                <SelectItem value="killrace">Multiplayer</SelectItem>
-                <SelectItem value="tdm">Team Deathmatch</SelectItem>
-                <SelectItem value="blitz">Blitz</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Placeholder for match results */}
-        <div className="mt-8">
-          <p className="text-center text-gray-500 text-sm">
-            Filtered matches will appear here based on your selections above.
+      <section className="bg-black text-white px-4 py-8 rounded-xl shadow-lg max-w-4xl mx-auto my-6">
+        <div className="max-w-2xl mx-auto">
+          {/* Section Title */}
+          <h2 className="text-xl sm:text-2xl font-bold text-orange-500 text-center mb-1">Filter Active Matches</h2>
+          <p className="text-center text-xs sm:text-sm text-gray-400 mb-6">
+            Quickly narrow down live matches by game or match type.
           </p>
+
+          {/* Filter Dropdowns */}
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
+            {/* Filter by Game */}
+            <div>
+              <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🎮 Filter by Game:</label>
+              <Select value={selectedMode} onValueChange={setSelectedMode}>
+                <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                  <SelectValue placeholder="All Games" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 text-white border-zinc-700">
+                  <SelectItem value="all">All Games</SelectItem>
+                  <SelectItem value="cod">Call of Duty 6</SelectItem>
+                  <SelectItem value="apex">Apex Legends</SelectItem>
+                  <SelectItem value="nba">NBA 2K25</SelectItem>
+                  <SelectItem value="madden">Madden 25</SelectItem>
+                  <SelectItem value="fortnite">Fortnite</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filter by Mode */}
+            <div>
+              <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🕹️ Filter by Game Mode:</label>
+              <Select value={selectedMode} onValueChange={setSelectedMode}>
+                <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-green-400">
+                  <SelectValue placeholder="All Modes" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 text-white border-zinc-700">
+                  <SelectItem value="all">All Modes</SelectItem>
+                  <SelectItem value="ffa">Free-for-All</SelectItem>
+                  <SelectItem value="killrace">Multiplayer</SelectItem>
+                  <SelectItem value="tdm">Team Deathmatch</SelectItem>
+                  <SelectItem value="blitz">Blitz</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Placeholder for match results */}
+          <div className="mt-6 sm:mt-8">
+            <p className="text-center text-gray-500 text-xs sm:text-sm">
+              Filtered matches will appear here based on your selections above.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -206,47 +208,48 @@ const Index = () => {
 
       {/* VIP Membership Section */}
       <section className="bg-black text-white py-10 px-4 sm:px-6 lg:px-8">
-        {/* Headline */}
-        <h2 className="text-3xl font-bold text-center text-orange-500 mb-2">VIP MEMBERSHIP</h2>
-        <p className="text-center text-gray-300 text-sm mb-6">
-          Start your 7-day free trial and get early access to what's coming next.
-        </p>
-
-        {/* Poster */}
-        <div className="text-center mb-6">
-          <img 
-            src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png" 
-            alt="VIP Membership Poster" 
-            className="mx-auto rounded-xl shadow-lg max-w-full" 
-            style={{maxWidth: '500px'}}
-          />
-        </div>
-
-        {/* Pricing + Benefits */}
-        <div className="bg-gray-800 rounded-xl p-6 text-white shadow-md max-w-md mx-auto">
-          <div className="text-center mb-2 text-yellow-400 font-bold">🆓 7-DAY FREE TRIAL</div>
-          <h3 className="text-xl font-semibold text-center mb-2">VIP Membership</h3>
-          <p className="text-center text-lg mb-4">$9.99/month</p>
-
-          <ul className="text-sm text-gray-200 space-y-2 mb-6">
-            <li>⚡ Priority Access to Match Queue</li>
-            <li>👑 VIP Badge & Recognition</li>
-            <li>🏆 Sunday Showdown Advantage</li>
-            <li>🚀 Early Access to $10+ Matches (Launching Soon)</li>
-            <li>🗓️ Reserved Spot in Future VIP Tournaments</li>
-          </ul>
-
-          <button 
-            className="bg-orange-500 hover:bg-orange-600 w-full py-2 rounded text-white font-semibold"
-            onClick={() => window.location.href = '/auth'}
-          >
-            Start Free Trial
-          </button>
-
-          <p className="text-xs text-center text-gray-400 mt-4">
-            Free for 7 days, then $9.99/month. Cancel anytime. No hidden fees.<br />
-            High-stakes matches are rolling out soon — VIPs get first access.
+        <div className="max-w-4xl mx-auto">
+          {/* Headline */}
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-orange-500 mb-2">VIP MEMBERSHIP</h2>
+          <p className="text-center text-gray-300 text-sm mb-6">
+            Start your 7-day free trial and get early access to what's coming next.
           </p>
+
+          {/* Poster */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/lovable-uploads/13412423-6f9e-439b-bdfe-130d9db066d8.png" 
+              alt="VIP Membership Poster" 
+              className="rounded-xl shadow-lg w-full max-w-sm sm:max-w-md" 
+            />
+          </div>
+
+          {/* Pricing + Benefits */}
+          <div className="bg-gray-800 rounded-xl p-4 sm:p-6 text-white shadow-md max-w-md mx-auto">
+            <div className="text-center mb-2 text-yellow-400 font-bold text-sm sm:text-base">🆓 7-DAY FREE TRIAL</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-center mb-2">VIP Membership</h3>
+            <p className="text-center text-base sm:text-lg mb-4">$9.99/month</p>
+
+            <ul className="text-xs sm:text-sm text-gray-200 space-y-2 mb-6">
+              <li>⚡ Priority Access to Match Queue</li>
+              <li>👑 VIP Badge & Recognition</li>
+              <li>🏆 Sunday Showdown Advantage</li>
+              <li>🚀 Early Access to $10+ Matches (Launching Soon)</li>
+              <li>🗓️ Reserved Spot in Future VIP Tournaments</li>
+            </ul>
+
+            <button 
+              className="bg-orange-500 hover:bg-orange-600 w-full py-2 sm:py-3 rounded text-white font-semibold text-sm sm:text-base"
+              onClick={() => window.location.href = '/auth'}
+            >
+              Start Free Trial
+            </button>
+
+            <p className="text-xs text-center text-gray-400 mt-4">
+              Free for 7 days, then $9.99/month. Cancel anytime. No hidden fees.<br />
+              High-stakes matches are rolling out soon — VIPs get first access.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -267,13 +270,15 @@ const Index = () => {
       <section className="bg-black py-6 px-4 text-white">
         <div className="max-w-3xl mx-auto text-center">
           <h4 className="text-md font-semibold mb-3">📲 Scan to Join PUOSU</h4>
-          <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?data=https://putuporshutup.online&size=200x200&margin=10" 
-            alt="QR Code to PUOSU"
-            className="mx-auto w-48 h-48 border-4 border-white rounded shadow-md cursor-pointer hover:opacity-90 transition-opacity"
-            onClick={() => navigate('/profile')}
-          />
-          <p className="text-xs text-gray-400 mt-3">Visit: <br /> https://putuporshutup.online</p>
+          <div className="flex justify-center items-center mb-3">
+            <img 
+              src="https://api.qrserver.com/v1/create-qr-code/?data=https://putuporshutup.online&size=200x200&margin=10" 
+              alt="QR Code to PUOSU"
+              className="w-32 h-32 sm:w-48 sm:h-48 border-4 border-white rounded shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => navigate('/profile')}
+            />
+          </div>
+          <p className="text-xs text-gray-400 text-center">Visit: <br /> https://putuporshutup.online</p>
         </div>
       </section>
 
