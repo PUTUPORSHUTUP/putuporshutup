@@ -157,7 +157,7 @@ const Index = () => {
               <SelectContent className="bg-zinc-900 text-white border-zinc-700">
                 <SelectItem value="all">All Modes</SelectItem>
                 <SelectItem value="ffa">Free-for-All</SelectItem>
-                <SelectItem value="killrace">Kill Race</SelectItem>
+                <SelectItem value="killrace">Multiplayer</SelectItem>
                 <SelectItem value="tdm">Team Deathmatch</SelectItem>
                 <SelectItem value="blitz">Blitz</SelectItem>
               </SelectContent>

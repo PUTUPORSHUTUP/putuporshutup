@@ -33,7 +33,7 @@ export function EnhancedGameConfig({
             <SelectContent>
               {gameData.gameModes.map((mode) => (
                 <SelectItem key={mode} value={mode}>
-                  {mode}
+                  {mode === 'Kill Race' ? 'Multiplayer' : mode}
                 </SelectItem>
               ))}
             </SelectContent>
