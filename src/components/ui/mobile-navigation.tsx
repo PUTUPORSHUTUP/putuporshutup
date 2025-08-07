@@ -16,7 +16,8 @@ import {
   Shield,
   Bell,
   X,
-  Megaphone
+  Megaphone,
+  Wallet
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
@@ -121,6 +122,16 @@ export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
                 >
                   <User className="w-5 h-5 mr-3 text-gray-500" />
                   <span className="font-medium">Profile</span>
+                </Button>
+              </Link>
+
+              <Link to="/wallet" onClick={handleNavClick}>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start h-12 text-left hover:bg-muted/50"
+                >
+                  <Wallet className="w-5 h-5 mr-3 text-green-500" />
+                  <span className="font-medium">Wallet</span>
                 </Button>
               </Link>
 
