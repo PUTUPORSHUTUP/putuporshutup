@@ -616,26 +616,19 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-17 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-12 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="passive-income" className="text-xs sm:text-sm">💰 Passive Income</TabsTrigger>
-            <TabsTrigger value="manual-deposits" className="text-xs sm:text-sm">💳 Manual Deposits</TabsTrigger>
             <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
-            <TabsTrigger value="roles" className="text-xs sm:text-sm">Roles</TabsTrigger>
-            <TabsTrigger value="tournaments" className="text-xs sm:text-sm">Tournaments</TabsTrigger>
             <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
-            <TabsTrigger value="suggestions" className="text-xs sm:text-sm">Suggestions</TabsTrigger>
-            <TabsTrigger value="games" className="text-xs sm:text-sm">Games</TabsTrigger>
-            <TabsTrigger value="automation" className="text-xs sm:text-sm">🤖 Automation</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
-            <TabsTrigger value="projections" className="text-xs sm:text-sm">💰 Projections</TabsTrigger>
-            <TabsTrigger value="sponsor-hub" className="text-xs sm:text-sm">🎯 Sponsors</TabsTrigger>
-            <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">🏢 Sponsor Admin</TabsTrigger>
-            <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">🎮 Xbox Live</TabsTrigger>
-            <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">🧪 Xbox Test</TabsTrigger>
-            <TabsTrigger value="system-test" className="text-xs sm:text-sm">🚀 Full Test</TabsTrigger>
-            <TabsTrigger value="posters" className="text-xs sm:text-sm">🖼️ Posters</TabsTrigger>
+            <TabsTrigger value="passive-income" className="text-xs sm:text-sm">Passive Income</TabsTrigger>
+            <TabsTrigger value="tournaments" className="text-xs sm:text-sm">Tournaments</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
+            <TabsTrigger value="automation" className="text-xs sm:text-sm">Automation</TabsTrigger>
+            <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">Xbox Live</TabsTrigger>
+            <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
+            <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
+            <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
