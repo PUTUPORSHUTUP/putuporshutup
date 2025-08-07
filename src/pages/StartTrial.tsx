@@ -11,7 +11,7 @@ const StartTrial = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const startTrialProcess = async () => {
+    const startVipTrial = async () => {
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -23,39 +23,27 @@ const StartTrial = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('create-premium-subscription');
+        // Use the existing database function to start VIP trial
+        const { error } = await supabase.rpc('start_vip_trial', {
+          user_id_param: user.id
+        });
 
         if (error) {
-          console.error('Subscription error:', error);
+          console.error('VIP trial error:', error);
           toast({
-            title: "Subscription Error",
-            description: "Invalid Stripe configuration. Please contact support.",
+            title: "Trial Error",
+            description: "Error starting trial. Please contact support.",
             variant: "destructive",
           });
           navigate('/vip-required');
           return;
         }
 
-        // Check if data has an error (from the edge function response)
-        if (data?.error) {
-          console.error('Edge function error:', data.error);
-          toast({
-            title: "Subscription Error", 
-            description: data.error.includes('Invalid API Key') 
-              ? "Payment system configuration error. Please contact support."
-              : data.error,
-            variant: "destructive",
-          });
-          navigate('/vip-required');
-          return;
-        }
-
-        if (data.url) {
-          // Redirect to Stripe checkout
-          window.location.href = data.url;
-        } else {
-          navigate('/vip-required');
-        }
+        toast({
+          title: "🔥 VIP Trial Activated!",
+          description: "You now have premium access for 7 days!",
+        });
+        navigate('/vip');
       } catch (error) {
         console.error('Free trial error:', error);
         toast({
@@ -67,7 +55,7 @@ const StartTrial = () => {
       }
     };
 
-    startTrialProcess();
+    startVipTrial();
   }, [user, navigate, toast]);
 
   return (
