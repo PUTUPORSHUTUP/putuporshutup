@@ -62,7 +62,7 @@ export default function AllGamesDropdown({ onSelect }: { onSelect: (game: string
       </button>
 
       {isOpen && (
-        <ul className="absolute w-full bg-background border border-border rounded-md shadow-lg max-h-64 overflow-y-auto mt-2 z-[9999] overflow-visible">
+        <ul className="absolute w-full bg-background border border-border rounded-md shadow-lg max-h-64 overflow-y-auto mt-2 z-[9999]">
           {games.map((game) => (
             <li
               key={game.id}
