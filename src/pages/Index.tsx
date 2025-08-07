@@ -7,6 +7,7 @@ import { Clock, Gamepad2, QrCode } from "lucide-react";
 import { FeaturedPoster } from "@/components/ui/featured-poster";
 import TournamentCarousel from "@/components/TournamentCarousel";
 import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
+import PosterSelector from "@/components/PosterSelector";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -59,6 +60,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+
+      {/* Poster Selector - Remove this after selecting posters */}
+      <PosterSelector />
 
       {/* Enhanced Mobile-Optimized Hero Section */}
       <section className="w-full bg-black text-white py-8 px-4 md:px-10 rounded-lg shadow-lg">
