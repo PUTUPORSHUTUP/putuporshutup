@@ -32,6 +32,7 @@ import { NotificationProvider } from '@/components/notifications/NotificationPro
 import { GamertagWarning } from '@/components/GamertagWarning';
 import { ActiveMatchWarning } from '@/components/ActiveMatchWarning';
 import { AppHeader } from '@/components/layout/AppHeader';
+import Footer from '@/components/layout/Footer';
 import VipTrialBanner from '@/components/VipTrialBanner';
 
 const App = () => {
@@ -120,9 +121,10 @@ const App = () => {
                 </ProtectedRoute>
               } />
                <Route path="/vip-success" element={<VIPSuccess />} />
-               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Footer />
             </BrowserRouter>
           </div>
         </TooltipProvider>
