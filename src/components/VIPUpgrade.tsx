@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { QRCodeGenerator, generatePaymentURL } from '@/components/payments/QRCodeGenerator';
 
 export const VIPUpgrade = () => {
   const { user } = useAuth();
@@ -89,18 +90,29 @@ export const VIPUpgrade = () => {
           <CardTitle className="text-2xl text-green-400 text-center">Complete Your Deposit</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
-          <p className="text-lg">Send <strong className="text-green-400">${amount}</strong> to:</p>
+          <p className="text-lg">Send <strong className="text-green-400">${amount}</strong> using the QR code below:</p>
           
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <p className="text-xl font-bold text-orange-500 mb-2">
-              {paymentMethod === 'venmo' && '💸 Venmo: @PUTUPORSHUTUP2025'}
-              {paymentMethod === 'cashapp' && '💸 Cash App: $PUOSUCASH'} 
-              {paymentMethod === 'paypal' && '💸 PayPal: paypal.me/puosu'}
+          <div className="bg-gray-800 p-6 rounded-lg flex flex-col items-center">
+            <p className="text-xl font-bold text-orange-500 mb-4">
+              {paymentMethod === 'venmo' && '💸 Venmo Payment'}
+              {paymentMethod === 'cashapp' && '💸 Cash App Payment'} 
+              {paymentMethod === 'paypal' && '💸 PayPal Payment'}
             </p>
+            <QRCodeGenerator 
+              value={generatePaymentURL(
+                paymentMethod as 'cashapp' | 'paypal' | 'venmo',
+                paymentMethod === 'venmo' ? 'PUTUPORSHUTUP2025' : 
+                paymentMethod === 'cashapp' ? 'PUOSUCASH' : 'puosu',
+                parseFloat(amount)
+              )}
+              size={200}
+              className="bg-white p-2"
+            />
           </div>
 
           <div className="bg-gray-800 p-4 rounded-lg text-left space-y-2">
             <p><strong>Important:</strong></p>
+            <p>• Scan the QR code with your payment app</p>
             <p>• Include your username/email in the payment notes</p>
             <p>• Amount: ${amount}</p>
             <p>• Your deposit will be processed within 24 hours</p>
@@ -147,9 +159,9 @@ export const VIPUpgrade = () => {
           <Label className="text-white mb-3 block">Select Payment Method</Label>
           <div className="grid grid-cols-1 gap-3">
             {[
-              { id: 'venmo', name: 'Venmo', handle: '@PUTUPORSHUTUP2025', icon: '💸' },
-              { id: 'cashapp', name: 'Cash App', handle: '$PUOSUCASH', icon: '💸' },
-              { id: 'paypal', name: 'PayPal', handle: 'paypal.me/puosu', icon: '💸' }
+              { id: 'venmo', name: 'Venmo', handle: 'Scan QR Code', icon: '💸' },
+              { id: 'cashapp', name: 'Cash App', handle: 'Scan QR Code', icon: '💸' },
+              { id: 'paypal', name: 'PayPal', handle: 'Scan QR Code', icon: '💸' }
             ].map((method) => (
               <button
                 key={method.id}
