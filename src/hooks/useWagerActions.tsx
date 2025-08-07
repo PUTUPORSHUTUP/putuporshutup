@@ -28,12 +28,29 @@ export const useWagerActions = () => {
     wagers: Wager[], 
     onSuccess: () => void
   ) => {
-    if (!user) return;
+    if (!user || joining === wagerId) return; // Prevent double-clicks
 
     try {
       setJoining(wagerId);
       
-      // Check user's wallet balance first
+      // IDEMPOTENT JOIN: Check if already joined first (with unique constraint protection)
+      const { data: existing } = await supabase
+        .from('challenge_participants')
+        .select('id, stake_paid')
+        .eq('challenge_id', wagerId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: "Already Joined",
+          description: "You've already joined this wager.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check wallet balance with FOR UPDATE to prevent race conditions
       const { data: profile } = await supabase
         .from('profiles')
         .select('wallet_balance')
@@ -49,51 +66,35 @@ export const useWagerActions = () => {
         return;
       }
 
-      // Check if already joined
-      const { data: existing } = await supabase
-        .from('challenge_participants')
-        .select('id')
-        .eq('challenge_id', wagerId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (existing) {
-        toast({
-          title: "Already Joined",
-          description: "You've already joined this wager.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Join the wager
-      const { error: joinError } = await supabase
-        .from('challenge_participants')
-        .insert({
-          challenge_id: wagerId,
-          user_id: user.id,
-          stake_paid: stakeAmount
-        });
+      // ATOMIC TRANSACTION: Join challenge and debit wallet in one operation
+      const { error: joinError } = await supabase.rpc('join_challenge_atomic', {
+        p_challenge_id: wagerId,
+        p_user_id: user.id,
+        p_stake_amount: stakeAmount
+      });
 
       if (joinError) {
-        toast({
-          title: "Error joining wager",
-          description: joinError.message,
-          variant: "destructive",
-        });
+        // Handle specific constraint violations
+        if (joinError.message.includes('already_joined')) {
+          toast({
+            title: "Already Joined",
+            description: "You've already joined this wager.",
+            variant: "destructive",
+          });
+        } else if (joinError.message.includes('insufficient_funds')) {
+          toast({
+            title: "Insufficient Funds",
+            description: "Your wallet balance is too low for this wager.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error joining wager",
+            description: joinError.message,
+            variant: "destructive",
+          });
+        }
         return;
-      }
-
-      // Update user's wallet balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ 
-          wallet_balance: profile.wallet_balance - stakeAmount 
-        })
-        .eq('user_id', user.id);
-
-      if (balanceError) {
-        console.error('Error updating balance:', balanceError);
       }
 
       // Find the wager for stat logging
@@ -111,7 +112,7 @@ export const useWagerActions = () => {
 
       toast({
         title: "Joined Wager!",
-        description: "You've successfully joined the challenge. Good luck!",
+        description: "Entry fee debited. You're in the queue!",
       });
 
       // Refresh data

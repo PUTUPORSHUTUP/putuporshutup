@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,50 @@ import { Play, Users, Trophy, AlertTriangle, Zap } from "lucide-react";
 
 export function AdminSimPanel() {
   const [busy, setBusy] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsAdmin(false);
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('user_id', user.id)
+          .single();
+
+        setIsAdmin(profile?.is_admin || false);
+      } catch (error) {
+        console.error('Error checking admin access:', error);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAdminAccess();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card className="border-neutral-500/20">
+        <CardContent className="p-6 text-center">
+          <div className="text-muted-foreground">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isAdmin) {
+    return null; // Hide completely for non-admins
+  }
 
   const callEdgeFunction = async (functionName: string, payload: any = {}) => {
     setBusy(true);

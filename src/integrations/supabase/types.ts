@@ -3288,6 +3288,56 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          challenge_id: string | null
+          created_at: string | null
+          id: string
+          match_id: string | null
+          metadata: Json | null
+          reason: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          challenge_id?: string | null
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          reason: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          challenge_id?: string | null
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          reason?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       xbox_api_calls: {
         Row: {
           created_at: string
@@ -3657,7 +3707,15 @@ export type Database = {
         Returns: boolean
       }
       increment_wallet_balance: {
-        Args: { user_id_param: string; amount_param: number }
+        Args:
+          | { user_id_param: string; amount_param: number }
+          | {
+              user_id_param: string
+              amount_param: number
+              reason_param?: string
+              match_id_param?: string
+              challenge_id_param?: string
+            }
         Returns: undefined
       }
       is_admin: {
