@@ -1,161 +1,64 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
 
-interface TournamentPoster {
-  id: string;
-  title: string;
-  image_url: string;
-  description: string | null;
-  featured: boolean;
-  is_active: boolean;
-  is_archived: boolean;
-  event_type: string | null;
-  display_order: number | null;
-}
+const posterImages = [
+  "/posters/sunday_showdown_aug11.png",
+  "/posters/sunday_showdown_aug4.png", 
+  "/posters/sunday_showdown_july28.png",
+  "/posters/sunday_showdown_fresh.png"
+];
 
 export default function TournamentCarousel() {
-  const [posters, setPosters] = useState<TournamentPoster[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    fetchPosters();
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % posterImages.length);
+    }, 5000); // Rotate every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchPosters = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('posters')
-        .select('*')
-        .eq('is_active', true)
-        .order('featured', { ascending: false })
-        .order('display_order', { ascending: true })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPosters(data || []);
-    } catch (error) {
-      console.error('Error fetching posters:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load tournament posters",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePosterClick = (poster: TournamentPoster) => {
-    // For now, just navigate to tournaments page or specific event
-    if (poster.event_type === 'sunday_showdown') {
-      window.open('/sunday-showdown', '_blank');
-    } else {
-      window.open('/tournaments', '_blank');
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="w-full max-w-6xl mx-auto px-4">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded mb-4 w-48"></div>
-          <div className="flex space-x-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-1 h-64 bg-muted rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (posters.length === 0) {
-    return null;
-  }
-
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+    <div className="w-full max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-foreground">
           Featured Tournaments
         </h2>
         <div className="text-sm text-muted-foreground">
-          {posters.length} tournament{posters.length !== 1 ? 's' : ''} available
+          Auto-rotating gallery
         </div>
       </div>
 
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full"
-      >
-        <CarouselContent>
-          {posters.map((poster) => (
-            <CarouselItem key={poster.id} className="md:basis-1/2 lg:basis-1/3">
-              <Card className="h-full hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-0">
-                  <div className="relative group cursor-pointer" onClick={() => handlePosterClick(poster)}>
-                    {poster.image_url ? (
-                      <img
-                        src={poster.image_url}
-                        alt={poster.title || 'Tournament poster'}
-                        className="w-full h-64 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200"
-                      />
-                    ) : (
-                      <div className="w-full h-64 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-t-lg flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-4xl mb-2">🏆</div>
-                          <div className="text-muted-foreground">Tournament</div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {poster.featured && (
-                      <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
-                        Featured
-                      </div>
-                    )}
-                    
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-t-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <Button variant="secondary" size="sm" className="gap-2">
-                        <ExternalLink className="h-4 w-4" />
-                        View Tournament
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground truncate">
-                      {poster.title}
-                    </h3>
-                    {poster.description && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {poster.description}
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
+      <div className="relative overflow-hidden rounded-lg bg-card shadow-sm">
+        <div 
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {posterImages.map((image, index) => (
+            <div key={index} className="w-full flex-shrink-0">
+              <img
+                src={image}
+                alt={`Tournament poster ${index + 1}`}
+                className="w-full h-64 md:h-80 lg:h-96 object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                onClick={() => window.open('/tournaments', '_blank')}
+              />
+            </div>
           ))}
-        </CarouselContent>
-        <CarouselPrevious className="hidden md:flex" />
-        <CarouselNext className="hidden md:flex" />
-      </Carousel>
+        </div>
+        
+        {/* Navigation dots */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {posterImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrent(index)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                current === index ? 'bg-white' : 'bg-white/50'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
