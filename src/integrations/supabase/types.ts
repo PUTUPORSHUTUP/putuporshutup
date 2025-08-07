@@ -2000,6 +2000,7 @@ export type Database = {
           username: string | null
           vip_access: boolean | null
           vip_expires: string | null
+          vip_trial_start: string | null
           wallet_balance: number | null
           xbox_gamer_score: number | null
           xbox_gamertag: string | null
@@ -2031,6 +2032,7 @@ export type Database = {
           username?: string | null
           vip_access?: boolean | null
           vip_expires?: string | null
+          vip_trial_start?: string | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
@@ -2062,6 +2064,7 @@ export type Database = {
           username?: string | null
           vip_access?: boolean | null
           vip_expires?: string | null
+          vip_trial_start?: string | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
@@ -3643,6 +3646,10 @@ export type Database = {
         Args: { user_id_param: string }
         Returns: boolean
       }
+      has_vip_access_v2: {
+        Args: { user_id_param: string }
+        Returns: boolean
+      }
       increment_wallet_balance: {
         Args: { user_id_param: string; amount_param: number }
         Returns: undefined
@@ -3689,6 +3696,10 @@ export type Database = {
         }[]
       }
       start_vip_trial: {
+        Args: { user_id_param: string }
+        Returns: undefined
+      }
+      start_vip_trial_v2: {
         Args: { user_id_param: string }
         Returns: undefined
       }
