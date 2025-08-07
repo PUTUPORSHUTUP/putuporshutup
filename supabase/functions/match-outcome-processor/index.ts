@@ -87,6 +87,9 @@ serve(async (req) => {
 
     // Check for stale matches that need fallback processing
     await processStaleMatches(supabaseService);
+    
+    // Check for failed launch timeouts
+    await processLaunchTimeouts(supabaseService);
 
     console.log(`✅ Match outcome processing completed. Processed: ${processedCount}, Auto-verified: ${autoVerifiedCount}`);
 
@@ -384,5 +387,95 @@ async function processStaleMatches(supabase: any) {
         updated_at: new Date().toISOString()
       })
       .eq("id", challenge.id);
+  }
+}
+
+async function processLaunchTimeouts(supabase: any) {
+  // Find matches that are in 'launching' state for more than 10 minutes with no players joined
+  const timeoutTime = new Date(Date.now() - 10 * 60 * 1000); // 10 minutes ago
+  
+  const { data: failedLaunches } = await supabase
+    .from("challenges")
+    .select(`
+      id, 
+      title, 
+      created_at,
+      challenge_participants(count)
+    `)
+    .eq("status", "launching")
+    .lt("created_at", timeoutTime.toISOString());
+
+  for (const match of failedLaunches || []) {
+    const playersJoined = match.challenge_participants?.[0]?.count || 0;
+    
+    if (playersJoined === 0) {
+      console.log(`Processing failed launch timeout for match: ${match.id}`);
+      
+      // Update match status to failed_to_launch
+      await supabase
+        .from("challenges")
+        .update({
+          status: 'failed_to_launch',
+          admin_notes: 'Console failure – match never launched',
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", match.id);
+
+      // Refund all players (if any had paid)
+      await refundAllPlayers(supabase, match.id, 'Console failure – match never launched');
+      
+      // Log the automated action
+      await supabase
+        .from("automated_actions")
+        .insert({
+          automation_type: "launch_timeout_processing",
+          action_type: "failed_to_launch",
+          target_id: match.id,
+          success: true,
+          action_data: {
+            reason: 'Console failure – match never launched',
+            timeout_minutes: 10,
+            players_joined: playersJoined
+          }
+        });
+    }
+  }
+}
+
+async function refundAllPlayers(supabase: any, matchId: string, reason: string) {
+  // Get all participants who paid for this match
+  const { data: participants } = await supabase
+    .from("challenge_participants")
+    .select("user_id, stake_paid")
+    .eq("challenge_id", matchId);
+
+  for (const participant of participants || []) {
+    if (participant.stake_paid > 0) {
+      console.log(`Refunding ${participant.stake_paid} to user ${participant.user_id} for failed launch`);
+      
+      // Refund the stake amount to user's wallet
+      await supabase
+        .from("profiles")
+        .update({
+          wallet_balance: supabase.raw(`wallet_balance + ${participant.stake_paid}`)
+        })
+        .eq("user_id", participant.user_id);
+
+      // Create a transaction record for the refund
+      await supabase
+        .from("transactions")
+        .insert({
+          user_id: participant.user_id,
+          type: 'refund',
+          amount: participant.stake_paid,
+          status: 'completed',
+          description: `Refund for failed match launch: ${reason}`,
+          metadata: {
+            match_id: matchId,
+            refund_reason: reason,
+            automated: true
+          }
+        });
+    }
   }
 }
