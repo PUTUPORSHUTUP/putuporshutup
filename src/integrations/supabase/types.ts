@@ -1987,6 +1987,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_premium: boolean | null
+          is_vip: boolean | null
           is_vip_trial: boolean | null
           payoneer_email: string | null
           premium_expires_at: string | null
@@ -1998,6 +1999,7 @@ export type Database = {
           user_id: string
           username: string | null
           vip_access: boolean | null
+          vip_expires: string | null
           wallet_balance: number | null
           xbox_gamer_score: number | null
           xbox_gamertag: string | null
@@ -2016,6 +2018,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_vip?: boolean | null
           is_vip_trial?: boolean | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
@@ -2027,6 +2030,7 @@ export type Database = {
           user_id: string
           username?: string | null
           vip_access?: boolean | null
+          vip_expires?: string | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
@@ -2045,6 +2049,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_premium?: boolean | null
+          is_vip?: boolean | null
           is_vip_trial?: boolean | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
@@ -2056,6 +2061,7 @@ export type Database = {
           user_id?: string
           username?: string | null
           vip_access?: boolean | null
+          vip_expires?: string | null
           wallet_balance?: number | null
           xbox_gamer_score?: number | null
           xbox_gamertag?: string | null
