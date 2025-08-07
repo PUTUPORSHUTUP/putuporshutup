@@ -75,7 +75,7 @@ export const VIPUpgrade = () => {
 
   const getAccountDetails = (method: string) => {
     switch (method) {
-      case 'venmo': return '@puosu';
+      case 'venmo': return '@PUTUPORSHUTUP2025';
       case 'cashapp': return '$PUOSUCASH';
       case 'paypal': return 'paypal.me/puosu';
       default: return '';
@@ -93,7 +93,7 @@ export const VIPUpgrade = () => {
           
           <div className="bg-gray-800 p-6 rounded-lg">
             <p className="text-xl font-bold text-orange-500 mb-2">
-              {paymentMethod === 'venmo' && '💸 Venmo: @puosu'}
+              {paymentMethod === 'venmo' && '💸 Venmo: @PUTUPORSHUTUP2025'}
               {paymentMethod === 'cashapp' && '💸 Cash App: $PUOSUCASH'} 
               {paymentMethod === 'paypal' && '💸 PayPal: paypal.me/puosu'}
             </p>
@@ -147,7 +147,7 @@ export const VIPUpgrade = () => {
           <Label className="text-white mb-3 block">Select Payment Method</Label>
           <div className="grid grid-cols-1 gap-3">
             {[
-              { id: 'venmo', name: 'Venmo', handle: '@puosu', icon: '💸' },
+              { id: 'venmo', name: 'Venmo', handle: '@PUTUPORSHUTUP2025', icon: '💸' },
               { id: 'cashapp', name: 'Cash App', handle: '$PUOSUCASH', icon: '💸' },
               { id: 'paypal', name: 'PayPal', handle: 'paypal.me/puosu', icon: '💸' }
             ].map((method) => (
