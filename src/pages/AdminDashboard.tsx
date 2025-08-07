@@ -71,6 +71,7 @@ import { PassiveIncomeController } from '@/components/admin/PassiveIncomeControl
 import SponsorAdminPanel from '@/components/admin/SponsorAdminPanel';
 import PosterManagement from '@/components/admin/PosterManagement';
 import { ManualDepositProcessor } from '@/components/admin/ManualDepositProcessor';
+import PosterSelector from '@/components/PosterSelector';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -1262,7 +1263,26 @@ const AdminDashboard = () => {
 
           {/* Poster Management Tab */}
           <TabsContent value="posters" className="space-y-6">
-            <PosterManagement />
+            <div className="grid gap-6">
+              {/* Tournament Poster Selector */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Image className="w-5 h-5" />
+                    Tournament Poster Selector
+                  </CardTitle>
+                  <p className="text-muted-foreground text-sm">
+                    Select which uploaded images to use for tournament posters
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <PosterSelector />
+                </CardContent>
+              </Card>
+              
+              {/* Original Poster Management */}
+              <PosterManagement />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
