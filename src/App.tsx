@@ -32,6 +32,7 @@ import { NotificationProvider } from '@/components/notifications/NotificationPro
 import { GamertagWarning } from '@/components/GamertagWarning';
 import { ActiveMatchWarning } from '@/components/ActiveMatchWarning';
 import { AppHeader } from '@/components/layout/AppHeader';
+import VipTrialBanner from '@/components/VipTrialBanner';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => {
                 </div>
                 <GamertagWarning />
                 <ActiveMatchWarning />
+                <VipTrialBanner />
           <BrowserRouter>
             <AppHeader />
             <Routes>
