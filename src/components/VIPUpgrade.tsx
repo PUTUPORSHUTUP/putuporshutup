@@ -115,7 +115,7 @@ export const VIPUpgrade = () => {
             <p>• Scan the QR code with your payment app</p>
             <p>• Include your username/email in the payment notes</p>
             <p>• Amount: ${amount}</p>
-            <p>• Your deposit will be processed within 24 hours</p>
+            
           </div>
 
           <Button 
