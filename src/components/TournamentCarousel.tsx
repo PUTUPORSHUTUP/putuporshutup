@@ -1,45 +1,61 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-const posterImages = [
-  { src: "/posters/sunday_showdown_fresh.png", label: "🔥 This Sunday — Winner Takes All" },
-  { src: "/posters/sunday_showdown_aug11.png", label: "Sunday Showdown – August 11" },
-  { src: "/posters/sunday_showdown_aug4.png", label: "Sunday Showdown – August 4" },
-  { src: "/posters/sunday_showdown_july28.png", label: "Sunday Showdown – July 28" }
-]
+type Poster = { src: string; label: string; href?: string };
+
+const posters: Poster[] = [
+  {
+    src: "/posters/sunday_showdown_fresh.png", // 🔥 newest / featured
+    label: "🔥 Sunday Showdown — Winner Takes All",
+    href: "/tournaments/sunday-showdown"
+  },
+  { src: "/posters/sunday_showdown_aug11.png", label: "Sunday Showdown – August 11", href: "/tournaments/sunday-showdown" },
+  { src: "/posters/sunday_showdown_aug4.png",  label: "Sunday Showdown – August 4",  href: "/tournaments/sunday-showdown" },
+  { src: "/posters/sunday_showdown_july28.png",label: "Sunday Showdown – July 28",   href: "/tournaments/sunday-showdown" }
+];
 
 export default function TournamentCarousel() {
-  const [current, setCurrent] = useState(0)
-
-  const goNext = () => setCurrent((prev) => (prev + 1) % posterImages.length)
-  const goPrev = () => setCurrent((prev) => (prev - 1 + posterImages.length) % posterImages.length)
+  const [i, setI] = useState(0);
+  const next = () => setI((p) => (p + 1) % posters.length);
+  const prev = () => setI((p) => (p - 1 + posters.length) % posters.length);
 
   useEffect(() => {
-    const interval = setInterval(goNext, 5000)
-    return () => clearInterval(interval)
-  }, [])
+    const id = setInterval(next, 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  const cur = posters[i];
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 relative">
-      <img
-        src={posterImages[current].src}
-        alt={posterImages[current].label}
-        className="rounded-2xl shadow-lg w-full object-contain"
-      />
-      <p className="text-center text-neutral-300 text-sm mt-2">{posterImages[current].label}</p>
+      <a href={cur.href || "#"} aria-label={cur.label}>
+        <img src={cur.src} alt={cur.label} className="rounded-2xl shadow-lg w-full object-contain" />
+      </a>
+
+      <p className="text-center text-neutral-300 text-sm mt-2">{cur.label}</p>
+
+      <div className="flex justify-center mt-3">
+        <a
+          href="/join-queue?sunday=1"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
+        >
+          ✅ Join Sunday Showdown
+        </a>
+      </div>
 
       <button
-        onClick={goPrev}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-neutral-800 bg-opacity-60 px-2 py-1 text-white rounded-full hover:bg-opacity-90"
+        onClick={prev}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 px-2 py-1 text-white rounded-full hover:bg-neutral-800"
+        aria-label="Previous poster"
       >
         ◀
       </button>
-
       <button
-        onClick={goNext}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-neutral-800 bg-opacity-60 px-2 py-1 text-white rounded-full hover:bg-opacity-90"
+        onClick={next}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 px-2 py-1 text-white rounded-full hover:bg-neutral-800"
+        aria-label="Next poster"
       >
         ▶
       </button>
     </div>
-  )
+  );
 }
