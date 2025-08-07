@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Gamepad2, QrCode } from "lucide-react";
 import { FeaturedPoster } from "@/components/ui/featured-poster";
+import TournamentCarousel from "@/components/TournamentCarousel";
+import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -97,6 +99,16 @@ const Index = () => {
       {/* Featured Poster Section */}
       <section className="py-6 px-4">
         <FeaturedPoster />
+      </section>
+
+      {/* Sunday Showdown Tournament Carousel */}
+      <section className="py-6 px-4">
+        <TournamentCarousel />
+      </section>
+
+      {/* Midweek Mayhem Tournament Carousel */}
+      <section className="py-6 px-4">
+        <MidweekMayhemCarousel />
       </section>
 
       {/* Live Match Preview */}
