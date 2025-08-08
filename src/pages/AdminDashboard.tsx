@@ -636,6 +636,9 @@ const AdminDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Simulation Panel - Prominently displayed at top */}
+            <AdminSimPanel />
+            
             {/* Revenue Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="bg-gradient-to-br from-green-500/5 to-green-600/10 border-green-500/20">
