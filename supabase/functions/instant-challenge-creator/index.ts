@@ -20,7 +20,10 @@ Deno.serve(async (req) => {
 
     // Get available test users with sufficient balance
     const { data: testUsers, error: usersError } = await supabase
-      .rpc('get_available_test_users', { min_balance: 10, max_users: 6 });
+      .from('profiles')
+      .select('user_id, username, wallet_balance')
+      .gte('wallet_balance', 10.0)
+      .limit(6);
     
     if (usersError || !testUsers?.length) {
       throw new Error(`No test users available: ${usersError?.message}`);
@@ -64,17 +67,37 @@ Deno.serve(async (req) => {
 
     console.log('✅ Challenge created:', challenge.id);
 
-    // Add participants instantly using atomic function
+    // Add participants instantly using direct database operations
     let participantCount = 0;
     for (const user of testUsers.slice(0, 4)) {
       try {
-        await supabase.rpc('join_challenge_atomic', {
-          p_challenge_id: challenge.id,
-          p_user_id: user.user_id,
-          p_stake_amount: stakeAmount
-        });
-        participantCount++;
-        console.log(`✅ User ${participantCount} joined challenge`);
+        // Insert participant
+        const { error: participantError } = await supabase
+          .from('challenge_participants')
+          .insert({
+            challenge_id: challenge.id,
+            user_id: user.user_id,
+            stake_paid: stakeAmount
+          });
+        
+        if (!participantError) {
+          // Deduct stake from wallet
+          const { error: walletError } = await supabase
+            .from('profiles')
+            .update({ 
+              wallet_balance: user.wallet_balance - stakeAmount 
+            })
+            .eq('user_id', user.user_id);
+          
+          if (!walletError) {
+            participantCount++;
+            console.log(`✅ User ${participantCount} joined challenge`);
+          } else {
+            console.log(`⚠️ Failed to deduct stake: ${walletError.message}`);
+          }
+        } else {
+          console.log(`⚠️ Failed to join challenge: ${participantError.message}`);
+        }
       } catch (error) {
         console.log(`⚠️ User failed to join: ${error.message}`);
         break;

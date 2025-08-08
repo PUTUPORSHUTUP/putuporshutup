@@ -20,12 +20,19 @@ Deno.serve(async (req) => {
 
     console.log('💰 INSTANT PAYOUT PROCESSOR - Processing challenge:', challengeId);
 
-    // Mark as settled atomically (prevents double processing)
-    const wasAlreadySettled = await supabase.rpc('mark_challenge_settled', {
-      p_challenge_id: challengeId
-    });
+    // Mark as settled using direct database update (prevents double processing)
+    const { data: updateResult, error: settleError } = await supabase
+      .from('challenges')
+      .update({ status: 'settled' })
+      .eq('id', challengeId)
+      .neq('status', 'settled')
+      .select('id');
 
-    if (!wasAlreadySettled) {
+    if (settleError) {
+      throw new Error(`Failed to settle challenge: ${settleError.message}`);
+    }
+
+    if (!updateResult || updateResult.length === 0) {
       console.log('⚠️ Challenge already settled, skipping payout');
       return new Response(JSON.stringify({
         success: true,
@@ -107,12 +114,27 @@ Deno.serve(async (req) => {
     const processedPayouts = [];
     for (const payout of payouts) {
       try {
-        await supabase.rpc('increment_wallet_balance', {
-          user_id_param: payout.user_id,
-          amount_param: payout.amount,
-          reason_param: 'challenge_win',
-          challenge_id_param: challengeId
-        });
+        // Get current balance and update directly
+        const { data: profile, error: getError } = await supabase
+          .from('profiles')
+          .select('wallet_balance')
+          .eq('user_id', payout.user_id)
+          .single();
+        
+        if (getError || !profile) {
+          throw new Error(`Profile not found: ${getError?.message}`);
+        }
+        
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            wallet_balance: profile.wallet_balance + payout.amount 
+          })
+          .eq('user_id', payout.user_id);
+        
+        if (updateError) {
+          throw new Error(`Failed to update balance: ${updateError.message}`);
+        }
 
         processedPayouts.push(payout);
         console.log(`✅ Paid $${payout.amount} to position ${payout.position}`);
