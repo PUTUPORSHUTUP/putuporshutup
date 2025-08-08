@@ -33,8 +33,8 @@ serve(async (req) => {
     // fetch by id, but don't explode if zero/many
     let { data: prof, error: pErr } = await sb
       .from("profiles")
-      .select("id,is_admin,created_at")
-      .eq("id", uid)
+      .select("user_id,is_admin,created_at")
+      .eq("user_id", uid)
       .order("created_at", { ascending: true })
       .limit(2);    // if there are dupes, we'll see 2
 
@@ -45,14 +45,14 @@ serve(async (req) => {
     if (!prof || prof.length === 0) {
       // create a default profile for this user
       const { error: cErr } = await sb.from("profiles").insert({
-        id: uid,
+        user_id: uid,
         is_admin: false,
         wallet_balance: 0,
       });
       if (cErr) {
         return cors(new Response(JSON.stringify({ ok:false, code:500, message:`Auto-create profile failed: ${cErr.message}` }), { status: 500 }));
       }
-      prof = [{ id: uid, is_admin: false, created_at: new Date().toISOString() } as any];
+      prof = [{ user_id: uid, is_admin: false, created_at: new Date().toISOString() } as any];
     }
 
     // if somehow dupes exist, pick the first one
