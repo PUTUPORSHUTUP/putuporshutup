@@ -630,7 +630,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">Xbox Live</TabsTrigger>
             <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
             <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
-            <TabsTrigger value="suggestions" className="text-xs sm:text-sm">Simulation</TabsTrigger>
+            
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
           </TabsList>
 
