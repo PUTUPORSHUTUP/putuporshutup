@@ -620,7 +620,7 @@ const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-12 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="matches" className="text-xs sm:text-sm">Matches</TabsTrigger>
+            <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
             <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
             <TabsTrigger value="passive-income" className="text-xs sm:text-sm">Passive Income</TabsTrigger>
@@ -636,9 +636,6 @@ const AdminDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Simulation Panel - Prominently displayed at top */}
-            <AdminSimPanel />
-            
             {/* Revenue Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="bg-gradient-to-br from-green-500/5 to-green-600/10 border-green-500/20">
@@ -788,9 +785,9 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* Matches Tab */}
-          <TabsContent value="matches" className="space-y-6">
-            <MatchManagement />
+          {/* Simulation Tab */}
+          <TabsContent value="simulation" className="space-y-6">
+            <AdminSimPanel />
           </TabsContent>
 
           {/* Users Tab */}
@@ -1053,10 +1050,6 @@ const AdminDashboard = () => {
             <DisputeManagement />
           </TabsContent>
 
-          {/* Simulation Tab */}
-          <TabsContent value="suggestions" className="space-y-6">
-            <AdminSimPanel />
-          </TabsContent>
 
           {/* Games Tab */}
           <TabsContent value="games" className="space-y-6">
@@ -1204,10 +1197,6 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
-          {/* Simulation Tab */}
-          <TabsContent value="simulation" className="space-y-6">
-            <AdminSimPanel />
-          </TabsContent>
         </Tabs>
       </div>
     </div>
