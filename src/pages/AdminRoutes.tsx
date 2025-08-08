@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminDashboard from "./AdminDashboard";
-import { AdminSimPanel } from "@/components/AdminSimPanel";
+import AdminSimPanel from "@/components/AdminSimPanel";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 // --- ADMIN MENU ITEMS ---

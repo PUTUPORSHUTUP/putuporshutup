@@ -34,7 +34,7 @@ import {
 import { GamePerformanceAnalytics } from '@/components/admin/GamePerformanceAnalytics';
 import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptimization';
 import { GameManagement } from '@/components/admin/GameManagement';
-import { AdminSimPanel } from '@/components/AdminSimPanel';
+import AdminSimPanel from '@/components/AdminSimPanel';
 import { ProjectExportModal } from '@/components/admin/ProjectExportModal';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';

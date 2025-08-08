@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import AdminRoutes from "./pages/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
-import { AdminSimPanel } from "./components/AdminSimPanel";
+import AdminSimPanel from "./components/AdminSimPanel";
 import Games from "./pages/Games";
 import Tournaments from "./pages/Tournaments";
 import Leaderboards from "./pages/Leaderboards";
