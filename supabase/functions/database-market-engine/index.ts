@@ -11,12 +11,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const body = await req.json().catch(() => ({}));
     const { 
       manual = false, 
       min_players = 6, 
       crash_rate = 0.05, 
       force_no_crash = true 
-    } = await req.json();
+    } = body;
     
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -35,20 +36,35 @@ Deno.serve(async (req) => {
 
     if (error) {
       console.error('❌ Atomic market cycle failed:', error);
+      console.error('Error details:', { code: error.code, message: error.message, details: error.details, hint: error.hint });
       
       // Log error to database
-      await supabase.from('market_engine_errors').insert({
-        error: error.message,
-        stack: error.details || error.hint || '',
-        environment: {
-          min_players,
-          crash_rate,
-          force_no_crash,
-          manual
-        }
-      });
+      try {
+        await supabase.from('market_engine_errors').insert({
+          error: error.message || 'Unknown database error',
+          stack: JSON.stringify({ code: error.code, details: error.details, hint: error.hint }),
+          environment: {
+            min_players,
+            crash_rate,
+            force_no_crash,
+            manual
+          }
+        });
+      } catch (logError) {
+        console.error('Failed to log error:', logError);
+      }
       
-      throw new Error(`Database function failed: ${error.message}`);
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message || 'Database function failed',
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        message: 'Database market engine failed'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     const totalTime = Date.now() - startTime;

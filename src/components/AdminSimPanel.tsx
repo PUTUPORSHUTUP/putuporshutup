@@ -52,7 +52,7 @@ export default function AdminSimPanel() {
     push("🚀 Starting Database Market Engine…");
 
     try {
-      const data = await invokeInstantMarket({ manual: true });
+      const data = await invokeInstantMarket({ manual: true, min_players: 4 });
       if (data?.success) {
         const id = data.challengeId;
         const timeMs = data.totalTimeMs;
