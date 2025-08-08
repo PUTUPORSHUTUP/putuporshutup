@@ -13,42 +13,108 @@ serve(async (req) => {
   }
 
   try {
-    // DEBUGGING: Log headers for verification
+    // COMPREHENSIVE HEADER DIAGNOSTICS
     const headers: Record<string, string> = {};
     for (const [key, value] of req.headers.entries()) {
-      headers[key] = key.toLowerCase().includes('auth') ? '***redacted***' : value;
+      headers[key] = value;
     }
-    console.log('Received headers:', JSON.stringify(headers, null, 2));
     
-    // ENHANCED AUTH VALIDATION
     const authHeader = req.headers.get('Authorization');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const isDiagMode = req.headers.get('X-Diag-Mode') === 'full';
+    const callerInfo = req.headers.get('X-Caller') || 'unknown';
+    const challengeId = req.headers.get('X-Challenge-Id') || 'unknown';
     
+    console.log("🔍 Process-match-payouts FULL DIAGNOSTICS:", {
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      url: req.url,
+      receivedHeaders: headers,
+      authDetails: {
+        authHeaderPresent: !!authHeader,
+        authHeaderStart: authHeader?.substring(0, 20) + "...",
+        expectedStart: `Bearer ${serviceRoleKey?.substring(0, 10)}...`,
+        authHeaderLength: authHeader?.length || 0,
+        expectedLength: serviceRoleKey ? `Bearer ${serviceRoleKey}`.length : 0,
+        exactMatch: authHeader === `Bearer ${serviceRoleKey}`
+      },
+      environment: {
+        SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
+        SERVICE_ROLE_KEY: !!serviceRoleKey,
+        serviceRoleKeyLength: serviceRoleKey?.length || 0
+      },
+      callerInfo: {
+        caller: callerInfo,
+        challengeId: challengeId,
+        isDiagnosticMode: isDiagMode
+      }
+    });
+    
+    // ENHANCED AUTH VALIDATION with detailed diagnostics
     if (!authHeader) {
-      console.error('No authorization header found');
-      return new Response(JSON.stringify({
+      const diagnosticResponse = {
         code: 421,
         message: "Missing authorization header",
-        hint: "Check if calling function passes Authorization header"
-      }), { 
+        timestamp: new Date().toISOString(),
+        diagnostic: {
+          received_headers: headers,
+          expected_auth_format: `Bearer ${serviceRoleKey?.substring(0, 10)}...`,
+          env_vars: {
+            SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
+            SERVICE_ROLE_KEY: !!serviceRoleKey,
+            service_key_length: serviceRoleKey?.length || 0
+          },
+          caller_info: {
+            caller: callerInfo,
+            challenge_id: challengeId
+          },
+          troubleshooting: {
+            check_edge_function_secrets: "Run: supabase secrets list",
+            verify_header_propagation: "Check sim_runner Authorization header sending",
+            check_function_deployment: "Verify both functions deployed to same project"
+          }
+        }
+      };
+      
+      console.error("❌ AUTH FAILURE - Missing header:", diagnosticResponse);
+      
+      return new Response(JSON.stringify(diagnosticResponse), { 
         status: 421,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
     if (authHeader !== `Bearer ${serviceRoleKey}`) {
-      console.error('Invalid authorization token');
-      return new Response(JSON.stringify({
-        code: 403,
-        message: "Invalid authorization token",
-        hint: "Verify SERVICE_ROLE_KEY matches in both functions"
-      }), { 
-        status: 403,
+      const diagnosticResponse = {
+        code: 421,
+        message: "Invalid authorization header",
+        timestamp: new Date().toISOString(),
+        diagnostic: {
+          received_auth: authHeader?.substring(0, 30) + "...",
+          expected_auth: `Bearer ${serviceRoleKey?.substring(0, 15)}...`,
+          comparison: {
+            receivedLength: authHeader?.length || 0,
+            expectedLength: `Bearer ${serviceRoleKey}`.length,
+            startsWithBearer: authHeader?.startsWith('Bearer ') || false,
+            keyPortionMatches: authHeader?.substring(7) === serviceRoleKey
+          },
+          troubleshooting: {
+            check_service_role_key: "Verify SUPABASE_SERVICE_ROLE_KEY is identical in both functions",
+            check_header_format: "Ensure Authorization: Bearer [key] format",
+            verify_no_trailing_spaces: "Check for whitespace in environment variables"
+          }
+        }
+      };
+      
+      console.error("❌ AUTH FAILURE - Invalid header:", diagnosticResponse);
+      
+      return new Response(JSON.stringify(diagnosticResponse), { 
+        status: 421,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
-    console.log('Authorization validation passed');
+    console.log("✅ Authorization validated successfully - proceeding with payout processing");
     const { matchId } = await req.json();
 
     if (!matchId) {

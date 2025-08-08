@@ -3740,6 +3740,33 @@ export type Database = {
       }
     }
     Views: {
+      auth_diagnostics: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          error_time: string | null
+          event_type: string | null
+          match_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          error_time?: string | null
+          event_type?: string | null
+          match_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          error_time?: string | null
+          event_type?: string | null
+          match_id?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       payout_guard: {
         Row: {
           challenge_id: string | null
@@ -3761,6 +3788,15 @@ export type Database = {
       bytea_to_text: {
         Args: { data: string }
         Returns: string
+      }
+      check_function_diagnostics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          function_name: string
+          recent_errors: number
+          last_error_time: string
+          error_types: string[]
+        }[]
       }
       check_rls_policy_coverage: {
         Args: Record<PropertyKey, never>
