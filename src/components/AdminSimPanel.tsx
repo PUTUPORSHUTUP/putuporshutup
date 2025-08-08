@@ -36,7 +36,7 @@ export default function AdminSimPanel() {
 
   // Use the new Database Market Engine
   const invokeInstantMarket = async (payload: any) => {
-    const response = await apiClient.adminCall('database_market_engine', payload);
+    const response = await apiClient.adminCall('database-market-engine', payload);
     
     if (response.error) {
       console.error("Database Market Engine error:", response.error);
