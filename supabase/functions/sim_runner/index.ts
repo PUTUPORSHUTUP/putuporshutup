@@ -10,7 +10,7 @@ const URL = Deno.env.get("SUPABASE_URL")!;
 const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TEST_MODE = (Deno.env.get("TEST_MODE") || "true").toLowerCase() === "true";
 const ENTRY_FEE = 5;
-const RANDOM_CRASH_RATE = 0.20; // 20%
+const RANDOM_CRASH_RATE = Number(Deno.env.get("SIM_CRASH_RATE") ?? "0.08"); // 8% default
 
 type SB = ReturnType<typeof createClient>;
 
@@ -37,6 +37,18 @@ async function logDiag(sb: SB, challengeId: string | null, step: string, note?: 
   } catch (e) {
     console.error("Failed to log diag:", e);
   }
+}
+
+// simple anti-cluster guard: don't crash twice in a row
+async function crashedLastRun(sb: SB) {
+  const { data } = await sb
+    .from("payout_automation_log")
+    .select("event_type, created_at")
+    .eq("event_type", "sim_diag")
+    .eq("status", "refunded")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  return !!data?.length;
 }
 
 serve(async (req) => {
@@ -115,8 +127,11 @@ serve(async (req) => {
     if (aErr) return fail(`activate challenge: ${aErr.message}`);
     await logDiag(sb, challengeId, "challenge_active");
 
-    // 6) Random crash branch
-    const crashed = Math.random() < RANDOM_CRASH_RATE;
+    // 6) Random crash branch with anti-cluster guard
+    const lastWasCrash = await crashedLastRun(sb);
+    const randomCrash = Math.random() < RANDOM_CRASH_RATE;
+    // crash only if random says so AND last run was NOT a crash
+    const crashed = !lastWasCrash && randomCrash;
     if (crashed) {
       // Refund path
       const res = await fetch(`${URL}/functions/v1/handle-match-failure`, {
