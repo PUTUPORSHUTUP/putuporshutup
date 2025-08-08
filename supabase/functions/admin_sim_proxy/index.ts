@@ -63,15 +63,22 @@ serve(async (req) => {
       return cors(new Response(JSON.stringify({ ok:false, code:403, message:"Admin only" }), { status: 403 }));
     }
 
-    // 3) Forward to sim_runner with Service Role header
-    const body = await req.text();
-    const res = await fetch(`${URL}/functions/v1/sim_runner`, {
+    // 3) Parse request to get endpoint
+    const requestBody = JSON.parse(await req.text());
+    const { endpoint, ...payload } = requestBody;
+    
+    if (!endpoint) {
+      return cors(new Response(JSON.stringify({ ok:false, code:400, message:"Missing endpoint parameter" }), { status: 400 }));
+    }
+
+    // 4) Forward to the specified endpoint with Service Role header
+    const res = await fetch(`${URL}/functions/v1/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${SRK}`,
       },
-      body,
+      body: JSON.stringify(payload),
     });
 
     const text = await res.text();

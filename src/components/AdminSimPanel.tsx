@@ -53,7 +53,7 @@ export default function AdminSimPanel() {
 
     try {
       const data = await invokeInstantMarket({ manual: true, min_players: 4 });
-      if (data?.success) {
+      if (data?.ok || data?.success) {
         const id = data.challengeId;
         const timeMs = data.totalTimeMs;
         const participants = data.challenge?.participantCount || 0;
