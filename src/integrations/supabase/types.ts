@@ -3957,6 +3957,10 @@ export type Database = {
         Args: { p_match_id: string; p_total_pot_cents: number }
         Returns: number
       }
+      db_market_run: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       detect_suspicious_stats: {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
