@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
+import AdminRoutes from "./pages/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
 import { AdminSimPanel } from "./components/AdminSimPanel";
 import Games from "./pages/Games";
@@ -76,6 +77,7 @@ const App = () => {
                 </ProtectedRoute>
               } />
               <Route path="/leaderboards" element={<Leaderboards />} />
+              <Route path="/admin/*" element={<AdminRoutes />} />
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminDashboard />
@@ -120,11 +122,6 @@ const App = () => {
                 <ProtectedRoute>
                   <Wallet />
                 </ProtectedRoute>
-               } />
-               <Route path="/admin/simulation" element={
-                 <ProtectedRoute>
-                   <AdminSimPanel />
-                 </ProtectedRoute>
                } />
                 <Route path="/vip-success" element={<VIPSuccess />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
