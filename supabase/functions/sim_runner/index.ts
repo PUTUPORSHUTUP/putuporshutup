@@ -10,22 +10,13 @@ const URL = Deno.env.get("SUPABASE_URL")!;
 const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TEST_MODE = (Deno.env.get("TEST_MODE") || "true").toLowerCase() === "true";
 const ENTRY_FEE = 5;
-const RANDOM_CRASH_RATE = Number(Deno.env.get("SIM_CRASH_RATE") ?? "0.08"); // 8% default
+const CRASH_RATE = Number(Deno.env.get("SIM_CRASH_RATE") ?? "0.08"); // 8%
 
 type SB = ReturnType<typeof createClient>;
+const ok = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+const fail = (m: string, s = 500) => ok({ ok: false, error: m }, s);
 
-function ok(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { 
-    status, 
-    headers: { ...corsHeaders, "Content-Type": "application/json" } 
-  });
-}
-
-function fail(message: string, status = 500) {
-  return ok({ ok: false, error: message }, status);
-}
-
-async function logDiag(sb: SB, challengeId: string | null, step: string, note?: string) {
+async function log(sb: SB, challengeId: string | null, step: string, note?: string) {
   try {
     await sb.from("payout_automation_log").insert({
       event_type: "sim_diag",
@@ -35,20 +26,21 @@ async function logDiag(sb: SB, challengeId: string | null, step: string, note?: 
       error_message: note ?? null,
     });
   } catch (e) {
-    console.error("Failed to log diag:", e);
+    console.error("Failed to log:", e);
   }
 }
 
-// simple anti-cluster guard: don't crash twice in a row
-async function crashedLastRun(sb: SB) {
+// Was the last simulation a crash/refund?
+async function lastRunWasCrash(sb: SB) {
   const { data } = await sb
     .from("payout_automation_log")
-    .select("event_type, created_at")
-    .eq("event_type", "sim_diag")
-    .eq("status", "refunded")
+    .select("event_type, status, created_at")
+    .in("event_type", ["refund", "sim_diag"])
     .order("created_at", { ascending: false })
     .limit(1);
-  return !!data?.length;
+  if (!data?.length) return false;
+  const d = data[0];
+  return d.event_type === "refund" || d.status === "refunded";
 }
 
 serve(async (req) => {
@@ -60,7 +52,7 @@ serve(async (req) => {
   const sb = createClient(URL, KEY, { auth: { persistSession: false } });
 
   try {
-    // 1) Get 8 test profiles with funds
+    // 1) Get test profiles
     const { data: profiles, error: pErr } = await sb
       .from("profiles")
       .select("user_id, wallet_balance")
@@ -68,9 +60,8 @@ serve(async (req) => {
       .gte("wallet_balance", ENTRY_FEE)
       .order("created_at", { ascending: true })
       .limit(8);
-
     if (pErr) return fail(`profiles: ${pErr.message}`);
-    if (!profiles || profiles.length < 3) return fail("Need >=3 test profiles with funds");
+    if (!profiles || profiles.length < 3) return fail("Need >=3 test profiles");
 
     // 2) Get available game
     const { data: game } = await sb
@@ -78,10 +69,9 @@ serve(async (req) => {
       .select("id")
       .limit(1)
       .single();
-      
     if (!game) return fail("No games found in database");
 
-    // 3) Create challenge first — so we always have a challengeId to return/log
+    // 3) Create challenge first
     const { data: chIns, error: chErr } = await sb
       .from("challenges")
       .insert([{ 
@@ -96,12 +86,11 @@ serve(async (req) => {
       }])
       .select("id")
       .single();
-
     if (chErr || !chIns?.id) return fail(`create challenge: ${chErr?.message || "no id returned"}`);
     const challengeId = chIns.id;
-    await logDiag(sb, challengeId, "challenge_created");
+    await log(sb, challengeId, "challenge_created");
 
-    // 4) Join each player atomically
+    // 4) Queue + escrow
     for (const prof of profiles) {
       const { error: jErr } = await sb.rpc("join_challenge_atomic", {
         p_challenge_id: challengeId,
@@ -109,13 +98,13 @@ serve(async (req) => {
         p_stake_amount: ENTRY_FEE,
       });
       if (jErr) {
-        await logDiag(sb, challengeId, "join_error", `${prof.user_id}: ${jErr.message}`);
+        await log(sb, challengeId, "join_error", `${prof.user_id}: ${jErr.message}`);
         console.error("Join error for", prof.user_id, jErr);
       }
     }
-    await logDiag(sb, challengeId, "players_joined");
+    await log(sb, challengeId, "players_joined");
 
-    // 5) Move to active (simulate match started)
+    // 5) Activate
     const { error: aErr } = await sb
       .from("challenges")
       .update({
@@ -125,26 +114,25 @@ serve(async (req) => {
       })
       .eq("id", challengeId);
     if (aErr) return fail(`activate challenge: ${aErr.message}`);
-    await logDiag(sb, challengeId, "challenge_active");
+    await log(sb, challengeId, "challenge_active");
 
-    // 6) Random crash branch with anti-cluster guard
-    const lastWasCrash = await crashedLastRun(sb);
-    const randomCrash = Math.random() < RANDOM_CRASH_RATE;
-    // crash only if random says so AND last run was NOT a crash
-    const crashed = !lastWasCrash && randomCrash;
+    // 6) Crash logic — no back-to-back crashes
+    const prevCrashed = await lastRunWasCrash(sb);
+    const randomCrash = Math.random() < CRASH_RATE;
+    const crashed = !prevCrashed && randomCrash;
+
     if (crashed) {
-      // Refund path
       const res = await fetch(`${URL}/functions/v1/handle-match-failure`, {
         method: "POST",
         headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({ matchId: challengeId, reason: "Simulated console crash" }),
       });
       const j = await res.json().catch(() => ({}));
-      await logDiag(sb, challengeId, "refunded", `handle_match_failure: ${res.status}`);
-      return ok({ ok: true, challengeId, crashed: true, refund: j });
+      await log(sb, challengeId, "refunded", `handle_match_failure: ${res.status}`);
+      return ok({ ok: true, challengeId, crashed: true, refundCount: Array.isArray(j?.refunded) ? j.refunded.length : j?.refunded ?? null });
     }
 
-    // 7) Results → Top 3
+    // 7) Results
     const p1 = profiles[0].user_id, p2 = profiles[1].user_id, p3 = profiles[2].user_id;
     const { error: rErr } = await sb.from("challenge_stats").insert([
       { challenge_id: challengeId, user_id: p1, placement: 1, kills: 19 },
@@ -152,7 +140,7 @@ serve(async (req) => {
       { challenge_id: challengeId, user_id: p3, placement: 3, kills: 9 },
     ]);
     if (rErr) return fail(`write results: ${rErr.message}`);
-    await logDiag(sb, challengeId, "results_written");
+    await log(sb, challengeId, "results_written");
 
     // 8) Payouts
     const payoutRes = await fetch(`${URL}/functions/v1/process-match-payouts`, {
@@ -160,20 +148,20 @@ serve(async (req) => {
       headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ matchId: challengeId }),
     });
-
     const payoutJson = await payoutRes.json().catch(() => ({}));
     if (!payoutRes.ok) {
-      await logDiag(sb, challengeId, "payout_error", JSON.stringify(payoutJson).slice(0, 200));
-      // as a safety net, refund instead of leaving it hanging
+      await log(sb, challengeId, "payout_error", JSON.stringify(payoutJson).slice(0, 200));
+      // fail-safe refund instead of leaving challenge stuck
       await fetch(`${URL}/functions/v1/handle-match-failure`, {
         method: "POST",
         headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({ matchId: challengeId, reason: "Payout failed → auto-refund" }),
       });
+      await log(sb, challengeId, "refunded", "payout_failed");
       return ok({ ok: true, challengeId, crashed: true, note: "payout failed → refunded" });
     }
 
-    await logDiag(sb, challengeId, "payout_done");
+    await log(sb, challengeId, "payout_done");
     return ok({ ok: true, challengeId, crashed: false, payout: payoutJson });
   } catch (e) {
     console.error("Error in sim runner:", e);
