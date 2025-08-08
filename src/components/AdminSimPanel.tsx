@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type Log = { ts: string; msg: string | React.ReactNode };
+type Log = { ts: string; msg: string };
 
 export default function AdminSimPanel() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -12,7 +12,7 @@ export default function AdminSimPanel() {
   const tickRef = useRef<number | null>(null);
   const intervalMs = 8 * 60 * 1000; // 8 minutes
 
-  const push = (msg: string | React.ReactNode) =>
+  const push = (msg: string) =>
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg }, ...l].slice(0, 300));
 
   // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
@@ -62,18 +62,7 @@ export default function AdminSimPanel() {
         // Create clickable link if we have an ID
         if (id !== "n/a") {
           push(
-            <span>
-              ✅ Completed: challenge=
-              <a 
-                href={`/games`} 
-                className="underline text-blue-300 hover:text-blue-200 ml-1" 
-                target="_blank" 
-                rel="noreferrer"
-              >
-                {shortId}
-              </a>
-              {" "}· crashed={String(data.crashed)}
-            </span>
+            `✅ Completed: challenge=<a href="/games" class="underline text-blue-300 hover:text-blue-200 ml-1" target="_blank" rel="noreferrer">${shortId}</a> · crashed=${String(data.crashed)}`
           );
         } else {
           push(`✅ Completed: challenge=${shortId} · crashed=${String(data.crashed)}`);
@@ -164,9 +153,10 @@ export default function AdminSimPanel() {
       <div className="bg-neutral-800 rounded p-3 max-h-72 overflow-auto text-sm">
         {logs.length === 0 ? <div className="text-neutral-400">No logs yet.</div> : null}
         {logs.map((l, i) => (
-          <div key={i}>
-            <span className="text-neutral-500">{l.ts}</span> — {l.msg}
-          </div>
+          <div
+            key={i}
+            dangerouslySetInnerHTML={{ __html: `<span class="text-neutral-500">${l.ts}</span> — ${l.msg}` }}
+          />
         ))}
       </div>
 
