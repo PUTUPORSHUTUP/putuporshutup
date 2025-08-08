@@ -1433,6 +1433,57 @@ export type Database = {
         }
         Relationships: []
       }
+      market_engine_errors: {
+        Row: {
+          created_at: string | null
+          environment: Json | null
+          error: string
+          id: number
+          stack: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          environment?: Json | null
+          error: string
+          id?: number
+          stack?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          environment?: Json | null
+          error?: string
+          id?: number
+          stack?: string | null
+        }
+        Relationships: []
+      }
+      market_events: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          event_type: string
+          id: number
+          match_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          event_type: string
+          id?: number
+          match_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          event_type?: string
+          id?: number
+          match_id?: string | null
+        }
+        Relationships: []
+      }
       match_notifications: {
         Row: {
           created_at: string
@@ -2087,6 +2138,7 @@ export type Database = {
           is_test_account: boolean | null
           is_vip: boolean | null
           is_vip_trial: boolean | null
+          last_used: string | null
           payoneer_email: string | null
           premium_expires_at: string | null
           total_losses: number | null
@@ -2121,6 +2173,7 @@ export type Database = {
           is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
+          last_used?: string | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
@@ -2155,6 +2208,7 @@ export type Database = {
           is_test_account?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
+          last_used?: string | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
           total_losses?: number | null
@@ -3861,6 +3915,14 @@ export type Database = {
       }
     }
     Functions: {
+      atomic_market_cycle: {
+        Args: {
+          min_players?: number
+          crash_rate?: number
+          force_no_crash?: boolean
+        }
+        Returns: Json
+      }
       bytea_to_text: {
         Args: { data: string }
         Returns: string
@@ -3897,6 +3959,10 @@ export type Database = {
       }
       generate_automated_tournaments: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      generate_challenge_results: {
+        Args: { challenge_id: string; user_ids: string[] }
         Returns: undefined
       }
       generate_secure_otp: {
@@ -4065,6 +4131,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_market_event: {
+        Args: { match_id: string; event_type: string; details?: Json }
+        Returns: undefined
+      }
       log_security_event: {
         Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
         Returns: undefined
@@ -4076,6 +4146,13 @@ export type Database = {
       mark_challenge_settled: {
         Args: { p_challenge_id: string }
         Returns: boolean
+      }
+      refund_all_challenge_players: {
+        Args: { challenge_id: string; reason: string }
+        Returns: {
+          user_id: string
+          refund_amount: number
+        }[]
       }
       safe_nextval: {
         Args: { sequence_name: string }
@@ -4119,6 +4196,10 @@ export type Database = {
           details: string
           severity: string
         }[]
+      }
+      settle_challenge_payouts: {
+        Args: { challenge_id: string }
+        Returns: undefined
       }
       setup_test_profiles: {
         Args: Record<PropertyKey, never>
