@@ -134,154 +134,102 @@ serve(async (req) => {
     await log(sb, challengeId, "challenge_active");
 
     // 6) Crash logic — improved handling with reasons
-    const prevCrashed = await lastRunWasCrash(sb);
-    const randomCrash = Math.random() < CRASH_RATE;
-    let crashed = !prevCrashed && randomCrash;
-    let crashReason: string | null = null;
-
-    // Hard override for testing
-    if (FORCE_NO_CRASH) {
-      crashed = false;
-    }
-
-    // When it *would* crash, record the reason
-    if (!FORCE_NO_CRASH && crashed) {
-      crashReason = prevCrashed ? "guard_blocked" : "random_crash";
-      const res = await fetch(`${URL}/functions/v1/handle_match_failure`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ matchId: challengeId, reason: "Simulated console crash" }),
+    const lastWasCrash = await lastRunWasCrash(sb);
+    const forceNoCrash = FORCE_NO_CRASH;
+    const shouldCrash = !forceNoCrash && (lastWasCrash ? false : Math.random() < CRASH_RATE);
+    
+    if (shouldCrash) {
+      const crashReasons = [
+        "server_timeout", "network_error", "host_disconnect", "anti_cheat_kick",
+        "lobby_full", "connection_lost", "game_update", "maintenance_mode"
+      ];
+      const reason = crashReasons[Math.floor(Math.random() * crashReasons.length)];
+      
+      await log(sb, challengeId, "crash_detected", `Simulated crash: ${reason}`);
+      
+      const { error: crashErr } = await sb.rpc("handle_match_failure", {
+        p_match_id: challengeId,
+        p_failure_reason: reason,
+        p_refund_type: "full"
       });
-      const j = await res.json().catch(() => ({}));
-      const refundCount = Array.isArray(j?.refunded) ? j.refunded.length
-                        : typeof j?.refunded === "number" ? j.refunded : null;
-
-      await log(sb, challengeId, "refunded", `reason=${crashReason} | http=${res.status} | refunds=${refundCount}`);
-      return ok({ ok: true, challengeId, crashed: true, crashReason, refundCount });
+      
+      if (crashErr) {
+        await log(sb, challengeId, "crash_handling_failed", crashErr.message);
+        return fail(`Crash handling failed: ${crashErr.message}`);
+      }
+      
+      await log(sb, challengeId, "refunded");
+      console.log(`Crash simulated (${reason}), participants refunded`);
+      return ok({ 
+        challengeId, 
+        outcome: "crashed", 
+        reason,
+        message: `Challenge crashed due to ${reason}, all participants refunded`
+      });
     }
 
-    // 7) Results
-    const p1 = profiles[0].user_id, p2 = profiles[1].user_id, p3 = profiles[2].user_id;
-    const { error: rErr } = await sb.from("challenge_stats").insert([
-      { challenge_id: challengeId, user_id: p1, placement: 1, kills: 19 },
-      { challenge_id: challengeId, user_id: p2, placement: 2, kills: 14 },
-      { challenge_id: challengeId, user_id: p3, placement: 3, kills: 9 },
-    ]);
-    if (rErr) return fail(`write results: ${rErr.message}`);
+    // 7) Record results
+    const results = [
+      { user_id: profiles[0].user_id, placement: 1, kills: 15, deaths: 3 },
+      { user_id: profiles[1].user_id, placement: 2, kills: 12, deaths: 5 },
+      { user_id: profiles[2].user_id, placement: 3, kills: 8, deaths: 8 }
+    ];
+
+    for (const result of results) {
+      await sb.from("challenge_stats").insert({
+        challenge_id: challengeId,
+        user_id: result.user_id,
+        placement: result.placement,
+        kills: result.kills,
+        deaths: result.deaths,
+        verified: true
+      });
+    }
     await log(sb, challengeId, "results_written");
 
-    // 8) Payouts with enhanced diagnostics
-    console.log("💰 Processing payouts with enhanced diagnostics...");
-    const payoutResult = await callPayoutWithDiagnostics(sb, challengeId);
-    console.log("Enhanced payout result:", payoutResult);
-    
-    if (!payoutResult.success) {
-      crashReason = "payout_failed";
-      await log(sb, challengeId, 'payout_failed', JSON.stringify({
-        error: payoutResult.error,
-        status: payoutResult.status,
-        reason: 'authorization_or_network_error'
-      }));
-      
-      // Call failure handler
-      await fetch(`${URL}/functions/v1/handle_match_failure`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ matchId: challengeId, reason: `Payout failed: ${payoutResult.error}` }),
+    // 8) DIRECT PAYOUT CALL - Skip admin_sim_proxy entirely
+    console.log("Calling payout processor directly...");
+    try {
+      const payoutResponse = await fetch(`${URL}/functions/v1/process-match-payouts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${KEY}`,
+          'Content-Type': 'application/json',
+          'X-Challenge-Id': challengeId,
+          'X-Caller': 'sim_runner_direct'
+        },
+        body: JSON.stringify({ matchId: challengeId })
       });
-      await log(sb, challengeId, "refunded", `reason=${crashReason}`);
-      return ok({ ok: true, challengeId, crashed: true, crashReason, error_details: payoutResult.error });
-    }
-    
-    const payoutJson = payoutResult.data;
 
-    await log(sb, challengeId, "payout_done");
-    return ok({ ok: true, challengeId, crashed: false, crashReason: null, payout: payoutJson });
+      const payoutData = await payoutResponse.text();
+      
+      if (!payoutResponse.ok) {
+        await log(sb, challengeId, "payout_error", `HTTP ${payoutResponse.status}: ${payoutData}`);
+        console.error("Payout failed:", payoutData);
+        return fail(`Payout failed: ${payoutData}`);
+      }
+
+      await log(sb, challengeId, "payout_completed");
+      console.log("Payout completed successfully");
+      
+    } catch (payoutErr) {
+      await log(sb, challengeId, "payout_error", `Fetch error: ${payoutErr.message}`);
+      console.error("Payout error:", payoutErr);
+      return fail(`Payout error: ${payoutErr.message}`);
+    }
+
+    // 9) Final result
+    await log(sb, challengeId, "simulation_complete");
+    return ok({ 
+      ok: true, 
+      challengeId, 
+      outcome: "completed",
+      participants: profiles.length,
+      winner: profiles[0].user_id,
+      message: "Simulation completed successfully"
+    });
   } catch (e) {
     console.error("Error in sim runner:", e);
     await log(sb, null, "simulation_error", `Error: ${String(e)}`);
     return fail(`sim_runner: ${String(e)}`);
-  }
 });
-
-// ENHANCED PAYOUT FUNCTION with comprehensive diagnostics
-async function callPayoutWithDiagnostics(sb: SB, challengeId: string) {
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const functionUrl = `${supabaseUrl}/functions/v1/process-match-payouts`;
-  
-  // Enhanced diagnostic payload
-  const diagPayload = {
-    matchId: challengeId, // Note: using matchId for consistency
-    caller: "sim_runner",
-    timestamp: new Date().toISOString(),
-    diagnostics: {
-      hasServiceKey: !!serviceRoleKey,
-      hasUrl: !!supabaseUrl,
-      keyLength: serviceRoleKey?.length || 0
-    }
-  };
-
-  console.log("🔍 Enhanced payout diagnostics:", {
-    url: functionUrl,
-    challengeId,
-    payload: diagPayload,
-    keyPreview: serviceRoleKey?.substring(0, 20) + "...",
-    environment: {
-      SUPABASE_URL: !!supabaseUrl,
-      SERVICE_ROLE_KEY: !!serviceRoleKey
-    }
-  });
-
-  try {
-    // Method 1: Direct fetch with full diagnostics
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${serviceRoleKey}`,
-        'Content-Type': 'application/json',
-        'X-Diag-Mode': 'full',
-        'X-Caller': 'sim_runner',
-        'X-Challenge-Id': challengeId
-      },
-      body: JSON.stringify(diagPayload)
-    });
-    
-    const responseText = await response.text();
-    
-    console.log("📊 Payout response diagnostics:", {
-      status: response.status,
-      ok: response.ok,
-      body: responseText.substring(0, 500),
-      headers: Object.fromEntries(response.headers.entries())
-    });
-
-    if (response.ok) {
-      await log(sb, challengeId, "payout_success", `HTTP ${response.status}`);
-      return { 
-        data: responseText ? JSON.parse(responseText) : {},
-        success: true 
-      };
-    }
-    
-    // Log detailed error for 421 cases
-    await log(sb, challengeId, 'payout_error_421', `Status: ${response.status} | Body: ${responseText} | SentAuth: Bearer ${serviceRoleKey?.substring(0, 10)}...`);
-    
-    return {
-      error: responseText || `HTTP ${response.status}`,
-      status: response.status,
-      success: false
-    };
-
-  } catch (fetchError) {
-    console.error("❌ Fetch error:", fetchError);
-    
-    await log(sb, challengeId, 'payout_fetch_error', `Error: ${fetchError.message} | Stack: ${fetchError.stack}`);
-    
-    return {
-      error: fetchError.message,
-      status: 500,
-      success: false
-    };
-  }
-}
