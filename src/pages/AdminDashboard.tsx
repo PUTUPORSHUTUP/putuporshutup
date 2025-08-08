@@ -36,6 +36,7 @@ import { AutomatedGameOptimization } from '@/components/admin/AutomatedGameOptim
 import { GameManagement } from '@/components/admin/GameManagement';
 import AdminSimPanel from '@/components/AdminSimPanel';
 import { ProjectExportModal } from '@/components/admin/ProjectExportModal';
+import { ApiDiagnosticsPanel } from '@/components/admin/ApiDiagnosticsPanel';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
 import ComprehensiveSystemTest from '@/components/admin/ComprehensiveSystemTest';
@@ -618,7 +619,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-12 max-w-8xl gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-13 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
             <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
@@ -630,7 +631,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">Xbox Live</TabsTrigger>
             <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
             <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
-            
+            <TabsTrigger value="diagnostics" className="text-xs sm:text-sm">Diagnostics</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
           </TabsList>
 
@@ -1195,6 +1196,11 @@ const AdminDashboard = () => {
               {/* Original Poster Management */}
               <PosterManagement />
             </div>
+          </TabsContent>
+
+          {/* API Diagnostics Tab */}
+          <TabsContent value="diagnostics" className="space-y-6">
+            <ApiDiagnosticsPanel />
           </TabsContent>
 
         </Tabs>

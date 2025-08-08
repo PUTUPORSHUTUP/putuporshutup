@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { apiClient } from "@/lib/apiClient";
 
 type Log = { ts: string; msg: string };
 type PayoutDiagnostic = {
@@ -34,37 +34,16 @@ export default function AdminSimPanel() {
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...l].slice(0, 300));
   };
 
-  // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
+  // Use the new secure apiClient for all sim runner calls
   const invokeSimRunner = async (payload: any) => {
-    // Preferred: SDK invoke (handles auth/CORS) - Use admin proxy for proper authorization
-    const { data, error } = await supabase.functions.invoke("admin_sim_proxy", { body: payload });
-
-    if (!error && data) return data;
-
-    // Fallback: raw fetch (log HTML if received)
-    try {
-      const url = `https://mwuakdaogbywysjplrmx.supabase.co/functions/v1/admin_sim_proxy`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Optional: pass anon key if your function checks it
-          apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13dWFrZGFvZ2J5d3lzanBscm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzc1MjMsImV4cCI6MjA2ODYxMzUyM30.Ocg97rg7G0Zkuf12DW5udFRwmpK1rL2EKthgvdVStpQ",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error(
-          `Bad JSON from server (status ${res.status}): ${text.slice(0, 120)}…`
-        );
-      }
-    } catch (e: any) {
-      throw new Error(error?.message || e?.message || "Unknown invoke error");
+    const response = await apiClient.adminCall('sim_runner', payload);
+    
+    if (response.error) {
+      console.error("Sim runner error:", response.error);
+      return { ok: false, message: response.error, status: response.status };
     }
+    
+    return response.data || { ok: true };
   };
 
   const runOnce = async () => {
@@ -132,8 +111,8 @@ export default function AdminSimPanel() {
   const loadDiagnostics = async () => {
     setLoadingDiag(true);
     try {
-      const { data, error } = await supabase.from("payout_guard").select("*").limit(10);
-      if (error) throw error;
+      const { data, error } = await apiClient.call("auth_diagnostics", { method: "GET" });
+      if (error) throw new Error(error);
       setDiagnostics(data || []);
     } catch (e: any) {
       push(`❌ Diagnostics error: ${e.message}`);
