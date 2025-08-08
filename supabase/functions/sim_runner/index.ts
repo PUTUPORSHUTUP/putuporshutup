@@ -154,16 +154,17 @@ serve(async (req) => {
     if (rErr) return fail(`write results: ${rErr.message}`);
     await log(sb, challengeId, "results_written");
 
-    // 8) Payouts
-    const payoutRes = await fetch(`${URL}/functions/v1/process-match-payouts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ matchId: challengeId }),
+    // 8) Payouts - Use supabase.functions.invoke with proper auth
+    const payoutRes = await sb.functions.invoke('process-match-payouts', {
+      body: { matchId: challengeId },
+      headers: {
+        'Authorization': `Bearer ${KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
-    const payoutJson = await payoutRes.json().catch(() => ({}));
-    if (!payoutRes.ok) {
+    if (payoutRes.error) {
       crashReason = "payout_failed";
-      await log(sb, challengeId, "payout_error", JSON.stringify(payoutJson).slice(0, 200));
+      await log(sb, challengeId, "payout_error", JSON.stringify(payoutRes.error).slice(0, 200));
       await fetch(`${URL}/functions/v1/handle_match_failure`, {
         method: "POST",
         headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
@@ -172,6 +173,7 @@ serve(async (req) => {
       await log(sb, challengeId, "refunded", `reason=${crashReason}`);
       return ok({ ok: true, challengeId, crashed: true, crashReason, refundCount: null });
     }
+    const payoutJson = payoutRes.data;
 
     await log(sb, challengeId, "payout_done");
     return ok({ ok: true, challengeId, crashed: false, crashReason: null, payout: payoutJson });

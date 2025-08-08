@@ -13,6 +13,20 @@ serve(async (req) => {
   }
 
   try {
+    // CRITICAL AUTH VALIDATION - Prevent 421 errors
+    const authHeader = req.headers.get('Authorization');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader || authHeader !== `Bearer ${serviceRoleKey}`) {
+      return new Response(JSON.stringify({
+        code: 421,
+        message: "Missing or invalid authorization header"
+      }), { 
+        status: 421,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const { matchId } = await req.json();
     if (!matchId) {
       return new Response(JSON.stringify({ error: "matchId required" }), { 
@@ -22,7 +36,6 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     
     const supabase = createClient(supabaseUrl, serviceRoleKey, { 
       auth: { persistSession: false } 
@@ -33,7 +46,7 @@ serve(async (req) => {
       .from("payout_automation_log")
       .select("id")
       .eq("entity_id", matchId)
-      .eq("entity_type", "match")
+      .eq("entity_type", "challenge")
       .eq("event_type", "payout")
       .eq("status", "processed")
       .maybeSingle();
@@ -130,7 +143,7 @@ serve(async (req) => {
       await supabase.from("payout_automation_log").insert({
         event_type: "payout",
         entity_id: matchId,
-        entity_type: "match",
+        entity_type: "challenge",
         payout_amount: payout.amount,
         winner_id: payout.user_id,
         status: "processed",
