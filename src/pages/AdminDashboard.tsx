@@ -630,8 +630,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">Xbox Live</TabsTrigger>
             <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
             <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
+            <TabsTrigger value="suggestions" className="text-xs sm:text-sm">Simulation</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
-            <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1050,95 +1050,9 @@ const AdminDashboard = () => {
             <DisputeManagement />
           </TabsContent>
 
-          {/* Suggestions Tab */}
+          {/* Simulation Tab */}
           <TabsContent value="suggestions" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5" />
-                  Game Suggestions Management
-                  <Badge variant="secondary">{gameSuggestions.filter(s => s.status === 'pending').length} pending</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {gameSuggestions.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No game suggestions found</p>
-                    </div>
-                  ) : (
-                    gameSuggestions.map((suggestion) => (
-                      <div key={suggestion.id} className="border rounded-lg p-4 space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-medium">{suggestion.display_name}</h4>
-                              <Badge 
-                                variant="outline" 
-                                className={getStatusColor(suggestion.status)}
-                              >
-                                {getStatusIcon(suggestion.status)}
-                                <span className="ml-1">{suggestion.status}</span>
-                              </Badge>
-                            </div>
-                            
-                            <div className="text-sm text-muted-foreground space-y-1">
-                              <p><strong>Game Name:</strong> {suggestion.game_name}</p>
-                              {suggestion.description && (
-                                <p><strong>Description:</strong> {suggestion.description}</p>
-                              )}
-                              <p><strong>Platforms:</strong> {suggestion.platform.join(', ')}</p>
-                              <p><strong>Suggested by:</strong> {suggestion.profiles?.display_name || suggestion.profiles?.username || 'Unknown User'}</p>
-                              <p><strong>Date:</strong> {new Date(suggestion.created_at).toLocaleDateString()}</p>
-                            </div>
-
-                            {suggestion.image_url && (
-                              <div className="mt-2">
-                                <img 
-                                  src={suggestion.image_url} 
-                                  alt={suggestion.display_name}
-                                  className="w-20 h-20 object-cover rounded border"
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {suggestion.status === 'pending' && (
-                            <div className="flex gap-2 ml-4">
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                className="text-green-600 border-green-600 hover:bg-green-50"
-                                onClick={() => handleSuggestion(suggestion.id, 'approved')}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                className="text-red-600 border-red-600 hover:bg-red-50"
-                                onClick={() => handleSuggestion(suggestion.id, 'rejected')}
-                              >
-                                <XCircle className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-
-                        {suggestion.reviewed_at && (
-                          <div className="pt-2 border-t text-xs text-muted-foreground">
-                            Reviewed on {new Date(suggestion.reviewed_at).toLocaleDateString()}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <AdminSimPanel />
           </TabsContent>
 
           {/* Games Tab */}
