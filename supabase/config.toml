@@ -13,6 +13,9 @@ verify_jwt = true
 [functions.instant-market-engine]
 verify_jwt = true
 
+[functions.atomic-market-engine]
+verify_jwt = true
+
 [functions.tilled-webhook]
 verify_jwt = false
 
