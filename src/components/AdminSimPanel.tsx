@@ -34,12 +34,12 @@ export default function AdminSimPanel() {
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...l].slice(0, 300));
   };
 
-  // Use the new Atomic Market Engine
+  // Use the new Database Market Engine
   const invokeInstantMarket = async (payload: any) => {
-    const response = await apiClient.adminCall('atomic_market_engine', payload);
+    const response = await apiClient.adminCall('database_market_engine', payload);
     
     if (response.error) {
-      console.error("Atomic Market Engine error:", response.error);
+      console.error("Database Market Engine error:", response.error);
       return { ok: false, message: response.error, status: response.status };
     }
     
@@ -49,7 +49,7 @@ export default function AdminSimPanel() {
   const runOnce = async () => {
     if (busy) return;
     setBusy(true);
-    push("🚀 Starting Atomic Market Engine…");
+    push("🚀 Starting Database Market Engine…");
 
     try {
       const data = await invokeInstantMarket({ manual: true });
@@ -62,14 +62,15 @@ export default function AdminSimPanel() {
         const payoutCount = data.payouts?.processed || 0;
 
         push(
-          `✅ ATOMIC MARKET SUCCESS: <span class="text-green-400">Challenge ${id.slice(0, 8)}...</span> · ` +
+          `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${id.slice(0, 8)}...</span> · ` +
           `<span class="text-blue-300">${participants}p</span> · ` +
           `<span class="text-yellow-400">$${totalPot}</span> · ` +
           `<span class="text-purple-400">${payoutCount} payouts</span> · ` +
-          `<span class="text-orange-400">${Math.round(timeMs/1000)}s</span>`
+          `<span class="text-orange-400">${Math.round(timeMs/1000)}s</span>` +
+          `${data.crashed ? ' · <span class="text-red-400">CRASHED (refunded)</span>' : ''}`
         );
       } else {
-        push(`❌ Atomic Market Failed: ${data.error || 'Unknown error'}`);
+        push(`❌ Database Market Failed: ${data.error || 'Unknown error'}`);
       }
     } catch (e: any) {
       push(`❌ Connection Error: ${e?.message || String(e)}`);
@@ -127,14 +128,14 @@ export default function AdminSimPanel() {
 
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded p-4 space-y-6 text-white">
-      <h3 className="font-bold text-xl">⚡ Atomic Market Engine</h3>
+      <h3 className="font-bold text-xl">🎯 Database Market Engine</h3>
       <p className="text-sm text-neutral-300">
-        Mode: <b>Atomic</b> • Payout: <b>Top 3 (60/30/10)</b> • Platform fee: <b>10%</b> • Target: <b>&lt;30s</b>
+        Mode: <b>Database-First</b> • Payout: <b>Top 3 (60/30/10)</b> • Platform fee: <b>10%</b> • Target: <b>&lt;15s</b>
       </p>
 
       {/* Engine Status */}
       <div className="bg-neutral-800 border border-neutral-700 rounded p-3 space-y-2">
-        <h4 className="font-semibold text-green-400">⚡ Atomic Market Status</h4>
+        <h4 className="font-semibold text-green-400">🎯 Database Market Status</h4>
         <div className="text-sm space-y-1">
           <div>
             <span className="text-neutral-400">Challenge Creation:</span> 
@@ -150,7 +151,7 @@ export default function AdminSimPanel() {
           </div>
         </div>
         <div className="text-xs text-neutral-400">
-          Single atomic transaction with secure database functions for maximum reliability
+          Single PostgreSQL function with ACID compliance and automatic rollback
         </div>
       </div>
 
@@ -190,7 +191,7 @@ export default function AdminSimPanel() {
           disabled={busy}
           className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
         >
-          {busy ? "⚡ Processing…" : "⚡ Run Atomic Market"}
+          {busy ? "🎯 Processing…" : "🎯 Run Database Market"}
         </button>
 
         {!running ? (
@@ -228,7 +229,7 @@ export default function AdminSimPanel() {
       </div>
 
       <p className="text-xs text-neutral-400">
-        Atomic Market Engine uses secure database transactions for complete atomicity. Target: Complete market cycle in under 30 seconds.
+        Database Market Engine: Single PostgreSQL function with full ACID compliance. Target: Complete market cycle in under 15 seconds.
       </p>
     </div>
   );
