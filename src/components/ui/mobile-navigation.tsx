@@ -146,15 +146,26 @@ export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
               </Link>
 
               {profile?.is_admin && (
-                <Link to="/admin" onClick={handleNavClick}>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start h-12 text-left hover:bg-muted/50"
-                  >
-                    <Shield className="w-5 h-5 mr-3 text-red-500" />
-                    <span className="font-medium">Admin Dashboard</span>
-                  </Button>
-                </Link>
+                <>
+                  <Link to="/admin" onClick={handleNavClick}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start h-12 text-left hover:bg-muted/50"
+                    >
+                      <Shield className="w-5 h-5 mr-3 text-red-500" />
+                      <span className="font-medium">Admin Dashboard</span>
+                    </Button>
+                  </Link>
+                  <Link to="/admin?tab=simulation" onClick={handleNavClick}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start h-12 text-left hover:bg-muted/50"
+                    >
+                      🧪
+                      <span className="font-medium ml-3">Simulation</span>
+                    </Button>
+                  </Link>
+                </>
               )}
 
               <div className="my-4 border-t border-border" />
