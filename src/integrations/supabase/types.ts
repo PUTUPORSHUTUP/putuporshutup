@@ -3953,6 +3953,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      db_market_payout_safe: {
+        Args: { p_match_id: string; p_total_pot_cents: number }
+        Returns: number
+      }
       detect_suspicious_stats: {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
