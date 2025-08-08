@@ -24,19 +24,44 @@ serve(async (req) => {
     if (!token) return cors(new Response(JSON.stringify({ ok:false, code:401, message:"Missing access token" }), { status: 401 }));
 
     // 2) Verify user + admin flag
-    const sbAnon = createClient(URL, SRK, { auth: { persistSession: false } });
-    const { data: userResp, error: uErr } = await sbAnon.auth.getUser(token);
+    const sb = createClient(URL, SRK, { auth: { persistSession: false } });
+    const { data: userResp, error: uErr } = await sb.auth.getUser(token);
     if (uErr || !userResp?.user) return cors(new Response(JSON.stringify({ ok:false, code:401, message:"Invalid token" }), { status: 401 }));
 
     const uid = userResp.user.id;
-    const { data: prof, error: pErr } = await sbAnon
-      .from("profiles")
-      .select("id,is_admin")
-      .eq("id", uid)
-      .single();
 
-    if (pErr)  return cors(new Response(JSON.stringify({ ok:false, code:500, message:`Profile check failed: ${pErr.message}` }), { status: 500 }));
-    if (!prof?.is_admin) return cors(new Response(JSON.stringify({ ok:false, code:403, message:"Admin only" }), { status: 403 }));
+    // fetch by id, but don't explode if zero/many
+    let { data: prof, error: pErr } = await sb
+      .from("profiles")
+      .select("id,is_admin,created_at")
+      .eq("id", uid)
+      .order("created_at", { ascending: true })
+      .limit(2);    // if there are dupes, we'll see 2
+
+    if (pErr) {
+      return cors(new Response(JSON.stringify({ ok:false, code:500, message:`Profile query failed: ${pErr.message}` }), { status: 500 }));
+    }
+
+    if (!prof || prof.length === 0) {
+      // create a default profile for this user
+      const { error: cErr } = await sb.from("profiles").insert({
+        id: uid,
+        is_admin: false,
+        wallet_balance: 0,
+      });
+      if (cErr) {
+        return cors(new Response(JSON.stringify({ ok:false, code:500, message:`Auto-create profile failed: ${cErr.message}` }), { status: 500 }));
+      }
+      prof = [{ id: uid, is_admin: false, created_at: new Date().toISOString() } as any];
+    }
+
+    // if somehow dupes exist, pick the first one
+    const profile = Array.isArray(prof) ? prof[0] : prof;
+
+    // gate by admin
+    if (!profile?.is_admin) {
+      return cors(new Response(JSON.stringify({ ok:false, code:403, message:"Admin only" }), { status: 403 }));
+    }
 
     // 3) Forward to sim_runner with Service Role header
     const body = await req.text();
