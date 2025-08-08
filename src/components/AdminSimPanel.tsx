@@ -1,15 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 type Log = { ts: string; msg: string };
-
-const call = async (path: string, body?: any) => {
-  const res = await fetch(`/functions/v1/${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  return res.json();
-};
 
 export default function AdminSimPanel() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -17,10 +9,44 @@ export default function AdminSimPanel() {
   const [busy, setBusy] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const timerRef = useRef<number | null>(null);
+  const tickRef = useRef<number | null>(null);
   const intervalMs = 8 * 60 * 1000; // 8 minutes
 
   const push = (msg: string) =>
-    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg }, ...l].slice(0, 200));
+    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg }, ...l].slice(0, 300));
+
+  // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
+  const invokeSimRunner = async (payload: any) => {
+    // Preferred: SDK invoke (handles auth/CORS)
+    const { data, error } = await supabase.functions.invoke("sim_runner", { body: payload });
+
+    if (!error && data) return data;
+
+    // Fallback: raw fetch (log HTML if received)
+    try {
+      const url = `https://mwuakdaogbywysjplrmx.supabase.co/functions/v1/sim_runner`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Optional: pass anon key if your function checks it
+          apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13dWFrZGFvZ2J5d3lzanBscm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzc1MjMsImV4cCI6MjA2ODYxMzUyM30.Ocg97rg7G0Zkuf12DW5udFRwmpK1rL2EKthgvdVStpQ",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new Error(
+          `Bad JSON from server (status ${res.status}): ${text.slice(0, 120)}…`
+        );
+      }
+    } catch (e: any) {
+      throw new Error(error?.message || e?.message || "Unknown invoke error");
+    }
+  };
 
   const runOnce = async () => {
     if (busy) return;
@@ -28,12 +54,15 @@ export default function AdminSimPanel() {
     push("▶ Starting simulation run…");
 
     try {
-      // kick the sim runner (Multiplayer, TOP_3, 10% fee—already set in function)
-      const data = await call("sim_runner", { manual: true });
+      const data = await invokeSimRunner({ manual: true });
       if (data?.ok) {
-        push(`✅ Completed: match=${data.challengeId ?? "n/a"} crashed=${String(data.crashed)}`);
+        push(
+          `✅ Completed: match=${data.matchId ?? "n/a"} crashed=${String(
+            data.crashed
+          )}`
+        );
       } else {
-        push(`❌ Error: ${JSON.stringify(data)}`);
+        push(`❌ Server responded but not OK: ${JSON.stringify(data)}`);
       }
     } catch (e: any) {
       push(`❌ Exception: ${e?.message || String(e)}`);
@@ -42,32 +71,21 @@ export default function AdminSimPanel() {
     }
   };
 
-  // Start/stop auto loop
   const startLoop = () => {
     if (timerRef.current) return;
     setRunning(true);
     setCountdown(intervalMs / 1000);
-    // fire immediately once
-    runOnce();
+    runOnce(); // fire immediately
 
-    // tick countdown every second
-    const tick = window.setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 1) return Math.floor(intervalMs / 1000);
-        return c - 1;
-      });
+    // countdown
+    tickRef.current = window.setInterval(() => {
+      setCountdown((c) => (c <= 1 ? Math.floor(intervalMs / 1000) : c - 1));
     }, 1000) as unknown as number;
 
-    // schedule run every 8 minutes
-    const id = window.setInterval(() => {
+    // schedule run
+    timerRef.current = window.setInterval(() => {
       runOnce();
     }, intervalMs) as unknown as number;
-
-    // stash one id; we'll clear both on stop
-    timerRef.current = id;
-
-    // store the tick id on window to clear later (simple)
-    (window as any).__simTick = tick;
   };
 
   const stopLoop = () => {
@@ -76,18 +94,15 @@ export default function AdminSimPanel() {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    if ((window as any).__simTick) {
-      window.clearInterval((window as any).__simTick);
-      (window as any).__simTick = null;
+    if (tickRef.current) {
+      window.clearInterval(tickRef.current);
+      tickRef.current = null;
     }
     setCountdown(0);
     push("⏹ Auto-run stopped.");
   };
 
-  useEffect(() => {
-    return () => stopLoop(); // cleanup on unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => () => stopLoop(), []);
 
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded p-4 space-y-4 text-white">
@@ -139,7 +154,7 @@ export default function AdminSimPanel() {
       </div>
 
       <p className="text-xs text-neutral-400">
-        Heads-up: client auto-run works only while this page is open. For true background runs, use the server cron below.
+        If you still see HTML errors, the function URL or deployment is wrong. Confirm function name <code>sim_runner</code> is deployed.
       </p>
     </div>
   );
