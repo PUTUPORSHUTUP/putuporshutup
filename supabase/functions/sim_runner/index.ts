@@ -232,4 +232,5 @@ serve(async (req) => {
     console.error("Error in sim runner:", e);
     await log(sb, null, "simulation_error", `Error: ${String(e)}`);
     return fail(`sim_runner: ${String(e)}`);
+  }
 });
