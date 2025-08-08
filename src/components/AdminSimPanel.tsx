@@ -12,8 +12,16 @@ export default function AdminSimPanel() {
   const tickRef = useRef<number | null>(null);
   const intervalMs = 8 * 60 * 1000; // 8 minutes
 
-  const push = (msg: string) =>
-    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg }, ...l].slice(0, 300));
+  const push = (msg: any) => {
+    const str =
+      typeof msg === "string"
+        ? msg
+        : (() => {
+            try { return JSON.stringify(msg); } catch { return String(msg); }
+          })();
+
+    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...l].slice(0, 300));
+  };
 
   // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
   const invokeSimRunner = async (payload: any) => {
@@ -56,22 +64,19 @@ export default function AdminSimPanel() {
     try {
       const data = await invokeSimRunner({ manual: true });
       if (data?.ok) {
-        const id = data.challengeId ?? data.matchId ?? "n/a";
-        const shortId = id !== "n/a" ? id.slice(0, 8) + "..." : "n/a";
-        
-        // Create clickable link if we have an ID
-        if (id !== "n/a") {
-          push(
-            `✅ Completed: challenge=<a href="/games" class="underline text-blue-300 hover:text-blue-200 ml-1" target="_blank" rel="noreferrer">${shortId}</a> · crashed=${String(data.crashed)}`
-          );
-        } else {
-          push(`✅ Completed: challenge=${shortId} · crashed=${String(data.crashed)}`);
-        }
+        const id = data.matchId ?? data.challengeId ?? "n/a";
+        const link = id !== "n/a" ? `/admin/matches/${id}` : null;
+        push(
+          link
+            ? `✅ Completed: match= <a href="${link}" class="underline text-blue-300" target="_blank" rel="noreferrer">${id}</a> · crashed=${String(data.crashed)}`
+            : `✅ Completed: match=${id} · crashed=${String(data.crashed)}`
+        );
       } else {
+        // show full payload instead of [object Object]
         push(`❌ Server responded but not OK: ${JSON.stringify(data)}`);
       }
     } catch (e: any) {
-      push(`❌ Exception: ${e?.message || String(e)}`);
+      push({ error: e?.message || String(e) });  // no [object Object]
     } finally {
       setBusy(false);
     }
