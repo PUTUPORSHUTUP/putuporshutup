@@ -53,16 +53,32 @@ serve(async (req) => {
   const sb = createClient(URL, KEY, { auth: { persistSession: false } });
 
   try {
-    // 1) Get test profiles
-    const { data: profiles, error: pErr } = await sb
-      .from("profiles")
-      .select("user_id, wallet_balance")
-      .eq("is_test_account", true)
-      .gte("wallet_balance", ENTRY_FEE)
-      .order("created_at", { ascending: true })
-      .limit(8);
-    if (pErr) return fail(`profiles: ${pErr.message}`);
-    if (!profiles || profiles.length < 3) return fail("Need >=3 test profiles");
+    // 1) Get available test users using the robust function
+    const { data: testUsers, error: testErr } = await sb.rpc("get_available_test_users", {
+      min_balance: ENTRY_FEE,
+      max_users: 8
+    });
+    
+    if (testErr) {
+      await log(sb, null, "test_user_error", `Failed to get test users: ${testErr.message}`);
+      return fail(`get test users: ${testErr.message}`);
+    }
+    
+    if (!testUsers || testUsers.length < 3) {
+      await log(sb, null, "insufficient_test_users", `Only found ${testUsers?.length || 0} test users, need at least 3`);
+      
+      // Log detailed error information
+      const { data: allProfiles } = await sb.from("profiles").select("id, user_id, wallet_balance, is_test_account").limit(20);
+      const testAccounts = allProfiles?.filter(p => p.is_test_account) || [];
+      const withBalance = testAccounts.filter(p => (p.wallet_balance || 0) >= ENTRY_FEE);
+      
+      await log(sb, null, "test_user_diagnostics", 
+        `Total profiles: ${allProfiles?.length || 0}, Test accounts: ${testAccounts.length}, With sufficient balance: ${withBalance.length}`);
+      
+      return fail(`Insufficient test users: found ${testUsers?.length || 0}, need at least 3. Check test account setup.`);
+    }
+    
+    const profiles = testUsers;
 
     // 2) Get available game
     const { data: game } = await sb
