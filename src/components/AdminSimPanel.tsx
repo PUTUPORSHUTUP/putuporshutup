@@ -66,10 +66,11 @@ export default function AdminSimPanel() {
       if (data?.ok) {
         const id = data.matchId ?? data.challengeId ?? "n/a";
         const link = id !== "n/a" ? `/admin/matches/${id}` : null;
+        const badge = data.crashBlocked ? ' <span class="px-2 py-0.5 ml-1 rounded bg-amber-600/30 text-amber-300 text-xs align-middle">CRASH BLOCKED</span>' : '';
         push(
           link
-            ? `✅ Completed: match= <a href="${link}" class="underline text-blue-300" target="_blank" rel="noreferrer">${id}</a> · crashed=${String(data.crashed)}`
-            : `✅ Completed: match=${id} · crashed=${String(data.crashed)}`
+            ? `✅ Completed: match= <a href="${link}" class="underline text-blue-300" target="_blank" rel="noreferrer">${id}</a> · crashed=${String(data.crashed)}${badge}`
+            : `✅ Completed: match=${id} · crashed=${String(data.crashed)}${badge}`
         );
       } else {
         // show full payload instead of [object Object]
