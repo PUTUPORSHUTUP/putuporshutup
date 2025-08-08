@@ -1660,6 +1660,45 @@ export type Database = {
           },
         ]
       }
+      match_results: {
+        Row: {
+          assists: number | null
+          created_at: string | null
+          damage_dealt: number | null
+          deaths: number | null
+          id: string
+          kills: number | null
+          match_id: string
+          placement: number
+          player_id: string
+          score: number | null
+        }
+        Insert: {
+          assists?: number | null
+          created_at?: string | null
+          damage_dealt?: number | null
+          deaths?: number | null
+          id?: string
+          kills?: number | null
+          match_id: string
+          placement: number
+          player_id: string
+          score?: number | null
+        }
+        Update: {
+          assists?: number | null
+          created_at?: string | null
+          damage_dealt?: number | null
+          deaths?: number | null
+          id?: string
+          kills?: number | null
+          match_id?: string
+          placement?: number
+          player_id?: string
+          score?: number | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -2136,6 +2175,7 @@ export type Database = {
           is_premium: boolean | null
           is_test: boolean | null
           is_test_account: boolean | null
+          is_test_user: boolean | null
           is_vip: boolean | null
           is_vip_trial: boolean | null
           last_used: string | null
@@ -2171,6 +2211,7 @@ export type Database = {
           is_premium?: boolean | null
           is_test?: boolean | null
           is_test_account?: boolean | null
+          is_test_user?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
           last_used?: string | null
@@ -2206,6 +2247,7 @@ export type Database = {
           is_premium?: boolean | null
           is_test?: boolean | null
           is_test_account?: boolean | null
+          is_test_user?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
           last_used?: string | null
@@ -3923,6 +3965,10 @@ export type Database = {
         }
         Returns: Json
       }
+      atomic_market_cycle_v2: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       bytea_to_text: {
         Args: { data: string }
         Returns: string
@@ -4128,6 +4174,10 @@ export type Database = {
           p_user_id: string
           p_stake_amount: number
         }
+        Returns: undefined
+      }
+      log_event: {
+        Args: { event_type: string; details: string }
         Returns: undefined
       }
       log_function_error: {
