@@ -208,8 +208,24 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Error processing match payouts:", error);
+    
+    // Log to database for monitoring
+    try {
+      await supabase.from('payout_automation_log').insert({
+        entity_id: null,
+        entity_type: 'system',
+        event_type: 'error',
+        status: 'failed',
+        error_message: String(error)
+      });
+    } catch (logError) {
+      console.error('Failed to log error:', logError);
+    }
+    
     return new Response(JSON.stringify({ 
-      error: String(error) 
+      code: 500,
+      error: String(error),
+      stack: error instanceof Error ? error.stack : undefined
     }), { 
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
