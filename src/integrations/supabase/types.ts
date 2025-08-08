@@ -3721,6 +3721,8 @@ export type Database = {
           payout_amount: number | null
           payout_status: string | null
           processed_at: string | null
+          settled_at: string | null
+          settlement_attempts: number | null
           status: string | null
           total_pot: number | null
           winner_id: string | null

@@ -29,120 +29,156 @@ serve(async (req) => {
       auth: { persistSession: false } 
     });
 
-    // IDEMPOTENCY CHECK: Prevent double processing
-    const { data: existingPayout } = await supabase
-      .from("payout_automation_log")
-      .select("id")
-      .eq("entity_id", matchId)
-      .eq("entity_type", "match")
-      .eq("event_type", "payout")
-      .eq("status", "processed")
-      .maybeSingle();
-    
-    if (existingPayout) {
+    console.log(`Processing payout for challenge: ${matchId}`);
+
+    // SETTLEMENT IDEMPOTENCY: Prevent double processing using new function
+    const { data: canSettle, error: settleErr } = await supabase.rpc("mark_challenge_settled", {
+      p_challenge_id: matchId
+    });
+
+    if (settleErr) {
+      console.error("Settlement check failed:", settleErr);
+      throw new Error(`Settlement check failed: ${settleErr.message}`);
+    }
+
+    if (!canSettle) {
+      console.log("Challenge already settled, skipping payout");
       return new Response(JSON.stringify({ 
         ok: true, 
-        message: "Match already processed" 
+        message: "Challenge already processed" 
       }), { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Get match details
-    const { data: match, error: matchErr } = await supabase
-      .from("matches")
+    // Get challenge details (using correct table name)
+    const { data: challenge, error: challengeErr } = await supabase
+      .from("challenges")
       .select("*")
       .eq("id", matchId)
       .single();
       
-    if (matchErr || !match) {
-      throw matchErr || new Error("Match not found");
+    if (challengeErr || !challenge) {
+      console.error("Challenge not found:", challengeErr);
+      throw challengeErr || new Error("Challenge not found");
     }
 
-    // Get participants
+    // Get participants (using correct table name)
     const { data: participants, error: partsErr } = await supabase
-      .from("match_queue")
-      .select("user_id, entry_fee")
-      .eq("match_id", matchId);
+      .from("challenge_participants")
+      .select("user_id, stake_paid")
+      .eq("challenge_id", matchId);
       
-    if (partsErr) throw partsErr;
+    if (partsErr) {
+      console.error("Failed to get participants:", partsErr);
+      throw partsErr;
+    }
 
-    // Get results
+    // Get results (using correct table name)
     const { data: results, error: resErr } = await supabase
-      .from("match_results")
-      .select("player_id, placement, kills")
-      .eq("match_id", matchId)
+      .from("challenge_stats")
+      .select("user_id, placement, kills")
+      .eq("challenge_id", matchId)
       .order("placement", { ascending: true });
       
-    if (resErr) throw resErr;
+    if (resErr) {
+      console.error("Failed to get results:", resErr);
+      throw resErr;
+    }
 
-    const totalPot = participants.reduce((s, p) => s + Number(p.entry_fee || 0), 0);
+    console.log(`Found ${participants.length} participants, ${results.length} results`);
+
+    if (results.length === 0) {
+      throw new Error("No results found for challenge");
+    }
+
+    const totalPot = participants.reduce((s, p) => s + Number(p.stake_paid || 0), 0);
     const feeRate = 0.10; // 10% platform fee
     const netPot = totalPot * (1 - feeRate);
 
-    // Determine payouts
+    console.log(`Total pot: $${totalPot}, Net pot after fees: $${netPot}`);
+
+    // Determine payouts - using challenge_type instead of payout_type
     type Payout = { player_id: string; amount: number };
     const payouts: Payout[] = [];
 
-    if (match.payout_type === "WINNER_TAKE_ALL") {
+    if (challenge.challenge_type === "1v1") {
+      // Winner takes all for 1v1
       const winner = results.find(r => r.placement === 1);
-      if (!winner) throw new Error("No winner recorded");
+      if (!winner) throw new Error("No winner recorded for 1v1 challenge");
+      
+      const winAmount = Number(netPot.toFixed(2));
       payouts.push({ 
-        player_id: winner.player_id, 
-        amount: Number(netPot.toFixed(2)) 
+        player_id: winner.user_id, 
+        amount: winAmount
       });
+      console.log(`1v1 payout: ${winner.user_id} gets $${winAmount}`);
     } else {
-      // TOP_3 split
+      // TOP_3 split for multiplayer
       const p1 = results.find(r => r.placement === 1);
       const p2 = results.find(r => r.placement === 2);
       const p3 = results.find(r => r.placement === 3);
       
-      if (!p1 || !p2 || !p3) {
-        throw new Error("Top 3 results missing");
-      }
+      if (!p1) throw new Error("No first place winner found");
       
-      payouts.push({ 
-        player_id: p1.player_id, 
-        amount: Number((netPot * 0.6).toFixed(2)) 
-      });
-      payouts.push({ 
-        player_id: p2.player_id, 
-        amount: Number((netPot * 0.3).toFixed(2)) 
-      });
-      payouts.push({ 
-        player_id: p3.player_id, 
-        amount: Number((netPot * 0.1).toFixed(2)) 
-      });
+      if (p2 && p3) {
+        // Full top 3 split
+        const amounts = [
+          Number((netPot * 0.6).toFixed(2)),
+          Number((netPot * 0.3).toFixed(2)),
+          Number((netPot * 0.1).toFixed(2))
+        ];
+        payouts.push({ player_id: p1.user_id, amount: amounts[0] });
+        payouts.push({ player_id: p2.user_id, amount: amounts[1] });
+        payouts.push({ player_id: p3.user_id, amount: amounts[2] });
+        console.log(`Top 3 payouts: 1st=$${amounts[0]}, 2nd=$${amounts[1]}, 3rd=${amounts[2]}`);
+      } else {
+        // Winner takes all if insufficient placements
+        const winAmount = Number(netPot.toFixed(2));
+        payouts.push({ player_id: p1.user_id, amount: winAmount });
+        console.log(`Winner takes all: ${p1.user_id} gets $${winAmount}`);
+      }
     }
 
     // CREDIT wallets atomically with audit trail
+    console.log("Starting wallet payouts...");
     for (const payout of payouts) {
+      console.log(`Paying ${payout.player_id}: $${payout.amount}`);
+      
       const { error: payoutErr } = await supabase.rpc("increment_wallet_balance", {
         user_id_param: payout.player_id,
         amount_param: payout.amount,
-        reason_param: "match_payout",
-        match_id_param: matchId
+        reason_param: "challenge_payout",
+        challenge_id_param: matchId
       });
       
-      if (payoutErr) throw payoutErr;
+      if (payoutErr) {
+        console.error(`Payout failed for ${payout.player_id}:`, payoutErr);
+        throw new Error(`Payout failed: ${payoutErr.message}`);
+      }
 
-      // Log payout
+      // Log payout with correct entity_type
       await supabase.from("payout_automation_log").insert({
         event_type: "payout",
         entity_id: matchId,
-        entity_type: "match",
+        entity_type: "challenge",
         payout_amount: payout.amount,
         winner_id: payout.player_id,
         status: "processed",
         processed_at: new Date().toISOString(),
       });
+      
+      console.log(`Successfully paid ${payout.player_id}: $${payout.amount}`);
     }
 
-    // Mark match as completed
-    await supabase.from("matches").update({ 
-      state: "completed" 
+    // Mark challenge as completed (using correct table name)
+    await supabase.from("challenges").update({ 
+      status: "completed",
+      end_time: new Date().toISOString()
     }).eq("id", matchId);
+
+    console.log(`Challenge ${matchId} payout completed successfully`);
 
     return new Response(JSON.stringify({ 
       ok: true, 
