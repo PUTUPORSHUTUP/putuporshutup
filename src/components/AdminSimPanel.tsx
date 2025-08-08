@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type Log = { ts: string; msg: string };
+type Log = { ts: string; msg: string | React.ReactNode };
 
 export default function AdminSimPanel() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -12,7 +12,7 @@ export default function AdminSimPanel() {
   const tickRef = useRef<number | null>(null);
   const intervalMs = 8 * 60 * 1000; // 8 minutes
 
-  const push = (msg: string) =>
+  const push = (msg: string | React.ReactNode) =>
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg }, ...l].slice(0, 300));
 
   // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
@@ -56,11 +56,28 @@ export default function AdminSimPanel() {
     try {
       const data = await invokeSimRunner({ manual: true });
       if (data?.ok) {
-        push(
-          `✅ Completed: match=${data.matchId ?? "n/a"} crashed=${String(
-            data.crashed
-          )}`
-        );
+        const id = data.challengeId ?? data.matchId ?? "n/a";
+        const shortId = id !== "n/a" ? id.slice(0, 8) + "..." : "n/a";
+        
+        // Create clickable link if we have an ID
+        if (id !== "n/a") {
+          push(
+            <span>
+              ✅ Completed: challenge=
+              <a 
+                href={`/games`} 
+                className="underline text-blue-300 hover:text-blue-200 ml-1" 
+                target="_blank" 
+                rel="noreferrer"
+              >
+                {shortId}
+              </a>
+              {" "}· crashed={String(data.crashed)}
+            </span>
+          );
+        } else {
+          push(`✅ Completed: challenge=${shortId} · crashed=${String(data.crashed)}`);
+        }
       } else {
         push(`❌ Server responded but not OK: ${JSON.stringify(data)}`);
       }
