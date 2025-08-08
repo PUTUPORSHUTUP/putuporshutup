@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
+import { AdminSimPanel } from "./components/AdminSimPanel";
 import Games from "./pages/Games";
 import Tournaments from "./pages/Tournaments";
 import Leaderboards from "./pages/Leaderboards";
@@ -119,8 +120,13 @@ const App = () => {
                 <ProtectedRoute>
                   <Wallet />
                 </ProtectedRoute>
-              } />
-               <Route path="/vip-success" element={<VIPSuccess />} />
+               } />
+               <Route path="/admin/simulation" element={
+                 <ProtectedRoute>
+                   <AdminSimPanel />
+                 </ProtectedRoute>
+               } />
+                <Route path="/vip-success" element={<VIPSuccess />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                <Route path="*" element={<NotFound />} />
             </Routes>
