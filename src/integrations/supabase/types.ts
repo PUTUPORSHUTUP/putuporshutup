@@ -1937,6 +1937,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "player_skill_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "test_user_status"
+            referencedColumns: ["id"]
+          },
         ]
       }
       player_stats: {
@@ -2241,6 +2248,13 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
+            foreignKeyName: "proof_submissions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "test_user_status"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "proof_submissions_tournament_match_id_fkey"
             columns: ["tournament_match_id"]
             isOneToOne: false
@@ -2393,6 +2407,30 @@ export type Database = {
           reason?: string | null
           start_date?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      simulation_errors: {
+        Row: {
+          env: Json | null
+          error: string
+          id: number
+          stack: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          env?: Json | null
+          error: string
+          id?: number
+          stack?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          env?: Json | null
+          error?: string
+          id?: number
+          stack?: string | null
+          timestamp?: string | null
         }
         Relationships: []
       }
@@ -2770,6 +2808,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "suspicious_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "test_user_status"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3439,6 +3484,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "wallet_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "test_user_status"
+            referencedColumns: ["id"]
+          },
         ]
       }
       xbox_api_calls: {
@@ -3783,6 +3835,30 @@ export type Database = {
         }
         Relationships: []
       }
+      test_user_status: {
+        Row: {
+          id: string | null
+          last_used: string | null
+          status: string | null
+          username: string | null
+          wallet_balance: number | null
+        }
+        Insert: {
+          id?: string | null
+          last_used?: string | null
+          status?: never
+          username?: string | null
+          wallet_balance?: number | null
+        }
+        Update: {
+          id?: string | null
+          last_used?: string | null
+          status?: never
+          username?: string | null
+          wallet_balance?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       bytea_to_text: {
@@ -3985,6 +4061,10 @@ export type Database = {
       log_security_event: {
         Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
         Returns: undefined
+      }
+      manage_test_users: {
+        Args: { action: string; username?: string; wallet_balance?: number }
+        Returns: Json
       }
       mark_challenge_settled: {
         Args: { p_challenge_id: string }
