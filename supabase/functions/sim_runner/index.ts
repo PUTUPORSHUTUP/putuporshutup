@@ -11,6 +11,7 @@ const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TEST_MODE = (Deno.env.get("TEST_MODE") || "true").toLowerCase() === "true";
 const ENTRY_FEE = 5;
 const CRASH_RATE = Number(Deno.env.get("SIM_CRASH_RATE") ?? "0.08"); // 8%
+const FORCE_NO_CRASH = (Deno.env.get("SIM_FORCE_NO_CRASH") ?? "0").toString() === "1";
 
 type SB = ReturnType<typeof createClient>;
 const ok = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -116,20 +117,31 @@ serve(async (req) => {
     if (aErr) return fail(`activate challenge: ${aErr.message}`);
     await log(sb, challengeId, "challenge_active");
 
-    // 6) Crash logic — no back-to-back crashes
+    // 6) Crash logic — improved handling with reasons
     const prevCrashed = await lastRunWasCrash(sb);
     const randomCrash = Math.random() < CRASH_RATE;
-    const crashed = !prevCrashed && randomCrash;
+    let crashed = !prevCrashed && randomCrash;
+    let crashReason: string | null = null;
 
-    if (crashed) {
-      const res = await fetch(`${URL}/functions/v1/handle-match-failure`, {
+    // Hard override for testing
+    if (FORCE_NO_CRASH) {
+      crashed = false;
+    }
+
+    // When it *would* crash, record the reason
+    if (!FORCE_NO_CRASH && crashed) {
+      crashReason = prevCrashed ? "guard_blocked" : "random_crash";
+      const res = await fetch(`${URL}/functions/v1/handle_match_failure`, {
         method: "POST",
         headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({ matchId: challengeId, reason: "Simulated console crash" }),
       });
       const j = await res.json().catch(() => ({}));
-      await log(sb, challengeId, "refunded", `handle_match_failure: ${res.status}`);
-      return ok({ ok: true, challengeId, crashed: true, refundCount: Array.isArray(j?.refunded) ? j.refunded.length : j?.refunded ?? null });
+      const refundCount = Array.isArray(j?.refunded) ? j.refunded.length
+                        : typeof j?.refunded === "number" ? j.refunded : null;
+
+      await log(sb, challengeId, "refunded", `reason=${crashReason} | http=${res.status} | refunds=${refundCount}`);
+      return ok({ ok: true, challengeId, crashed: true, crashReason, refundCount });
     }
 
     // 7) Results
@@ -143,26 +155,26 @@ serve(async (req) => {
     await log(sb, challengeId, "results_written");
 
     // 8) Payouts
-    const payoutRes = await fetch(`${URL}/functions/v1/process-match-payouts`, {
+    const payoutRes = await fetch(`${URL}/functions/v1/process_match_payouts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ matchId: challengeId }),
     });
     const payoutJson = await payoutRes.json().catch(() => ({}));
     if (!payoutRes.ok) {
+      crashReason = "payout_failed";
       await log(sb, challengeId, "payout_error", JSON.stringify(payoutJson).slice(0, 200));
-      // fail-safe refund instead of leaving challenge stuck
-      await fetch(`${URL}/functions/v1/handle-match-failure`, {
+      await fetch(`${URL}/functions/v1/handle_match_failure`, {
         method: "POST",
         headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({ matchId: challengeId, reason: "Payout failed → auto-refund" }),
       });
-      await log(sb, challengeId, "refunded", "payout_failed");
-      return ok({ ok: true, challengeId, crashed: true, note: "payout failed → refunded" });
+      await log(sb, challengeId, "refunded", `reason=${crashReason}`);
+      return ok({ ok: true, challengeId, crashed: true, crashReason, refundCount: null });
     }
 
     await log(sb, challengeId, "payout_done");
-    return ok({ ok: true, challengeId, crashed: false, payout: payoutJson });
+    return ok({ ok: true, challengeId, crashed: false, crashReason: null, payout: payoutJson });
   } catch (e) {
     console.error("Error in sim runner:", e);
     return fail(`sim_runner: ${String(e)}`);

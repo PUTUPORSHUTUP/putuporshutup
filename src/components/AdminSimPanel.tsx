@@ -68,7 +68,7 @@ export default function AdminSimPanel() {
         const link = id !== "n/a" ? `/admin/matches/${id}` : null;
 
         const crashBit = data.crashed
-          ? `crashed=<b>true</b>${typeof data.refundCount === "number" ? ` · refunds=${data.refundCount}` : ""}`
+          ? `crashed=<b>true</b>${data.crashReason ? ` · reason=${data.crashReason}` : ""}${typeof data.refundCount === "number" ? ` · refunds=${data.refundCount}` : ""}`
           : "crashed=false";
 
         push(
