@@ -36,14 +36,14 @@ export default function AdminSimPanel() {
 
   // Safer invoker: use Supabase SDK; fall back to raw fetch ONLY if needed
   const invokeSimRunner = async (payload: any) => {
-    // Preferred: SDK invoke (handles auth/CORS)
-    const { data, error } = await supabase.functions.invoke("sim_runner", { body: payload });
+    // Preferred: SDK invoke (handles auth/CORS) - Use admin proxy for proper authorization
+    const { data, error } = await supabase.functions.invoke("admin_sim_proxy", { body: payload });
 
     if (!error && data) return data;
 
     // Fallback: raw fetch (log HTML if received)
     try {
-      const url = `https://mwuakdaogbywysjplrmx.supabase.co/functions/v1/sim_runner`;
+      const url = `https://mwuakdaogbywysjplrmx.supabase.co/functions/v1/admin_sim_proxy`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
