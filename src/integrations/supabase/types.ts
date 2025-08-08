@@ -3929,6 +3929,13 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_available_test_users: {
+        Args: { min_balance?: number; max_users?: number }
+        Returns: {
+          user_id: string
+          wallet_balance: number
+        }[]
+      }
       get_user_role: {
         Args: { user_uuid?: string }
         Returns: string
