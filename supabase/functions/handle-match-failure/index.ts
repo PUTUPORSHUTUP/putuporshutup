@@ -52,8 +52,8 @@ serve(async (req) => {
     // Get participants to refund
     const { data: participants, error: partsErr } = await supabase
       .from("match_queue")
-      .select("user_id, entry_fee")
-      .eq("match_id", matchId);
+      .select("user_id, stake_amount")
+      .eq("wager_id", matchId);
       
     if (partsErr) throw partsErr;
 
@@ -62,7 +62,7 @@ serve(async (req) => {
 
     // Refund each participant
     for (const participant of participants) {
-      const amount = Number(participant.entry_fee || 0);
+      const amount = Number(participant.stake_amount || 0);
       if (amount <= 0) continue;
 
       const { error: refundErr } = await supabase.rpc("increment_wallet_balance", {
