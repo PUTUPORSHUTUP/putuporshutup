@@ -27,12 +27,8 @@ Deno.serve(async (req) => {
     console.log('🚀 DATABASE MARKET ENGINE - Starting atomic cycle...');
     const startTime = Date.now();
 
-    // Call the single atomic database function
-    const { data, error } = await supabase.rpc('atomic_market_cycle', {
-      min_players,
-      crash_rate: manual ? 0 : crash_rate, // Never crash on manual runs
-      force_no_crash: manual ? true : force_no_crash
-    });
+    // Use the working v2 atomic function instead
+    const { data, error } = await supabase.rpc('atomic_market_cycle_v2');
 
     if (error) {
       console.error('❌ Atomic market cycle failed:', error);
