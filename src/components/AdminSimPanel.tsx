@@ -66,14 +66,17 @@ export default function AdminSimPanel() {
       if (data?.ok) {
         const id = data.matchId ?? data.challengeId ?? "n/a";
         const link = id !== "n/a" ? `/admin/matches/${id}` : null;
-        const badge = data.crashBlocked ? ' <span class="px-2 py-0.5 ml-1 rounded bg-amber-600/30 text-amber-300 text-xs align-middle">CRASH BLOCKED</span>' : '';
+
+        const crashBit = data.crashed
+          ? `crashed=<b>true</b>${typeof data.refundCount === "number" ? ` · refunds=${data.refundCount}` : ""}`
+          : "crashed=false";
+
         push(
           link
-            ? `✅ Completed: match= <a href="${link}" class="underline text-blue-300" target="_blank" rel="noreferrer">${id}</a> · crashed=${String(data.crashed)}${badge}`
-            : `✅ Completed: match=${id} · crashed=${String(data.crashed)}${badge}`
+            ? `✅ Completed: match= <a href="${link}" class="underline text-blue-300" target="_blank" rel="noreferrer">${id}</a> · ${crashBit}`
+            : `✅ Completed: match=${id} · ${crashBit}`
         );
       } else {
-        // show full payload instead of [object Object]
         push(`❌ Server responded but not OK: ${JSON.stringify(data)}`);
       }
     } catch (e: any) {
