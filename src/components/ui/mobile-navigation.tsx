@@ -27,7 +27,7 @@ interface MobileNavigationProps {
 }
 
 export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
-  const { user, signOut } = useAuth();
+  const { user, profile: userProfile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
 
@@ -145,7 +145,7 @@ export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
                 </Button>
               </Link>
 
-              {profile?.is_admin && (
+              {userProfile?.is_admin && (
                 <>
                   <Link to="/admin" onClick={handleNavClick}>
                     <Button 
