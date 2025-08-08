@@ -4085,6 +4085,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      secure_increment_wallet_balance: {
+        Args: {
+          p_user_id: string
+          p_amount: number
+          p_reason?: string
+          p_challenge_id?: string
+          p_requires_admin?: boolean
+        }
+        Returns: Json
+      }
+      secure_join_challenge_atomic: {
+        Args: {
+          p_challenge_id: string
+          p_user_id: string
+          p_stake_amount: number
+        }
+        Returns: Json
+      }
+      secure_settle_challenge: {
+        Args: { p_challenge_id: string }
+        Returns: boolean
+      }
       secure_update_transaction_status: {
         Args: { p_transaction_id: string; p_new_status: string }
         Returns: undefined

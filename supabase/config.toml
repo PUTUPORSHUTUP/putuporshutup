@@ -1,5 +1,18 @@
 project_id = "mwuakdaogbywysjplrmx"
 
+# Add JWT verification to critical financial functions
+[functions.instant-challenge-creator]
+verify_jwt = true
+
+[functions.instant-payout-processor]
+verify_jwt = true
+
+[functions.instant-result-generator]
+verify_jwt = true
+
+[functions.instant-market-engine]
+verify_jwt = true
+
 [functions.tilled-webhook]
 verify_jwt = false
 

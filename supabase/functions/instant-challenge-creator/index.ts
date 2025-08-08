@@ -11,6 +11,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify JWT token for authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Missing or invalid Authorization header');
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -67,36 +73,21 @@ Deno.serve(async (req) => {
 
     console.log('✅ Challenge created:', challenge.id);
 
-    // Add participants instantly using direct database operations
+    // Add participants instantly using secure atomic function
     let participantCount = 0;
     for (const user of testUsers.slice(0, 4)) {
       try {
-        // Insert participant
-        const { error: participantError } = await supabase
-          .from('challenge_participants')
-          .insert({
-            challenge_id: challenge.id,
-            user_id: user.user_id,
-            stake_paid: stakeAmount
-          });
+        const { data, error } = await supabase.rpc('secure_join_challenge_atomic', {
+          p_challenge_id: challenge.id,
+          p_user_id: user.user_id,
+          p_stake_amount: stakeAmount
+        });
         
-        if (!participantError) {
-          // Deduct stake from wallet
-          const { error: walletError } = await supabase
-            .from('profiles')
-            .update({ 
-              wallet_balance: user.wallet_balance - stakeAmount 
-            })
-            .eq('user_id', user.user_id);
-          
-          if (!walletError) {
-            participantCount++;
-            console.log(`✅ User ${participantCount} joined challenge`);
-          } else {
-            console.log(`⚠️ Failed to deduct stake: ${walletError.message}`);
-          }
+        if (!error && data?.success) {
+          participantCount++;
+          console.log(`✅ User ${participantCount} joined challenge securely`);
         } else {
-          console.log(`⚠️ Failed to join challenge: ${participantError.message}`);
+          console.log(`⚠️ Failed to join challenge: ${error?.message}`);
         }
       } catch (error) {
         console.log(`⚠️ User failed to join: ${error.message}`);

@@ -11,8 +11,18 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify JWT token for authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Missing or invalid Authorization header');
+    }
+
     const { challengeId } = await req.json();
     
+    if (!challengeId) {
+      throw new Error('Challenge ID is required');
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -20,23 +30,21 @@ Deno.serve(async (req) => {
 
     console.log('💰 INSTANT PAYOUT PROCESSOR - Processing challenge:', challengeId);
 
-    // Mark as settled using direct database update (prevents double processing)
-    const { data: updateResult, error: settleError } = await supabase
-      .from('challenges')
-      .update({ status: 'settled' })
-      .eq('id', challengeId)
-      .neq('status', 'settled')
-      .select('id');
+    // Mark as settled using secure function (prevents double processing)
+    const { data: wasSettled, error: settleError } = await supabase.rpc('secure_settle_challenge', {
+      p_challenge_id: challengeId
+    });
 
     if (settleError) {
       throw new Error(`Failed to settle challenge: ${settleError.message}`);
     }
 
-    if (!updateResult || updateResult.length === 0) {
+    if (!wasSettled) {
       console.log('⚠️ Challenge already settled, skipping payout');
       return new Response(JSON.stringify({
         success: true,
-        message: 'Challenge already settled'
+        message: 'Challenge already processed',
+        challengeId
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -110,36 +118,26 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Process payouts instantly
+    // Process payouts securely
     const processedPayouts = [];
     for (const payout of payouts) {
       try {
-        // Get current balance and update directly
-        const { data: profile, error: getError } = await supabase
-          .from('profiles')
-          .select('wallet_balance')
-          .eq('user_id', payout.user_id)
-          .single();
+        const { data, error } = await supabase.rpc('secure_increment_wallet_balance', {
+          p_user_id: payout.user_id,
+          p_amount: payout.amount,
+          p_reason: 'challenge_win',
+          p_challenge_id: challengeId,
+          p_requires_admin: true
+        });
         
-        if (getError || !profile) {
-          throw new Error(`Profile not found: ${getError?.message}`);
+        if (!error && data?.success) {
+          processedPayouts.push(payout);
+          console.log(`✅ Securely paid $${payout.amount} to position ${payout.position}`);
+        } else {
+          throw new Error(`Payout failed: ${error?.message}`);
         }
-        
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ 
-            wallet_balance: profile.wallet_balance + payout.amount 
-          })
-          .eq('user_id', payout.user_id);
-        
-        if (updateError) {
-          throw new Error(`Failed to update balance: ${updateError.message}`);
-        }
-
-        processedPayouts.push(payout);
-        console.log(`✅ Paid $${payout.amount} to position ${payout.position}`);
       } catch (error) {
-        console.error(`❌ Failed to pay user ${payout.user_id}:`, error.message);
+        console.error(`❌ Failed to pay position ${payout.position}: ${error.message}`);
       }
     }
 
