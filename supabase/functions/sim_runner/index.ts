@@ -49,14 +49,14 @@ serve(async (req) => {
       throw new Error("Need at least 3 test profiles with funds");
     }
 
-    // 2) Get COD game ID
+    // 2) Get any available game (fallback to first available)
     const { data: game } = await supabase
       .from("games")
       .select("id")
-      .eq("name", "COD6")
+      .limit(1)
       .single();
       
-    if (!game) throw new Error("COD6 game not found");
+    if (!game) throw new Error("No games found in database");
 
     // 3) Create a new challenge: Multiplayer, TOP_3
     const { data: challengeInsert, error: chErr } = await supabase
