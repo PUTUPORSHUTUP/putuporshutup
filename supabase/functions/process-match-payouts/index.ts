@@ -12,22 +12,43 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Verify service role authentication
-  const authHeader = req.headers.get('Authorization');
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  
-  if (!authHeader || authHeader !== `Bearer ${serviceRoleKey}`) {
-    console.error("Authorization failed - missing or invalid service role key");
-    return new Response(JSON.stringify({ 
-      code: 421, 
-      message: "Missing authorization header" 
-    }), { 
-      status: 421,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-
   try {
+    // DEBUGGING: Log headers for verification
+    const headers: Record<string, string> = {};
+    for (const [key, value] of req.headers.entries()) {
+      headers[key] = key.toLowerCase().includes('auth') ? '***redacted***' : value;
+    }
+    console.log('Received headers:', JSON.stringify(headers, null, 2));
+    
+    // ENHANCED AUTH VALIDATION
+    const authHeader = req.headers.get('Authorization');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader) {
+      console.error('No authorization header found');
+      return new Response(JSON.stringify({
+        code: 421,
+        message: "Missing authorization header",
+        hint: "Check if calling function passes Authorization header"
+      }), { 
+        status: 421,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    if (authHeader !== `Bearer ${serviceRoleKey}`) {
+      console.error('Invalid authorization token');
+      return new Response(JSON.stringify({
+        code: 403,
+        message: "Invalid authorization token",
+        hint: "Verify SERVICE_ROLE_KEY matches in both functions"
+      }), { 
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log('Authorization validation passed');
     const { matchId } = await req.json();
 
     if (!matchId) {

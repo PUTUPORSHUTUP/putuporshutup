@@ -967,6 +967,33 @@ export type Database = {
         }
         Relationships: []
       }
+      function_errors: {
+        Row: {
+          created_at: string | null
+          error_code: number | null
+          error_message: string | null
+          function_name: string
+          id: number
+          request_headers: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_code?: number | null
+          error_message?: string | null
+          function_name: string
+          id?: number
+          request_headers?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          error_code?: number | null
+          error_message?: string | null
+          function_name?: string
+          id?: number
+          request_headers?: Json | null
+        }
+        Relationships: []
+      }
       game_api_integrations: {
         Row: {
           api_endpoint: string
@@ -3786,6 +3813,10 @@ export type Database = {
           new_users_this_week: number
         }[]
       }
+      get_auth_context: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_user_role: {
         Args: { user_uuid?: string }
         Returns: string
@@ -3903,6 +3934,15 @@ export type Database = {
           p_challenge_id: string
           p_user_id: string
           p_stake_amount: number
+        }
+        Returns: undefined
+      }
+      log_function_error: {
+        Args: {
+          function_name: string
+          error_code?: number
+          error_message?: string
+          request_headers?: Json
         }
         Returns: undefined
       }
