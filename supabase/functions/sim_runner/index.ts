@@ -155,7 +155,7 @@ serve(async (req) => {
     await log(sb, challengeId, "results_written");
 
     // 8) Payouts
-    const payoutRes = await fetch(`${URL}/functions/v1/process_match_payouts`, {
+    const payoutRes = await fetch(`${URL}/functions/v1/process-match-payouts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ matchId: challengeId }),

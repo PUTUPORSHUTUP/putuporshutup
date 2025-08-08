@@ -12,6 +12,21 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Verify service role authentication
+  const authHeader = req.headers.get('Authorization');
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  
+  if (!authHeader || authHeader !== `Bearer ${serviceRoleKey}`) {
+    console.error("Authorization failed - missing or invalid service role key");
+    return new Response(JSON.stringify({ 
+      code: 421, 
+      message: "Missing authorization header" 
+    }), { 
+      status: 421,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
   try {
     const { matchId } = await req.json();
 
