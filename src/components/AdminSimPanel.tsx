@@ -80,64 +80,53 @@ export function AdminSimPanel() {
     }
   };
 
-  const simulateMatchFlow = async () => {
+  const runSimulation = async () => {
     setBusy(true);
     try {
-      // Create a new challenge instead of using matches table
-      const { data: challenge, error: challengeError } = await supabase
-        .from('challenges')
-        .insert({
-          title: 'Test Match - ' + new Date().toLocaleTimeString(),
-          description: 'Automated test match simulation',
-          game_id: (await supabase.from('games').select('id').limit(1).single()).data?.id || '550e8400-e29b-41d4-a716-446655440001',
-          creator_id: '00000000-0000-0000-0000-000000000001',
-          stake_amount: 5,
-          max_participants: 8,
-          platform: 'Xbox',
-          status: 'open'
-        })
-        .select()
-        .single();
-
-      if (challengeError) throw challengeError;
-
-      // Add test players to the challenge
-      const testPlayers = [
-        '00000000-0000-0000-0000-000000000001',
-        '00000000-0000-0000-0000-000000000002', 
-        '00000000-0000-0000-0000-000000000003',
-        '00000000-0000-0000-0000-000000000004'
-      ];
-
-      const participants = testPlayers.map(playerId => ({
-        challenge_id: challenge.id,
-        user_id: playerId,
-        stake_paid: 5,
-        status: 'joined'
-      }));
-
-      await supabase.from('challenge_participants').insert(participants);
-
-      // Update challenge to in_progress
-      await supabase
-        .from('challenges')
-        .update({ 
-          status: 'in_progress',
-          start_time: new Date().toISOString()
-        })
-        .eq('id', challenge.id);
-
-      toast({
-        title: "Test Challenge Created",
-        description: `Created challenge ${challenge.id} with ${testPlayers.length} test players`,
+      const { data, error } = await supabase.functions.invoke('sim_runner', {
+        body: { manual: true }
       });
-
-      return challenge.id;
-    } catch (error) {
-      console.error('Simulate match flow error:', error);
+      
+      if (error) throw error;
+      
       toast({
-        title: "Error",
-        description: `Failed to simulate challenge: ${String(error)}`,
+        title: "Simulation Complete",
+        description: `Challenge: ${data.challengeId || "n/a"} | Crashed: ${String(data.crashed)}`,
+      });
+      
+      console.log('Simulation result:', data);
+    } catch (error: any) {
+      console.error('Simulation error:', error);
+      toast({
+        title: "Simulation Failed",
+        description: error.message || "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const forceReset = async () => {
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('force_reset_sim', {
+        body: {}
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Force Reset Complete",
+        description: `Reset challenge: ${data.resetChallengeId || "none found"}`,
+      });
+      
+      console.log('Reset result:', data);
+    } catch (error: any) {
+      console.error('Reset error:', error);
+      toast({
+        title: "Reset Failed",
+        description: error.message || "Unknown error", 
         variant: "destructive",
       });
     } finally {
@@ -278,56 +267,33 @@ export function AdminSimPanel() {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Button 
-            onClick={simulateMatchFlow}
+            onClick={runSimulation}
             disabled={busy}
             className="flex items-center gap-2"
             variant="default"
           >
-            <Users className="w-4 h-4" />
-            Start New Match
+            <Play className="w-4 h-4" />
+            {busy ? "Running..." : "Run One Simulation Now"}
           </Button>
           
           <Button 
-            onClick={() => completeWithResults('TOP_3')}
-            disabled={busy}
-            className="flex items-center gap-2"
-            variant="outline"
-          >
-            <Trophy className="w-4 h-4" />
-            Complete (Top 3)
-          </Button>
-          
-          <Button 
-            onClick={() => completeWithResults('WINNER_TAKE_ALL')}
-            disabled={busy}
-            className="flex items-center gap-2"
-            variant="outline"
-          >
-            <Trophy className="w-4 h-4" />
-            Complete (Winner Take All)
-          </Button>
-          
-          <Button 
-            onClick={simulateFailure}
+            onClick={forceReset}
             disabled={busy}
             className="flex items-center gap-2"
             variant="destructive"
           >
             <AlertTriangle className="w-4 h-4" />
-            Simulate Crash
+            🧹 Force Reset (Refund & Unlock)
           </Button>
-          
-          <Button 
-            onClick={() => callEdgeFunction('watchdog-refund-failures')}
-            disabled={busy}
-            className="flex items-center gap-2"
-            variant="secondary"
-          >
-            <Play className="w-4 h-4" />
-            Run Watchdog
-          </Button>
+        </div>
+        
+        <div className="mt-4 text-xs text-muted-foreground space-y-1">
+          <p>• Creates test challenges with 8 players</p>
+          <p>• 20% chance of simulated crash (auto-refund)</p>
+          <p>• 80% chance of completion with TOP_3 payouts (50/30/20)</p>
+          <p>• All transactions logged with full audit trail</p>
         </div>
         
         <div className="mt-4 p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg">
