@@ -4420,6 +4420,14 @@ export type Database = {
             }
         Returns: undefined
       }
+      ingest_results: {
+        Args: { p_match_id: string; p_mode_key: string }
+        Returns: undefined
+      }
+      ingest_results_cod6: {
+        Args: { p_match_id: string; p_mode_key: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_uuid?: string }
         Returns: boolean
