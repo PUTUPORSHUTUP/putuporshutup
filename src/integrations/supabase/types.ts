@@ -4195,6 +4195,15 @@ export type Database = {
           error_types: string[]
         }[]
       }
+      check_rate_limit: {
+        Args: {
+          p_user_id: string
+          p_action_type: string
+          p_max_attempts?: number
+          p_time_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_rls_policy_coverage: {
         Args: Record<PropertyKey, never>
         Returns: {
