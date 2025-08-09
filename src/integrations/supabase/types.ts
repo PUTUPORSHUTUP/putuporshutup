@@ -4450,6 +4450,15 @@ export type Database = {
           expires_at: string
         }[]
       }
+      generate_system_alert: {
+        Args: {
+          p_alert_type: string
+          p_severity: string
+          p_message: string
+          p_metadata?: Json
+        }
+        Returns: string
+      }
       get_admin_analytics: {
         Args: { hide_test_data?: boolean }
         Returns: {
@@ -4474,6 +4483,10 @@ export type Database = {
           user_id: string
           wallet_balance: number
         }[]
+      }
+      get_platform_health: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       get_user_role: {
         Args: { user_uuid?: string }
@@ -4828,6 +4841,10 @@ export type Database = {
           p_reason: string
           p_match: string
         }
+        Returns: undefined
+      }
+      weekly_maintenance: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       xbox_configure: {
