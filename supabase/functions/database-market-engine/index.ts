@@ -11,18 +11,21 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { manual = false } = await req.json().catch(() => ({}));
+    const { auto_seed = true, mode_key = 'COD6:KILL_RACE' } = await req.json().catch(() => ({}));
     
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('🚀 DATABASE MARKET ENGINE - Starting atomic cycle...');
+    console.log(`🎮 DATABASE MARKET ENGINE - Starting for mode: ${mode_key}, auto_seed: ${auto_seed}`);
     const startTime = Date.now();
 
-    // Call the working v2 atomic function
-    const { data, error } = await supabase.rpc('atomic_market_cycle_v2');
+    // Call the updated db_market_run function with game mode support
+    const { data, error } = await supabase.rpc('db_market_run', {
+      p_auto_seed: auto_seed,
+      p_mode_key: mode_key
+    });
 
     if (error) {
       console.error('❌ Atomic market cycle failed:', error);
@@ -37,22 +40,36 @@ Deno.serve(async (req) => {
     }
 
     const totalTime = Date.now() - startTime;
-    console.log(`🎉 DATABASE MARKET COMPLETE in ${totalTime}ms`);
+    console.log(`🎉 DATABASE MARKET COMPLETE for ${mode_key} in ${totalTime}ms - Status: ${data.status}`);
+
+    // Handle different response statuses
+    if (data.status === 'invalid_mode') {
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Invalid or disabled game mode: ${mode_key}`,
+        message: data.message || 'Game mode not available'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     return new Response(JSON.stringify({
-      success: true,
+      success: data.status === 'success',
+      status: data.status,
+      mode_key: data.mode_key || mode_key,
       challengeId: data.challenge_id,
       totalTimeMs: totalTime,
       challenge: {
-        participantCount: data.players,
-        totalPot: data.players * 100 * 0.9, // Assuming $100 stake per player minus 10% fee
-        gameTitle: 'Database Market Challenge'
+        participantCount: data.players_paired || 0,
+        totalPot: data.pot_cents ? data.pot_cents / 100 : 0,
+        gameTitle: `${mode_key} Challenge`,
+        seeded: data.seeded || false
       },
-      winner: data.winner ? {
-        user_id: data.winner.user_id,
-        score: data.winner.score || 0
-      } : null,
-      message: `Complete market cycle in ${Math.round(totalTime/1000)}s!`
+      paidRows: data.paid_rows || 0,
+      message: data.status === 'success' 
+        ? `Complete ${mode_key} match in ${Math.round(totalTime/1000)}s!`
+        : data.message || `${data.status} - ${data.players_paired || 0} players paired`
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

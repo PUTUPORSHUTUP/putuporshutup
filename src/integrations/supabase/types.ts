@@ -4517,6 +4517,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      queue_test_players: {
+        Args: { p_mode_key?: string; p_count?: number }
+        Returns: Json
+      }
       refund_all_challenge_players: {
         Args: { challenge_id: string; reason: string }
         Returns: {
