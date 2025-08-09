@@ -31,7 +31,7 @@ export default function AdminSimPanel() {
             try { return JSON.stringify(msg); } catch { return String(msg); }
           })();
 
-    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...l].slice(0, 300));
+    setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...(l || [])].slice(0, 300));
   };
 
   // Use the new Database Market Engine
@@ -54,20 +54,17 @@ export default function AdminSimPanel() {
     try {
       const data = await invokeInstantMarket({ manual: true, min_players: 4 });
       if (data?.ok || data?.success) {
-        const id = data.challengeId;
-        const timeMs = data.totalTimeMs;
-        const participants = data.challenge?.participantCount || 0;
-        const totalPot = data.challenge?.totalPot || 0;
+        const id = data.challenge_id || data.challengeId || 'unknown';
+        const timeMs = data.duration_ms || data.totalTimeMs || 0;
+        const participants = data.players || data.challenge?.participantCount || 0;
+        const totalPot = participants * 100 * 0.9; // Calculate pot from participants
         const winnerScore = data.winner?.score || 0;
-        const payoutCount = data.payouts?.processed || 0;
 
         push(
-          `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${id.slice(0, 8)}...</span> · ` +
+          `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${String(id).slice(0, 8)}...</span> · ` +
           `<span class="text-blue-300">${participants}p</span> · ` +
           `<span class="text-yellow-400">$${totalPot}</span> · ` +
-          `<span class="text-purple-400">${payoutCount} payouts</span> · ` +
-          `<span class="text-orange-400">${Math.round(timeMs/1000)}s</span>` +
-          `${data.crashed ? ' · <span class="text-red-400">CRASHED (refunded)</span>' : ''}`
+          `<span class="text-orange-400">${Math.round(timeMs/1000)}s</span>`
         );
       } else {
         push(`❌ Database Market Failed: ${data.error || 'Unknown error'}`);
