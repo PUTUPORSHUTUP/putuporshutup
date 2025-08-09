@@ -3179,6 +3179,45 @@ export type Database = {
           },
         ]
       }
+      system_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          message: string
+          metric_value: number | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string
+          threshold_value: number | null
+          updated_at: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          message: string
+          metric_value?: number | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity: string
+          threshold_value?: number | null
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string
+          metric_value?: number | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+          threshold_value?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tier_protection_rules: {
         Row: {
           created_at: string
