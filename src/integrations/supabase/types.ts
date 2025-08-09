@@ -964,6 +964,41 @@ export type Database = {
         }
         Relationships: []
       }
+      fraud_flags: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          flag: Database["public"]["Enums"]["fraud_flag_type"]
+          id: string
+          result_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          flag: Database["public"]["Enums"]["fraud_flag_type"]
+          id?: string
+          result_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          flag?: Database["public"]["Enums"]["fraud_flag_type"]
+          id?: string
+          result_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_flags_result_id_fkey"
+            columns: ["result_id"]
+            isOneToOne: false
+            referencedRelation: "match_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fraud_patterns: {
         Row: {
           auto_action: string | null
@@ -2470,6 +2505,7 @@ export type Database = {
           is_test_user: boolean | null
           is_vip: boolean | null
           is_vip_trial: boolean | null
+          last_ip: unknown | null
           last_used: string | null
           payoneer_email: string | null
           premium_expires_at: string | null
@@ -2506,6 +2542,7 @@ export type Database = {
           is_test_user?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
+          last_ip?: unknown | null
           last_used?: string | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
@@ -2542,6 +2579,7 @@ export type Database = {
           is_test_user?: boolean | null
           is_vip?: boolean | null
           is_vip_trial?: boolean | null
+          last_ip?: unknown | null
           last_used?: string | null
           payoneer_email?: string | null
           premium_expires_at?: string | null
@@ -4853,6 +4891,11 @@ export type Database = {
       }
     }
     Enums: {
+      fraud_flag_type:
+        | "WIN_STREAK"
+        | "RAPID_REMATCH"
+        | "SCREENSHOT_REUSED"
+        | "MULTI_ACCOUNT"
       skill_tier:
         | "novice"
         | "amateur"
@@ -5003,6 +5046,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      fraud_flag_type: [
+        "WIN_STREAK",
+        "RAPID_REMATCH",
+        "SCREENSHOT_REUSED",
+        "MULTI_ACCOUNT",
+      ],
       skill_tier: [
         "novice",
         "amateur",
