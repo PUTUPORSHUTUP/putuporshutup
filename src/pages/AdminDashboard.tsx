@@ -621,7 +621,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-13 max-w-8xl gap-1 h-auto">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-15 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
             <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
             <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
@@ -633,6 +633,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="xbox-live" className="text-xs sm:text-sm">Xbox Live</TabsTrigger>
             <TabsTrigger value="posters" className="text-xs sm:text-sm">Posters</TabsTrigger>
             <TabsTrigger value="sponsor-admin" className="text-xs sm:text-sm">Sponsor</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
+            <TabsTrigger value="monitoring" className="text-xs sm:text-sm">Monitor</TabsTrigger>
             <TabsTrigger value="diagnostics" className="text-xs sm:text-sm">Diagnostics</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
           </TabsList>
@@ -1198,6 +1200,16 @@ const AdminDashboard = () => {
               {/* Original Poster Management */}
               <PosterManagement />
             </div>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <SecuritySettings />
+          </TabsContent>
+
+          {/* System Monitoring Tab */}
+          <TabsContent value="monitoring" className="space-y-6">
+            <SystemMonitoring />
           </TabsContent>
 
           {/* API Diagnostics Tab */}
