@@ -55,8 +55,8 @@ export default function AdminSimPanel() {
       const data = await invokeInstantMarket({ manual: true, min_players: 4 });
       if (data?.status === 'success' || data?.ok || data?.success) {
         // Safe parsing with fallbacks
-        const id = data.challenge_id || '';
-        const shortId = id ? id.slice(0, 8) : '—';
+        const cid = data.challenge_id || '';
+        const shortId = cid ? cid.slice(0, 8) : '—';
         
         const players = Number.isFinite(data.players_paired) ? data.players_paired : 0;
         const potCents = Number.isFinite(data.pot_cents) ? data.pot_cents : 0;
