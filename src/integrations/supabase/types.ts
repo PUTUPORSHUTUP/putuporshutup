@@ -1153,7 +1153,7 @@ export type Database = {
           min_players: number | null
           mode_description: string | null
           mode_key: string | null
-          mode_name: string
+          mode_name: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1167,7 +1167,7 @@ export type Database = {
           min_players?: number | null
           mode_description?: string | null
           mode_key?: string | null
-          mode_name: string
+          mode_name?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1181,9 +1181,16 @@ export type Database = {
           min_players?: number | null
           mode_description?: string | null
           mode_key?: string | null
-          mode_name?: string
+          mode_name?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_game_modes_registry"
+            columns: ["game_key"]
+            isOneToOne: false
+            referencedRelation: "game_registry"
+            referencedColumns: ["game_key"]
+          },
           {
             foreignKeyName: "game_modes_game_id_fkey"
             columns: ["game_id"]
