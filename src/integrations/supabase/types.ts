@@ -1217,6 +1217,24 @@ export type Database = {
         }
         Relationships: []
       }
+      game_registry: {
+        Row: {
+          display_name: string
+          enabled: boolean
+          game_key: string
+        }
+        Insert: {
+          display_name: string
+          enabled?: boolean
+          game_key: string
+        }
+        Update: {
+          display_name?: string
+          enabled?: boolean
+          game_key?: string
+        }
+        Relationships: []
+      }
       game_suggestions: {
         Row: {
           created_at: string
@@ -1756,6 +1774,7 @@ export type Database = {
         Row: {
           expires_at: string
           game_id: string
+          game_mode_key: string | null
           id: string
           matched_at: string | null
           matched_with_user_id: string | null
@@ -1769,6 +1788,7 @@ export type Database = {
         Insert: {
           expires_at: string
           game_id: string
+          game_mode_key?: string | null
           id?: string
           matched_at?: string | null
           matched_with_user_id?: string | null
@@ -1782,6 +1802,7 @@ export type Database = {
         Update: {
           expires_at?: string
           game_id?: string
+          game_mode_key?: string | null
           id?: string
           matched_at?: string | null
           matched_with_user_id?: string | null
@@ -1859,6 +1880,7 @@ export type Database = {
         Row: {
           created_at: string | null
           game_key: string
+          game_mode_key: string | null
           id: string
           player_a: string
           player_b: string
@@ -1869,6 +1891,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           game_key: string
+          game_mode_key?: string | null
           id?: string
           player_a: string
           player_b: string
@@ -1879,6 +1902,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           game_key?: string
+          game_mode_key?: string | null
           id?: string
           player_a?: string
           player_b?: string
