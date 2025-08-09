@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Gamepad2, Link, Trophy } from 'lucide-react';
+import { Search, Gamepad2, Link, Trophy, CheckCircle2, XCircle } from 'lucide-react';
 
 interface XboxProfile {
   gamertag: string;
@@ -25,6 +25,7 @@ export function XboxLinking({ onProfileLinked }: XboxLinkingProps) {
   const [searchResults, setSearchResults] = useState<XboxProfile | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{ok: boolean; text: string} | null>(null);
   const { toast } = useToast();
 
   const searchGamertag = async () => {
@@ -38,40 +39,59 @@ export function XboxLinking({ onProfileLinked }: XboxLinkingProps) {
     }
 
     setIsSearching(true);
+    setSearchResults(null);
+    setVerificationResult(null);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('xbox-profile-integration', {
-        body: {
-          action: 'lookup_gamertag',
-          gamertag: gamertag.trim()
-        }
+      console.log(`🔍 Searching for gamertag: ${gamertag.trim()}`);
+      
+      // Use the new bulletproof verification system
+      const { data, error } = await supabase.functions.invoke('xbl_verify_profile', {
+        body: { gamertag: gamertag.trim() }
       });
 
       if (error) {
-        throw new Error(error.message || 'Failed to search for gamertag');
+        console.error('❌ Verification service error:', error);
+        throw new Error(error.message || 'Verification service unavailable');
       }
 
-      if (data.success) {
-        setSearchResults(data.profile);
-        toast({
-          title: "Gamertag found!",
-          description: `Found Xbox profile for ${data.profile.gamertag}`,
-        });
-      } else {
-        setSearchResults(null);
+      if (!data.ok) {
+        console.error('❌ Profile verification failed:', data.error);
+        setVerificationResult({ ok: false, text: data.error || "Could not verify this Xbox gamertag" });
         toast({
           title: "Gamertag not found",
           description: data.error || "Could not find this Xbox gamertag",
           variant: "destructive",
         });
+        return;
       }
+
+      // Success - create profile object
+      const profile: XboxProfile = {
+        gamertag: data.gamertag,
+        xuid: data.xuid,
+        profilePictureUrl: '', // Will be populated from Xbox API if available
+        gamerScore: 0, // Will be populated from Xbox API if available
+        isPublic: true
+      };
+
+      setSearchResults(profile);
+      setVerificationResult({ ok: true, text: `Verified as XUID ${data.xuid}` });
+      
+      toast({
+        title: "Gamertag verified!",
+        description: `Successfully verified ${data.gamertag}`,
+      });
+
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('💥 Search error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to search for gamertag';
+      setVerificationResult({ ok: false, text: errorMessage });
       toast({
         title: "Search failed",
-        description: error instanceof Error ? error.message : "Failed to search for gamertag",
+        description: errorMessage,
         variant: "destructive",
       });
-      setSearchResults(null);
     } finally {
       setIsSearching(false);
     }
@@ -149,6 +169,21 @@ export function XboxLinking({ onProfileLinked }: XboxLinkingProps) {
             <Search className="h-4 w-4" />
           </Button>
         </div>
+
+        {verificationResult && (
+          <div className={`flex items-center gap-2 p-3 rounded-lg border text-sm ${
+            verificationResult.ok 
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+              : "bg-destructive/10 border-destructive/20 text-destructive"
+          }`}>
+            {verificationResult.ok ? (
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+            ) : (
+              <XCircle className="h-4 w-4 flex-shrink-0" />
+            )}
+            <span className="font-medium">{verificationResult.text}</span>
+          </div>
+        )}
 
         {searchResults && (
           <Card className="bg-muted/50">

@@ -4034,6 +4034,30 @@ export type Database = {
         }
         Relationships: []
       }
+      xbox_integration: {
+        Row: {
+          console_ip: unknown
+          enc_api_key: string
+          id: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          console_ip: unknown
+          enc_api_key: string
+          id?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          console_ip?: unknown
+          enc_api_key?: string
+          id?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       xbox_leaderboard_stats: {
         Row: {
           avg_kd_ratio: number | null
@@ -4772,6 +4796,10 @@ export type Database = {
           p_match: string
         }
         Returns: undefined
+      }
+      xbox_configure: {
+        Args: { p_console_ip: string; p_api_key: string }
+        Returns: Json
       }
     }
     Enums: {

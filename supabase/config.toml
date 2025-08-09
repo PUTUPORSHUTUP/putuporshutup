@@ -3,6 +3,12 @@ project_id = "mwuakdaogbywysjplrmx"
 [functions.system-monitor]
 verify_jwt = false
 
+[functions.xbl_validate]
+verify_jwt = false
+
+[functions.xbl_verify_profile]
+verify_jwt = false
+
 # Add JWT verification to critical financial functions
 [functions.instant-challenge-creator]
 verify_jwt = true
