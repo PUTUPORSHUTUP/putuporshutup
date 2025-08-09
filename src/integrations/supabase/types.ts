@@ -4004,7 +4004,7 @@ export type Database = {
         Returns: number
       }
       db_market_run: {
-        Args: Record<PropertyKey, never>
+        Args: Record<PropertyKey, never> | { p_auto_seed?: boolean }
         Returns: Json
       }
       detect_suspicious_stats: {
