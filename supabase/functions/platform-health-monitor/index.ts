@@ -211,9 +211,6 @@ function generateRecommendations(health: HealthMetrics): string[] {
   return recommendations
 }
 
-/* Deno.cron example for automated monitoring (commented out for now)
-Deno.cron("Platform health check", "*/5 * * * *", () => {
-  console.log("⏰ Automated health check triggered");
-  // This would trigger the health monitor every 5 minutes
-});
-*/
+// For automated monitoring, use Supabase's pg_cron instead:
+// SELECT cron.schedule('platform-health-check', '*/5 * * * *', 
+//   $$ SELECT net.http_post(url:='https://PROJECT.supabase.co/functions/v1/platform-health-monitor') $$);
