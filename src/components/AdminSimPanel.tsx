@@ -73,11 +73,7 @@ export default function AdminSimPanel() {
           push("❌ No eligible players found - try seeding test users with balance");
         } else {
           push(
-            `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${id}...</span> · ` +
-            `<span class="text-blue-300">${players}p</span> · ` +
-            `<span class="text-yellow-400">$${pot}</span> · ` +
-            `<span class="text-purple-400">${paidRows} payouts</span> · ` +
-            `<span class="text-orange-400">${secs}s</span>`
+            `✅ DATABASE MARKET SUCCESS: Challenge ${id}... · ${players}p · $${pot} · ${paidRows} payouts · ${secs}s`
           );
         }
       } else {
@@ -255,9 +251,9 @@ export default function AdminSimPanel() {
       <div className="bg-neutral-800 rounded p-3 max-h-72 overflow-auto text-sm">
         {logs.length === 0 ? <div className="text-neutral-400">No logs yet.</div> : null}
         {logs.map((l, i) => (
-          <div key={i} className="whitespace-pre-wrap break-words">
+          <pre key={i} className="whitespace-pre-wrap break-words text-sm">
             <span className="text-neutral-500">{String(l?.ts ?? "")}</span> — {String(l?.msg ?? "")}
-          </div>
+          </pre>
         ))}
       </div>
 
