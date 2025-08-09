@@ -263,13 +263,23 @@ const Tournaments = () => {
         console.error('Error updating tournament:', updateError);
       }
 
-      // Update user's wallet balance
-      await supabase
-        .from('profiles')
-        .update({
-          wallet_balance: profile.wallet_balance - entryFee
-        })
-        .eq('user_id', user.id);
+      // Update user's wallet balance using secure RPC debit
+      const { error: walletError } = await supabase.rpc('wallet_debit_safe', {
+        p_user: user.id,
+        p_amount: Math.round(entryFee * 100), // Convert to cents
+        p_reason: `Tournament entry fee`,
+        p_match: null
+      });
+
+      if (walletError) {
+        console.error('Wallet debit error:', walletError);
+        toast({
+          title: "Payment Error",
+          description: "Failed to process payment",
+          variant: "destructive",
+        });
+        return;
+      }
 
       toast({
         title: "Joined Tournament!",

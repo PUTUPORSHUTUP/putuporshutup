@@ -255,10 +255,9 @@ export default function AdminSimPanel() {
       <div className="bg-neutral-800 rounded p-3 max-h-72 overflow-auto text-sm">
         {logs.length === 0 ? <div className="text-neutral-400">No logs yet.</div> : null}
         {logs.map((l, i) => (
-          <div
-            key={i}
-            dangerouslySetInnerHTML={{ __html: `<span class="text-neutral-500">${l.ts}</span> — ${l.msg}` }}
-          />
+          <div key={i} className="whitespace-pre-wrap break-words">
+            <span className="text-neutral-500">{String(l?.ts ?? "")}</span> — {String(l?.msg ?? "")}
+          </div>
         ))}
       </div>
 

@@ -332,13 +332,13 @@ export const CreateTournamentModal = ({
         console.error('Error adding creator as participant:', participantError);
       }
 
-      // Update user's wallet balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ 
-          wallet_balance: profile.wallet_balance - totalCost 
-        })
-        .eq('user_id', user.id);
+      // Update user's wallet balance using secure RPC debit
+      const { error: balanceError } = await supabase.rpc('wallet_debit_safe', {
+        p_user: user.id,
+        p_amount: Math.round(totalCost * 100), // Convert to cents
+        p_reason: `Tournament creation: ${form.title}`,
+        p_match: null
+      });
 
       if (balanceError) {
         console.error('Error updating balance:', balanceError);

@@ -85,13 +85,13 @@ export const TournamentRegistration = ({
 
       if (error) throw error;
 
-      // Update user wallet balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ 
-          wallet_balance: profile.wallet_balance - entryFee 
-        })
-        .eq('user_id', user.id);
+      // Update user wallet balance using secure RPC debit
+      const { error: balanceError } = await supabase.rpc('wallet_debit_safe', {
+        p_user: user.id,
+        p_amount: Math.round(entryFee * 100), // Convert to cents
+        p_reason: `Tournament registration: ${tournament.title}`,
+        p_match: null
+      });
 
       if (balanceError) {
         console.error('Error updating balance:', balanceError);

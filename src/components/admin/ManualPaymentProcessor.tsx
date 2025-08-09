@@ -62,24 +62,14 @@ export const ManualPaymentProcessor = () => {
       if (!request) return;
 
       if (action === 'approve') {
-        // Update user balance for deposits
+        // Update user balance for deposits using secure RPC
         if (request.type === 'deposit') {
-          // Get current balance and add to it
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('wallet_balance')
-            .eq('user_id', request.user_id)
-            .single();
+          const { error: walletError } = await supabase.rpc('increment_wallet_balance', {
+            user_id_param: request.user_id,
+            amount_param: request.amount
+          });
 
-          const currentBalance = profile?.wallet_balance || 0;
-          const newBalance = currentBalance + request.amount;
-
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ wallet_balance: newBalance })
-            .eq('user_id', request.user_id);
-
-          if (profileError) throw profileError;
+          if (walletError) throw walletError;
 
           // Record transaction
           await supabase
