@@ -395,6 +395,45 @@ All colors MUST be HSL.
   50% { opacity: 0.6; }
 }
 
+/* Legal Requirements Modal Styling */
+.legal-modal {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  padding: 24px !important;
+  border-radius: 10px !important;
+}
+
+.legal-modal h1,
+.legal-modal h2,
+.legal-modal h3 {
+  color: hsl(var(--primary)) !important;
+  font-weight: bold !important;
+}
+
+.legal-modal p,
+.legal-modal li {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.legal-modal .tab {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: none !important;
+}
+
+.legal-modal .tab.active {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.legal-modal .scroll-content {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
 /* Override react-flow styles for tournament */
 .react-flow__node-match {
   background: transparent;
