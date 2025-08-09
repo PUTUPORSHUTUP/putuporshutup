@@ -7,6 +7,12 @@ import { Clock, Gamepad2, QrCode } from "lucide-react";
 import { FeaturedPoster } from "@/components/ui/featured-poster";
 import TournamentCarousel from "@/components/TournamentCarousel";
 import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
+import { supabase } from "@/integrations/supabase/client";
+
+type BannerType = {
+  type: 'none' | 'verify' | 'funds' | 'auth';
+  msg?: string;
+};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -20,6 +26,9 @@ const Index = () => {
 
   // TEMP: Hide Filter Active Matches
   const SHOW_MATCH_FILTERS = false;
+
+  // Banner state for join validation
+  const [joinBanner, setJoinBanner] = useState<BannerType>({ type: 'none' });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,17 +56,58 @@ const Index = () => {
         match.game.toLowerCase().includes(selectedMode.toLowerCase().replace(" ", ""))
       );
 
-  const joinMatch = () => {
-    const isVerified = localStorage.getItem('is_verified_gamertag') === 'true';
-    const walletBalance = parseFloat(localStorage.getItem('wallet_balance') || '0');
+  const joinMatch = async () => {
+    try {
+      // Clear any existing banner
+      setJoinBanner({ type: 'none' });
+      
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setJoinBanner({ type: 'auth', msg: 'Please sign in to join matches.' });
+        return;
+      }
 
-    if (!isVerified || walletBalance < 5) {
-      alert('❌ You must verify your gamertag and have at least $5 in your wallet to join a match.');
-      return;
+      // Check gamertag verification and wallet balance
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('xbox_gamertag, xbox_linked_at, wallet_balance')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile) {
+        setJoinBanner({ type: 'auth', msg: 'Profile not found. Please sign in again.' });
+        return;
+      }
+
+      // Check if Xbox gamertag is verified (has xbox_gamertag and xbox_linked_at)
+      if (!profile.xbox_gamertag || !profile.xbox_linked_at) {
+        setJoinBanner({ 
+          type: 'verify', 
+          msg: 'Verify your Xbox gamertag to join matches.' 
+        });
+        return;
+      }
+
+      // Check wallet balance
+      const balance = Number(profile.wallet_balance || 0);
+      if (balance < 5) {
+        setJoinBanner({ 
+          type: 'funds', 
+          msg: `You need at least $5 in your wallet to join. Current balance: $${balance.toFixed(2)}` 
+        });
+        return;
+      }
+
+      // All checks passed - proceed to queue
+      navigate('/queue');
+    } catch (error) {
+      console.error('Join match error:', error);
+      setJoinBanner({ 
+        type: 'auth', 
+        msg: 'Something went wrong. Please try again.' 
+      });
     }
-
-    // ✅ Redirect to queue or trigger Supabase logic
-    navigate('/queue');
   };
 
   return (
@@ -85,18 +135,57 @@ const Index = () => {
         {/* Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
           <button 
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
+            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center transition-colors"
             onClick={joinMatch}
           >
             ✅ Join Match Queue
           </button>
           <button 
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center transition-colors"
             onClick={() => navigate('/start-trial')}
           >
             🎟️ Start Free VIP Trial
           </button>
         </div>
+
+        {/* Join Validation Banner */}
+        {joinBanner.type !== 'none' && (
+          <div className="mt-4 rounded-xl p-4 bg-yellow-900/30 border border-yellow-600 max-w-md mx-auto">
+            <p className="text-yellow-100 mb-3 text-sm">{joinBanner.msg}</p>
+            <div className="flex gap-2 justify-center">
+              {joinBanner.type === 'verify' && (
+                <button 
+                  onClick={() => navigate('/profile')} 
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors"
+                >
+                  Verify Gamertag
+                </button>
+              )}
+              {joinBanner.type === 'funds' && (
+                <button 
+                  onClick={() => navigate('/wallet')} 
+                  className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors"
+                >
+                  Add Funds
+                </button>
+              )}
+              {joinBanner.type === 'auth' && (
+                <button 
+                  onClick={() => navigate('/auth')} 
+                  className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold transition-colors"
+                >
+                  Sign In
+                </button>
+              )}
+              <button 
+                onClick={() => setJoinBanner({ type: 'none' })} 
+                className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold transition-colors"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Featured Poster Section */}
@@ -125,7 +214,7 @@ const Index = () => {
           </p>
           <div className="text-center mt-4">
             <button 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-colors"
               onClick={joinMatch}
             >
               Join Match Queue
