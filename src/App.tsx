@@ -15,6 +15,7 @@ import Social from "./pages/Social";
 import Auth from "./pages/Auth";
 import Moderator from "./pages/Moderator";
 import NotFound from "./pages/NotFound";
+import Health from "./pages/Health";
 import StartTrial from "./pages/StartTrial";
 import VIPSuccess from "./pages/VIPSuccess";
 import Sponsor from "./pages/Sponsor";
@@ -131,7 +132,8 @@ const App = () => {
                } />
                 <Route path="/vip-success" element={<VIPSuccess />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-               <Route path="*" element={<NotFound />} />
+                <Route path="/health" element={<Health />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
             </BrowserRouter>
