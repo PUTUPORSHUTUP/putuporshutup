@@ -33,24 +33,18 @@ export const useWagerActions = () => {
     try {
       setJoining(wagerId);
       
-      // IDEMPOTENT JOIN: Check if already joined first (with unique constraint protection)
-      const { data: existing } = await supabase
-        .from('challenge_participants')
-        .select('id, stake_paid')
-        .eq('challenge_id', wagerId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (existing) {
+      // Get the current session for JWT authentication
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
         toast({
-          title: "Already Joined",
-          description: "You've already joined this wager.",
+          title: "Authentication Error",
+          description: "Please log in again to continue",
           variant: "destructive",
         });
         return;
       }
 
-      // Check wallet balance with FOR UPDATE to prevent race conditions
+      // Check wallet balance from profiles
       const { data: profile } = await supabase
         .from('profiles')
         .select('wallet_balance')
@@ -66,36 +60,69 @@ export const useWagerActions = () => {
         return;
       }
 
-      // ATOMIC TRANSACTION: Join challenge and debit wallet in one operation
-      const { error: joinError } = await supabase.functions.invoke('join-challenge-atomic', {
+      console.log('Attempting to join wager with secure authentication:', {
+        wagerId,
+        userId: user.id,
+        stakeAmount,
+        userBalance: profile.wallet_balance
+      });
+
+      // Call the secure atomic join function with proper authentication
+      const { data, error: joinError } = await supabase.functions.invoke('join-challenge-atomic', {
         body: {
           challengeId: wagerId,
           userId: user.id,
           stakeAmount: stakeAmount
+        },
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
         }
       });
 
       if (joinError) {
-        // Handle specific constraint violations
-        if (joinError.message.includes('already_joined')) {
-          toast({
-            title: "Already Joined",
-            description: "You've already joined this wager.",
-            variant: "destructive",
-          });
-        } else if (joinError.message.includes('insufficient_funds')) {
-          toast({
-            title: "Insufficient Funds",
-            description: "Your wallet balance is too low for this wager.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error joining wager",
-            description: joinError.message,
-            variant: "destructive",
-          });
+        console.error('Edge function error:', joinError);
+        let errorMessage = "Failed to join wager";
+        
+        // Handle specific error cases
+        if (joinError.message) {
+          switch (joinError.message) {
+            case 'insufficient_balance':
+              errorMessage = "Insufficient wallet balance to join this wager";
+              break;
+            case 'already_joined':
+              errorMessage = "You have already joined this wager";
+              break;
+            case 'challenge_not_available':
+              errorMessage = "This wager is no longer available";
+              break;
+            case 'challenge_full':
+              errorMessage = "This wager is full";
+              break;
+            case 'rate_limit_exceeded':
+              errorMessage = "Too many attempts. Please try again in a few minutes";
+              break;
+            default:
+              errorMessage = joinError.message.includes('Unauthorized') 
+                ? "Your session has expired. Please log in again"
+                : joinError.message || errorMessage;
+          }
         }
+        
+        toast({
+          title: "Error joining wager",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!data?.ok) {
+        toast({
+          title: "Error joining wager",
+          description: data?.error || "Unknown error occurred",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -103,18 +130,23 @@ export const useWagerActions = () => {
       const wager = wagers.find(w => w.id === wagerId);
       if (wager) {
         // Log challenge participation silently
-        await StatLoggingService.logChallengeParticipation(
-          user.id,
-          wagerId,
-          wager.game?.display_name || 'Unknown Game',
-          wager.platform,
-          stakeAmount
-        );
+        try {
+          await StatLoggingService.logChallengeParticipation(
+            user.id,
+            wagerId,
+            wager.game?.display_name || 'Unknown Game',
+            wager.platform,
+            stakeAmount
+          );
+        } catch (statError) {
+          console.warn('Failed to log participation stats:', statError);
+          // Don't fail the join operation due to logging issues
+        }
       }
 
       toast({
-        title: "Joined Wager!",
-        description: "Entry fee debited. You're in the queue!",
+        title: "Successfully Joined!",
+        description: `You've joined the ${wager?.game?.display_name || 'wager'} for $${stakeAmount}!`,
       });
 
       // Refresh data
@@ -124,7 +156,7 @@ export const useWagerActions = () => {
       console.error('Error joining wager:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: "An unexpected error occurred while joining the wager.",
         variant: "destructive",
       });
     } finally {
