@@ -164,6 +164,33 @@ export type Database = {
         }
         Relationships: []
       }
+      api_keys: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          enc_key: string
+          id: string
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          enc_key: string
+          id?: string
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          enc_key?: string
+          id?: string
+          provider?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       api_verification_stats: {
         Row: {
           automated_verifications: number | null
@@ -4300,6 +4327,14 @@ export type Database = {
       admin_metrics_rollup: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      api_key_get: {
+        Args: { p_provider: string }
+        Returns: string
+      }
+      api_key_put: {
+        Args: { p_provider: string; p_plain: string }
+        Returns: string
       }
       atomic_market_cycle: {
         Args: {
