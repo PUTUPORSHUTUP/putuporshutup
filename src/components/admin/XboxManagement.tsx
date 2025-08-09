@@ -18,8 +18,12 @@ export function XboxManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="configure" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="setup" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="setup" className="flex items-center gap-2">
+                <Gamepad2 className="h-4 w-4" />
+                Setup
+              </TabsTrigger>
               <TabsTrigger value="configure" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Configuration
@@ -29,6 +33,46 @@ export function XboxManagement() {
                 Profile Verification
               </TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="setup" className="mt-6">
+              <div className="space-y-6">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold mb-3 text-lg">🚀 Simple Setup Steps</h3>
+                  <div className="space-y-4 text-sm">
+                    <div className="space-y-2">
+                      <p className="font-medium">Step 1: Open Your Computer's Terminal</p>
+                      <p className="text-muted-foreground pl-4">• On Windows: Press Win+R, type "cmd", press Enter</p>
+                      <p className="text-muted-foreground pl-4">• On Mac: Press Cmd+Space, type "terminal", press Enter</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <p className="font-medium">Step 2: Copy & Paste This Command</p>
+                      <div className="bg-background border rounded p-3 font-mono text-xs">
+                        <code>
+                          supabase secrets set \<br />
+                          &nbsp;&nbsp;ENCRYPTION_KEY="your-32-character-key-here" \<br />
+                          &nbsp;&nbsp;AZURE_TENANT_ID="your-azure-tenant-id" \<br />
+                          &nbsp;&nbsp;AZURE_AUTH_URL="https://login.microsoftonline.com" \<br />
+                          &nbsp;&nbsp;AZURE_TOKEN_PATH="/oauth2/v2.0/token"
+                        </code>
+                      </div>
+                      <p className="text-muted-foreground pl-4">• Replace "your-32-character-key-here" with any random 32-letter password</p>
+                      <p className="text-muted-foreground pl-4">• Replace "your-azure-tenant-id" with your Microsoft Azure ID</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <p className="font-medium">Step 3: Press Enter</p>
+                      <p className="text-muted-foreground pl-4">The command will save your settings securely</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <p className="font-medium">Step 4: Come Back Here</p>
+                      <p className="text-muted-foreground pl-4">Once done, use the "Configuration" tab above to enter your Xbox details</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
             
             <TabsContent value="configure" className="mt-6">
               <div className="space-y-4">
