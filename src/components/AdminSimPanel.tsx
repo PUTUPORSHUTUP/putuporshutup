@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ErrorBoundary, rpcSafe, n, shortId } from "@/lib/safety";
+import { AdminKpiChips } from "@/components/admin/AdminKpiChips";
 
 type Log = { ts: string; msg: string };
 type PayoutDiagnostic = {
@@ -36,11 +38,11 @@ export default function AdminSimPanel() {
 
   // Use the new Database Market Engine RPC function
   const invokeInstantMarket = async (payload: any) => {
-    const { data, error } = await supabase.rpc('db_market_run', { p_auto_seed: true });
+    const { data, error } = await rpcSafe(supabase, 'db_market_run', { p_auto_seed: true });
     
     if (error) {
       console.error("Database Market Engine error:", error);
-      return { ok: false, message: error.message, status: 'error' };
+      return { ok: false, message: error, status: 'error' };
     }
     
     return data as any || { ok: true };
@@ -56,22 +58,22 @@ export default function AdminSimPanel() {
       if (data?.status === 'success' || data?.ok || data?.success) {
         // Safe parsing with fallbacks
         const cid = data.challenge_id || '';
-        const shortId = cid ? cid.slice(0, 8) : '—';
+        const id = shortId(cid);
         
-        const players = Number.isFinite(data.players_paired) ? data.players_paired : 0;
-        const potCents = Number.isFinite(data.pot_cents) ? data.pot_cents : 0;
+        const players = n(data.players_paired);
+        const potCents = n(data.pot_cents);
         const pot = (potCents / 100).toFixed(2);
         
-        const durMs = Number.isFinite(data.duration_ms) ? data.duration_ms : 0;
+        const durMs = n(data.duration_ms);
         const secs = Math.max(0, Math.round(durMs / 1000));
         
-        const paidRows = Number.isFinite(data.paid_rows) ? data.paid_rows : 0;
+        const paidRows = n(data.paid_rows);
 
         if (players === 0) {
           push("❌ No eligible players found - try seeding test users with balance");
         } else {
           push(
-            `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${shortId}...</span> · ` +
+            `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${id}...</span> · ` +
             `<span class="text-blue-300">${players}p</span> · ` +
             `<span class="text-yellow-400">$${pot}</span> · ` +
             `<span class="text-purple-400">${paidRows} payouts</span> · ` +
@@ -153,10 +155,17 @@ export default function AdminSimPanel() {
 
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded p-4 space-y-6 text-white">
-      <h3 className="font-bold text-xl">🎯 Database Market Engine</h3>
-      <p className="text-sm text-neutral-300">
-        Mode: <b>Database-First</b> • Payout: <b>Top 3 (60/30/10)</b> • Platform fee: <b>10%</b> • Target: <b>&lt;15s</b>
-      </p>
+      <div>
+        <h3 className="font-bold text-xl">🎯 Database Market Engine</h3>
+        <p className="text-sm text-neutral-300">
+          Mode: <b>Database-First</b> • Payout: <b>Top 3 (60/30/10)</b> • Platform fee: <b>10%</b> • Target: <b>&lt;15s</b>
+        </p>
+      </div>
+
+      {/* KPI Dashboard */}
+      <ErrorBoundary>
+        <AdminKpiChips />
+      </ErrorBoundary>
 
       {/* Engine Status */}
       <div className="bg-neutral-800 border border-neutral-700 rounded p-3 space-y-2">
@@ -195,15 +204,15 @@ export default function AdminSimPanel() {
         <div className="max-h-40 overflow-auto text-xs space-y-1">
           {diagnostics.map((d, i) => (
             <div key={i} className="grid grid-cols-5 gap-2 p-1 hover:bg-neutral-700 rounded">
-              <div className="truncate">{d.challenge_id.slice(0, 8)}...</div>
+              <div className="truncate">{shortId(d.challenge_id)}...</div>
               <div className={d.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}>
                 {d.status}
               </div>
               <div className={d.payout_status === 'processed' ? 'text-green-400' : 'text-red-400'}>
                 {d.payout_status || 'none'}
               </div>
-              <div>${d.total_pot}</div>
-              <div className="text-neutral-400">{d.participant_count}p</div>
+              <div>${n(d.total_pot)}</div>
+              <div className="text-neutral-400">{n(d.participant_count)}p</div>
             </div>
           ))}
           {diagnostics.length === 0 && <div className="text-neutral-500">No recent data</div>}

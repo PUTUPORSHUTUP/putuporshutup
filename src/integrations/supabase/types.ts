@@ -80,6 +80,36 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_metrics_daily: {
+        Row: {
+          created_at: string
+          day: string
+          failures: number
+          matches_created: number
+          payouts_cents: number
+          payouts_count: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          failures?: number
+          matches_created?: number
+          payouts_cents?: number
+          payouts_count?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          failures?: number
+          matches_created?: number
+          payouts_cents?: number
+          payouts_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_roles: {
         Row: {
           granted_at: string
@@ -4216,6 +4246,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_kpis_last24: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      admin_metrics_rollup: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       atomic_market_cycle: {
         Args: {
           min_players?: number
@@ -4610,6 +4648,15 @@ export type Database = {
       verify_otp: {
         Args: { p_user_id: string; p_otp_code: string; p_purpose: string }
         Returns: boolean
+      }
+      wallet_debit_safe: {
+        Args: {
+          p_user: string
+          p_amount: number
+          p_reason?: string
+          p_match?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
