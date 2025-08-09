@@ -54,18 +54,30 @@ export default function AdminSimPanel() {
     try {
       const data = await invokeInstantMarket({ manual: true, min_players: 4 });
       if (data?.ok || data?.success) {
-        const id = data.challenge_id || data.challengeId || 'unknown';
-        const timeMs = data.duration_ms || data.totalTimeMs || 0;
-        const participants = data.players || data.challenge?.participantCount || 0;
-        const totalPot = participants * 100 * 0.9; // Calculate pot from participants
-        const winnerScore = data.winner?.score || 0;
+        // Safe parsing with fallbacks
+        const id = data.challenge_id || '';
+        const shortId = id ? id.slice(0, 8) : '—';
+        
+        const players = Number.isFinite(data.players) ? data.players : 0;
+        const potCents = Number.isFinite(data.pot_cents) ? data.pot_cents : 0;
+        const pot = (potCents / 100).toFixed(2);
+        
+        const durMs = Number.isFinite(data.duration_ms) ? data.duration_ms : 0;
+        const secs = Math.max(0, Math.round(durMs / 1000));
+        
+        const paidRows = Number.isFinite(data.paid_rows) ? data.paid_rows : 0;
 
-        push(
-          `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${String(id).slice(0, 8)}...</span> · ` +
-          `<span class="text-blue-300">${participants}p</span> · ` +
-          `<span class="text-yellow-400">$${totalPot}</span> · ` +
-          `<span class="text-orange-400">${Math.round(timeMs/1000)}s</span>`
-        );
+        if (players === 0) {
+          push("❌ No eligible players found - try seeding test users with balance");
+        } else {
+          push(
+            `✅ DATABASE MARKET SUCCESS: <span class="text-green-400">Challenge ${shortId}...</span> · ` +
+            `<span class="text-blue-300">${players}p</span> · ` +
+            `<span class="text-yellow-400">$${pot}</span> · ` +
+            `<span class="text-purple-400">${paidRows} payouts</span> · ` +
+            `<span class="text-orange-400">${secs}s</span>`
+          );
+        }
       } else {
         push(`❌ Database Market Failed: ${data.error || 'Unknown error'}`);
       }
