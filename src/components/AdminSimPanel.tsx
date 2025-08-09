@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { apiClient } from "@/lib/apiClient";
+import { supabase } from "@/integrations/supabase/client";
 
 type Log = { ts: string; msg: string };
 type PayoutDiagnostic = {
@@ -34,16 +34,16 @@ export default function AdminSimPanel() {
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...(l || [])].slice(0, 300));
   };
 
-  // Use the new Database Market Engine
+  // Use the new Database Market Engine RPC function
   const invokeInstantMarket = async (payload: any) => {
-    const response = await apiClient.adminCall('database-market-engine', payload);
+    const { data, error } = await supabase.rpc('db_market_run', { p_auto_seed: true });
     
-    if (response.error) {
-      console.error("Database Market Engine error:", response.error);
-      return { ok: false, message: response.error, status: response.status };
+    if (error) {
+      console.error("Database Market Engine error:", error);
+      return { ok: false, message: error.message, status: 'error' };
     }
     
-    return response.data || { ok: true };
+    return data as any || { ok: true };
   };
 
   const runOnce = async () => {
@@ -53,12 +53,12 @@ export default function AdminSimPanel() {
 
     try {
       const data = await invokeInstantMarket({ manual: true, min_players: 4 });
-      if (data?.ok || data?.success) {
+      if (data?.status === 'success' || data?.ok || data?.success) {
         // Safe parsing with fallbacks
         const id = data.challenge_id || '';
         const shortId = id ? id.slice(0, 8) : '—';
         
-        const players = Number.isFinite(data.players) ? data.players : 0;
+        const players = Number.isFinite(data.players_paired) ? data.players_paired : 0;
         const potCents = Number.isFinite(data.pot_cents) ? data.pot_cents : 0;
         const pot = (potCents / 100).toFixed(2);
         
@@ -79,7 +79,7 @@ export default function AdminSimPanel() {
           );
         }
       } else {
-        push(`❌ Database Market Failed: ${data.error || 'Unknown error'}`);
+        push(`❌ Database Market Failed: ${data.reason || data.error || 'Unknown error'}`);
       }
     } catch (e: any) {
       push(`❌ Connection Error: ${e?.message || String(e)}`);
@@ -119,13 +119,29 @@ export default function AdminSimPanel() {
     push("⏹ Auto-run stopped.");
   };
 
-  // Load diagnostic data
+  // Load diagnostic data from challenges table
   const loadDiagnostics = async () => {
     setLoadingDiag(true);
     try {
-      const { data, error } = await apiClient.call("auth_diagnostics", { method: "GET" });
-      if (error) throw new Error(error);
-      setDiagnostics(data || []);
+      const { data, error } = await supabase
+        .from('challenges')
+        .select('id, status, total_pot, settled_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+        
+      if (error) throw error;
+      
+      const formatted = (data || []).map(item => ({
+        challenge_id: item.id,
+        status: item.status,
+        payout_status: item.settled_at ? 'processed' : 'pending',
+        error_message: null,
+        participant_count: 2, // Default for now
+        total_pot: item.total_pot || 0,
+        settled_at: item.settled_at
+      }));
+      
+      setDiagnostics(formatted);
     } catch (e: any) {
       push(`❌ Diagnostics error: ${e.message}`);
     } finally {
