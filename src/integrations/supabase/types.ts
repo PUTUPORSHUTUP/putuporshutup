@@ -1699,6 +1699,39 @@ export type Database = {
         }
         Relationships: []
       }
+      matches: {
+        Row: {
+          created_at: string | null
+          game_key: string
+          id: string
+          player_a: string
+          player_b: string
+          stake_cents: number
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          game_key: string
+          id?: string
+          player_a: string
+          player_b: string
+          stake_cents: number
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          game_key?: string
+          id?: string
+          player_a?: string
+          player_b?: string
+          stake_cents?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -3589,6 +3622,30 @@ export type Database = {
           },
         ]
       }
+      wallets: {
+        Row: {
+          balance_cents: number
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_cents?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_cents?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       xbox_api_calls: {
         Row: {
           created_at: string
@@ -4000,7 +4057,7 @@ export type Database = {
         Returns: undefined
       }
       db_market_payout_safe: {
-        Args: { p_match_id: string; p_total_pot_cents: number }
+        Args: { p_match_id: string; p_pot_cents: number }
         Returns: number
       }
       db_market_run: {
