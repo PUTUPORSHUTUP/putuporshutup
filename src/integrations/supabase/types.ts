@@ -4414,6 +4414,10 @@ export type Database = {
         Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
         Returns: undefined
       }
+      log_security_violation: {
+        Args: { p_violation_type: string; p_user_id?: string; p_details?: Json }
+        Returns: undefined
+      }
       manage_test_users: {
         Args: { action: string; username?: string; wallet_balance?: number }
         Returns: Json
