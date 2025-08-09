@@ -1,116 +1,117 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+export const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabase = createClient();
+  const nowIso = new Date().toISOString();
+
+  let dbOk = false, rotationFresh = false, queueFresh = false;
+  let status = "ok";
+  let details: Record<string, unknown> = {};
+
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          persistSession: false,
-        },
-      }
-    )
+    // 1) DB reachability
+    const { data: dbTest, error: dbErr } = await supabase.from("profiles").select("id").limit(1);
+    if (dbErr) throw new Error("DB unreachable");
+    dbOk = true;
 
-    const startTime = Date.now()
-    const checks = {
-      database: false,
-      market_engine: false,
-      player_pool: false,
-      timestamp: new Date().toISOString()
+    // 2) Rotation freshness (updated in last 10m)
+    const { data: lastRotation } = await supabase
+      .from("kv_counters")
+      .select("updated_at")
+      .eq("key", "counter:COD6:KillRace")
+      .maybeSingle();
+
+    rotationFresh = !!lastRotation &&
+      Date.now() - new Date(lastRotation.updated_at!).getTime() < 10 * 60 * 1000;
+
+    // 3) Queue freshness (new entries in last 10m)
+    const { data: recentQueue, count } = await supabase
+      .from("market_queue")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", new Date(Date.now() - 10 * 60 * 1000).toISOString());
+
+    queueFresh = (count ?? 0) > 0;
+
+    // Build details and decide status
+    details = {
+      timestamp: nowIso,
+      rotationKey: "counter:COD6:KillRace",
+      queueCount: count ?? 0
+    };
+
+    if (!rotationFresh || !queueFresh) status = "error";
+
+    // --- LOG every run ---
+    await supabase.from("health_log").insert([{
+      status,
+      rotation_fresh: rotationFresh,
+      queue_fresh: queueFresh,
+      db_ok: dbOk,
+      details,
+      created_at: nowIso
+    }]);
+
+    // Optional: PagerDuty trigger on failure
+    if (status === "error" && Deno.env.get("PAGERDUTY_KEY")) {
+      await fetch("https://events.pagerduty.com/v2/enqueue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          routing_key: Deno.env.get("PAGERDUTY_KEY"),
+          event_action: "trigger",
+          payload: {
+            summary: "PUOSU Health Check Failed",
+            severity: "critical",
+            source: "puosu-health",
+            custom_details: { dbOk, rotationFresh, queueFresh, nowIso }
+          }
+        })
+      });
     }
 
-    // Database connectivity check
-    try {
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('id')
-        .limit(1)
-      
-      checks.database = !error && !!data
-    } catch (e) {
-      console.warn('Database check failed:', e)
-      checks.database = false
-    }
+    const body = { status, db: dbOk, rotationFresh, queueFresh, timestamp: nowIso };
+    return new Response(JSON.stringify(body), {
+      status: status === "ok" ? 200 : 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
 
-    // Market engine health check
-    try {
-      const { data, error } = await supabaseClient
-        .from('market_events')
-        .select('id')
-        .order('created_at', { ascending: false })
-        .limit(1)
-      
-      checks.market_engine = !error
-    } catch (e) {
-      console.warn('Market engine check failed:', e)
-      checks.market_engine = false
-    }
+  } catch (err) {
+    // Log hard failure (e.g., DB down)
+    await safeInsert(supabase, {
+      status: "error",
+      rotation_fresh: rotationFresh,
+      queue_fresh: queueFresh,
+      db_ok: dbOk,
+      details: { error: String(err) },
+      created_at: nowIso
+    });
 
-    // Player pool check
-    try {
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('id')
-        .eq('is_test_user', true)
-        .gte('wallet_balance', 100)
-        .limit(1)
-      
-      checks.player_pool = !error && (data?.length ?? 0) > 0
-    } catch (e) {
-      console.warn('Player pool check failed:', e)
-      checks.player_pool = false
-    }
-
-    const duration = Date.now() - startTime
-    const allHealthy = Object.values(checks).filter(v => typeof v === 'boolean').every(Boolean)
-    
-    const response = {
-      status: allHealthy ? 'healthy' : 'degraded',
-      checks,
-      response_time_ms: duration,
-      version: '1.0.0'
-    }
-
-    return new Response(
-      JSON.stringify(response, null, 2),
-      { 
-        status: allHealthy ? 200 : 503,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
-        } 
-      }
-    )
-
-  } catch (error) {
-    console.error('Health check failed:', error)
-    
-    return new Response(
-      JSON.stringify({ 
-        status: 'down',
-        error: error.message,
-        timestamp: new Date().toISOString()
-      }),
-      { 
-        status: 500, 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
-    )
+    return new Response(JSON.stringify({ status: "error", message: String(err) }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
-})
+});
+
+async function safeInsert(supabase: any, row: any) {
+  try { await supabase.from("health_log").insert([row]); } catch { /* ignore */ }
+}
+
+function createClient() {
+  const url = Deno.env.get("SUPABASE_URL")!;
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  // @ts-ignore
+  return new (await import("jsr:@supabase/supabase-js@2")).createClient(url, key, {
+    auth: { persistSession: false },
+  });
+}

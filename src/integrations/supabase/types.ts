@@ -1460,6 +1460,36 @@ export type Database = {
         }
         Relationships: []
       }
+      health_log: {
+        Row: {
+          created_at: string | null
+          db_ok: boolean | null
+          details: Json | null
+          id: string
+          queue_fresh: boolean | null
+          rotation_fresh: boolean | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          db_ok?: boolean | null
+          details?: Json | null
+          id?: string
+          queue_fresh?: boolean | null
+          rotation_fresh?: boolean | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          db_ok?: boolean | null
+          details?: Json | null
+          id?: string
+          queue_fresh?: boolean | null
+          rotation_fresh?: boolean | null
+          status?: string
+        }
+        Relationships: []
+      }
       lobby_participants: {
         Row: {
           challenge_id: string | null
