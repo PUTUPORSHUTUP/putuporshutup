@@ -74,6 +74,8 @@ import SponsorAdminPanel from '@/components/admin/SponsorAdminPanel';
 import PosterManagement from '@/components/admin/PosterManagement';
 import { ManualDepositProcessor } from '@/components/admin/ManualDepositProcessor';
 import PosterSelector from '@/components/PosterSelector';
+import { SecuritySettings } from '@/components/admin/SecuritySettings';
+import { SystemMonitoring } from '@/components/admin/SystemMonitoring';
 
 interface AdminAnalytics {
   total_deposits: number;

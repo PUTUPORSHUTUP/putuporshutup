@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateChallengeModal } from '@/components/games/CreateChallengeModal';
-import { TermsModal } from '@/components/TermsModal';
+import { ComprehensiveLegalModal } from '@/components/legal/ComprehensiveLegalModal';
 import { ChallengeCard } from '@/components/games/ChallengeCard';
 import { SuggestGameModal } from '@/components/games/SuggestGameModal';
 import { MatchingPreferences } from '@/components/games/MatchingPreferences';
@@ -29,7 +29,7 @@ const Games = () => {
   const [selectedGame, setSelectedGame] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('browse');
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -50,11 +50,12 @@ const Games = () => {
   
   const { joining, leaving, handleJoinWager, handleLeaveWager } = useWagerActions();
 
-  // Check if user has accepted terms
+  // Check if user has accepted comprehensive legal requirements
   useEffect(() => {
-    const termsAccepted = localStorage.getItem('puosu_terms_accepted');
-    if (!termsAccepted && user) {
-      setShowTermsModal(true);
+    const legalAccepted = localStorage.getItem('puosu_legal_accepted');
+    const legalVersion = localStorage.getItem('puosu_legal_version');
+    if ((!legalAccepted || legalVersion !== '2.0') && user) {
+      setShowLegalModal(true);
     }
   }, [user]);
 
@@ -274,10 +275,11 @@ const Games = () => {
         onOpenChange={setSuggestModalOpen}
       />
 
-      <TermsModal
-        open={showTermsModal}
-        onAccept={() => setShowTermsModal(false)}
-        onClose={() => setShowTermsModal(false)}
+      <ComprehensiveLegalModal
+        open={showLegalModal}
+        onAccept={() => setShowLegalModal(false)}
+        onClose={() => setShowLegalModal(false)}
+        actionText="Join Queue"
       />
     </div>
   );
