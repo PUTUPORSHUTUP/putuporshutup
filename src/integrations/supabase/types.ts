@@ -4349,10 +4349,7 @@ export type Database = {
         Returns: number
       }
       db_market_run: {
-        Args:
-          | Record<PropertyKey, never>
-          | { p_auto_seed?: boolean }
-          | { p_auto_seed?: boolean; p_mode_key?: string }
+        Args: { p_auto_seed?: boolean; p_mode_key?: string }
         Returns: Json
       }
       db_market_run_prod: {
