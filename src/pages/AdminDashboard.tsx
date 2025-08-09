@@ -77,6 +77,7 @@ import { ManualDepositProcessor } from '@/components/admin/ManualDepositProcesso
 import PosterSelector from '@/components/PosterSelector';
 import { SecuritySettings } from '@/components/admin/SecuritySettings';
 import { SystemMonitoring } from '@/components/admin/SystemMonitoring';
+import { PlatformHealthDashboard } from '@/components/admin/PlatformHealthDashboard';
 
 interface AdminAnalytics {
   total_deposits: number;
@@ -624,6 +625,7 @@ const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-15 max-w-8xl gap-1 h-auto">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="health" className="text-xs sm:text-sm">Health</TabsTrigger>
             <TabsTrigger value="simulation" className="text-xs sm:text-sm">Simulation</TabsTrigger>
             <TabsTrigger value="disputes" className="text-xs sm:text-sm">Disputes</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
@@ -766,6 +768,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Platform Health Tab */}
+          <TabsContent value="health" className="space-y-6">
+            <PlatformHealthDashboard />
           </TabsContent>
 
           {/* Passive Income Tab */}
