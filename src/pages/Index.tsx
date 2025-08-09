@@ -18,6 +18,9 @@ const Index = () => {
     { id: 3, player: "ClutchSniper88", amount: 12, game: "COD6 Blitz", result: "won" },
   ]);
 
+  // TEMP: Hide Filter Active Matches
+  const SHOW_MATCH_FILTERS = false;
+
   useEffect(() => {
     const timer = setInterval(() => {
       setMatchCountdown(prev => {
@@ -131,61 +134,63 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Enhanced Game & Mode Filter Section */}
-      <section className="bg-black text-white px-4 py-8 rounded-xl shadow-lg max-w-4xl mx-auto my-6">
-        <div className="max-w-2xl mx-auto">
-          {/* Section Title */}
-          <h2 className="text-xl sm:text-2xl font-bold text-orange-500 text-center mb-1">Filter Active Matches</h2>
-          <p className="text-center text-xs sm:text-sm text-gray-400 mb-6">
-            Quickly narrow down live matches by game or match type.
-          </p>
-
-          {/* Filter Dropdowns */}
-          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-            {/* Filter by Game */}
-            <div>
-              <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🎮 Filter by Game:</label>
-              <Select value={selectedMode} onValueChange={setSelectedMode}>
-                <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                  <SelectValue placeholder="All Games" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-900 text-white border-zinc-700">
-                  <SelectItem value="all">All Games</SelectItem>
-                  <SelectItem value="cod">Call of Duty 6</SelectItem>
-                  <SelectItem value="apex">Apex Legends</SelectItem>
-                  <SelectItem value="nba">NBA 2K25</SelectItem>
-                  <SelectItem value="madden">Madden 25</SelectItem>
-                  <SelectItem value="fortnite">Fortnite</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filter by Mode */}
-            <div>
-              <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🕹️ Filter by Game Mode:</label>
-              <Select value={selectedMode} onValueChange={setSelectedMode}>
-                <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-green-400">
-                  <SelectValue placeholder="All Modes" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-900 text-white border-zinc-700">
-                  <SelectItem value="all">All Modes</SelectItem>
-                  <SelectItem value="ffa">Free-for-All</SelectItem>
-                  <SelectItem value="killrace">Multiplayer</SelectItem>
-                  <SelectItem value="tdm">Team Deathmatch</SelectItem>
-                  <SelectItem value="blitz">Blitz</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Placeholder for match results */}
-          <div className="mt-6 sm:mt-8">
-            <p className="text-center text-gray-500 text-xs sm:text-sm">
-              Filtered matches will appear here based on your selections above.
+      {/* Enhanced Game & Mode Filter Section - TEMPORARILY HIDDEN */}
+      {SHOW_MATCH_FILTERS && (
+        <section className="bg-black text-white px-4 py-8 rounded-xl shadow-lg max-w-4xl mx-auto my-6">
+          <div className="max-w-2xl mx-auto">
+            {/* Section Title */}
+            <h2 className="text-xl sm:text-2xl font-bold text-orange-500 text-center mb-1">Filter Active Matches</h2>
+            <p className="text-center text-xs sm:text-sm text-gray-400 mb-6">
+              Quickly narrow down live matches by game or match type.
             </p>
+
+            {/* Filter Dropdowns */}
+            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
+              {/* Filter by Game */}
+              <div>
+                <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🎮 Filter by Game:</label>
+                <Select value={selectedMode} onValueChange={setSelectedMode}>
+                  <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <SelectValue placeholder="All Games" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 text-white border-zinc-700">
+                    <SelectItem value="all">All Games</SelectItem>
+                    <SelectItem value="cod">Call of Duty 6</SelectItem>
+                    <SelectItem value="apex">Apex Legends</SelectItem>
+                    <SelectItem value="nba">NBA 2K25</SelectItem>
+                    <SelectItem value="madden">Madden 25</SelectItem>
+                    <SelectItem value="fortnite">Fortnite</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter by Mode */}
+              <div>
+                <label className="text-white text-xs sm:text-sm font-semibold mb-2 block">🕹️ Filter by Game Mode:</label>
+                <Select value={selectedMode} onValueChange={setSelectedMode}>
+                  <SelectTrigger className="w-full bg-black border border-gray-700 rounded-lg text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-green-400">
+                    <SelectValue placeholder="All Modes" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 text-white border-zinc-700">
+                    <SelectItem value="all">All Modes</SelectItem>
+                    <SelectItem value="ffa">Free-for-All</SelectItem>
+                    <SelectItem value="killrace">Multiplayer</SelectItem>
+                    <SelectItem value="tdm">Team Deathmatch</SelectItem>
+                    <SelectItem value="blitz">Blitz</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Placeholder for match results */}
+            <div className="mt-6 sm:mt-8">
+              <p className="text-center text-gray-500 text-xs sm:text-sm">
+                Filtered matches will appear here based on your selections above.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Match Results Feed */}
       <section className="bg-zinc-900 py-6 px-4 text-white">
