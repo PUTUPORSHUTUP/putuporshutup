@@ -19,10 +19,10 @@ export default function MarketLogPretty({ entry, compact = false }: { entry: any
 
   if (data.kind === "error") {
     return (
-      <Line className="text-red-500">
+      <Line className="text-destructive">
         <XCircle className="h-4 w-4" />
         <span className="font-semibold">DATABASE MARKET FAILED</span>
-        <span className="text-red-400">{truncate(data.reason, 180)}</span>
+        <span className="text-destructive/80">{truncate(data.reason, 180)}</span>
         <Right timeMs={data.duration_ms} />
       </Line>
     );
@@ -30,10 +30,10 @@ export default function MarketLogPretty({ entry, compact = false }: { entry: any
 
   if (data.kind === "no_players") {
     return (
-      <Line className="text-amber-500">
+      <Line className="text-primary">
         <Info className="h-4 w-4" />
         <span className="font-semibold">NO ELIGIBLE PLAYERS</span>
-        <span className="text-amber-400">(try again shortly)</span>
+        <span className="text-primary/80">(try again shortly)</span>
         <Right timeMs={data.duration_ms} />
       </Line>
     );
@@ -41,14 +41,14 @@ export default function MarketLogPretty({ entry, compact = false }: { entry: any
 
   if (data.kind === "success") {
     return (
-      <Line className="text-emerald-400" compact={compact}>
+      <Line className="text-accent" compact={compact}>
         <CheckCircle2 className="h-4 w-4" />
         <span className="font-semibold">DATABASE MARKET SUCCESS:</span>
-        <Color spanClass="text-green-400">Challenge {shortId(data.challenge_id)}</Color>
-        <Color spanClass="text-blue-300">{num(data.players_paired)}p</Color>
-        <Color spanClass="text-yellow-400">${(num(data.pot_cents)/100).toFixed(2)}</Color>
-        <Color spanClass="text-purple-400">{num(data.paid_rows)} payouts</Color>
-        <Color spanClass="text-orange-400">{sec(data.duration_ms)}s</Color>
+        <Color spanClass="text-neon-green">Challenge {shortId(data.challenge_id)}</Color>
+        <Color spanClass="text-secondary">{num(data.players_paired)}p</Color>
+        <Color spanClass="text-primary">${(num(data.pot_cents)/100).toFixed(2)}</Color>
+        <Color spanClass="text-neon-purple">{num(data.paid_rows)} payouts</Color>
+        <Color spanClass="text-primary">{sec(data.duration_ms)}s</Color>
       </Line>
     );
   }
