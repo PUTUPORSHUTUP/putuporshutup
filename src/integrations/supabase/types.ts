@@ -1143,29 +1143,44 @@ export type Database = {
       game_modes: {
         Row: {
           created_at: string | null
+          display_name: string | null
+          enabled: boolean | null
           game_id: string | null
+          game_key: string | null
           id: string
           is_active: boolean | null
           max_players: number | null
+          min_players: number | null
           mode_description: string | null
+          mode_key: string | null
           mode_name: string
         }
         Insert: {
           created_at?: string | null
+          display_name?: string | null
+          enabled?: boolean | null
           game_id?: string | null
+          game_key?: string | null
           id?: string
           is_active?: boolean | null
           max_players?: number | null
+          min_players?: number | null
           mode_description?: string | null
+          mode_key?: string | null
           mode_name: string
         }
         Update: {
           created_at?: string | null
+          display_name?: string | null
+          enabled?: boolean | null
           game_id?: string | null
+          game_key?: string | null
           id?: string
           is_active?: boolean | null
           max_players?: number | null
+          min_players?: number | null
           mode_description?: string | null
+          mode_key?: string | null
           mode_name?: string
         }
         Relationships: [
