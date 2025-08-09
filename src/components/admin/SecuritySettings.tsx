@@ -11,21 +11,19 @@ import { Shield, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface SecurityConfig {
   otp_expiry_minutes: number;
-  password_breach_check_enabled: boolean;
+  breach_check: boolean;
   max_login_attempts: number;
   lockout_duration_minutes: number;
-  require_strong_passwords: boolean;
-  fraud_detection_enabled: boolean;
+  fraud_detection: boolean;
 }
 
 export const SecuritySettings = () => {
   const [config, setConfig] = useState<SecurityConfig>({
     otp_expiry_minutes: 3,
-    password_breach_check_enabled: true,
-    max_login_attempts: 5,
-    lockout_duration_minutes: 15,
-    require_strong_passwords: true,
-    fraud_detection_enabled: true,
+    breach_check: true,
+    max_login_attempts: 3,
+    lockout_duration_minutes: 5,
+    fraud_detection: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,33 +35,19 @@ export const SecuritySettings = () => {
 
   const loadSecurityConfig = async () => {
     try {
-      const { data, error } = await supabase
-        .from('api_configurations')
-        .select('config_key, config_value')
-        .in('config_key', [
-          'otp_expiry_minutes',
-          'password_breach_check_enabled',
-          'max_login_attempts',
-          'lockout_duration_minutes',
-          'require_strong_passwords',
-          'fraud_detection_enabled'
-        ]);
+      const { data, error } = await supabase.rpc('security_settings_get');
 
       if (error) throw error;
 
-      const configMap = data?.reduce((acc, item) => {
-        acc[item.config_key] = item.config_value;
-        return acc;
-      }, {} as Record<string, string>) || {};
-
-      setConfig({
-        otp_expiry_minutes: parseInt(configMap.otp_expiry_minutes) || 3,
-        password_breach_check_enabled: configMap.password_breach_check_enabled === 'true',
-        max_login_attempts: parseInt(configMap.max_login_attempts) || 5,
-        lockout_duration_minutes: parseInt(configMap.lockout_duration_minutes) || 15,
-        require_strong_passwords: configMap.require_strong_passwords === 'true',
-        fraud_detection_enabled: configMap.fraud_detection_enabled === 'true',
-      });
+      if (data) {
+        setConfig({
+          otp_expiry_minutes: data.otp_expiry_minutes,
+          breach_check: data.breach_check,
+          max_login_attempts: data.max_login_attempts,
+          lockout_duration_minutes: data.lockout_duration_minutes,
+          fraud_detection: data.fraud_detection,
+        });
+      }
     } catch (error) {
       console.error('Error loading security config:', error);
       toast({
@@ -79,26 +63,15 @@ export const SecuritySettings = () => {
   const saveSecurityConfig = async () => {
     setSaving(true);
     try {
-      const updates = [
-        { key: 'otp_expiry_minutes', value: config.otp_expiry_minutes.toString() },
-        { key: 'password_breach_check_enabled', value: config.password_breach_check_enabled.toString() },
-        { key: 'max_login_attempts', value: config.max_login_attempts.toString() },
-        { key: 'lockout_duration_minutes', value: config.lockout_duration_minutes.toString() },
-        { key: 'require_strong_passwords', value: config.require_strong_passwords.toString() },
-        { key: 'fraud_detection_enabled', value: config.fraud_detection_enabled.toString() },
-      ];
+      const { data, error } = await supabase.rpc('security_settings_save', {
+        p_otp: config.otp_expiry_minutes,
+        p_max_attempts: config.max_login_attempts,
+        p_lockout: config.lockout_duration_minutes,
+        p_breach: config.breach_check,
+        p_fraud: config.fraud_detection,
+      });
 
-      for (const update of updates) {
-        const { error } = await supabase
-          .from('api_configurations')
-          .upsert({
-            config_key: update.key,
-            config_value: update.value,
-            description: getConfigDescription(update.key),
-          });
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Settings Saved",
@@ -189,8 +162,8 @@ export const SecuritySettings = () => {
                 <Label htmlFor="breach-check">Password Breach Check</Label>
                 <Switch
                   id="breach-check"
-                  checked={config.password_breach_check_enabled}
-                  onCheckedChange={(checked) => updateConfig('password_breach_check_enabled', checked)}
+                  checked={config.breach_check}
+                  onCheckedChange={(checked) => updateConfig('breach_check', checked)}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -244,20 +217,6 @@ export const SecuritySettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label htmlFor="strong-passwords">Require Strong Passwords</Label>
-                <p className="text-xs text-muted-foreground">
-                  Enforce uppercase, lowercase, numbers, and minimum length
-                </p>
-              </div>
-              <Switch
-                id="strong-passwords"
-                checked={config.require_strong_passwords}
-                onCheckedChange={(checked) => updateConfig('require_strong_passwords', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
                 <Label htmlFor="fraud-detection">Fraud Detection</Label>
                 <p className="text-xs text-muted-foreground">
                   Enable automated fraud pattern detection
@@ -265,8 +224,8 @@ export const SecuritySettings = () => {
               </div>
               <Switch
                 id="fraud-detection"
-                checked={config.fraud_detection_enabled}
-                onCheckedChange={(checked) => updateConfig('fraud_detection_enabled', checked)}
+                checked={config.fraud_detection}
+                onCheckedChange={(checked) => updateConfig('fraud_detection', checked)}
               />
             </div>
           </div>
@@ -279,11 +238,11 @@ export const SecuritySettings = () => {
             <Badge variant={config.otp_expiry_minutes <= 5 ? "default" : "secondary"}>
               OTP: {config.otp_expiry_minutes}min
             </Badge>
-            <Badge variant={config.password_breach_check_enabled ? "default" : "secondary"}>
-              {config.password_breach_check_enabled ? "Breach Check ON" : "Breach Check OFF"}
+            <Badge variant={config.breach_check ? "default" : "secondary"}>
+              {config.breach_check ? "Breach Check ON" : "Breach Check OFF"}
             </Badge>
-            <Badge variant={config.fraud_detection_enabled ? "default" : "secondary"}>
-              {config.fraud_detection_enabled ? "Fraud Detection ON" : "Fraud Detection OFF"}
+            <Badge variant={config.fraud_detection ? "default" : "secondary"}>
+              {config.fraud_detection ? "Fraud Detection ON" : "Fraud Detection OFF"}
             </Badge>
           </div>
         </div>

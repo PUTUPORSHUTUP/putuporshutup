@@ -2716,52 +2716,55 @@ export type Database = {
       }
       security_settings: {
         Row: {
-          account_locked_until: string | null
-          created_at: string
-          failed_login_attempts: number
-          id: string
-          last_failed_login: string | null
-          last_password_change: string | null
+          breach_check: boolean
+          fraud_detection: boolean
+          id: number
           lockout_duration_minutes: number
           max_login_attempts: number
           otp_expiry_minutes: number
-          otp_method: string | null
-          password_change_required: boolean
-          two_factor_enabled: boolean
           updated_at: string
-          user_id: string | null
         }
         Insert: {
-          account_locked_until?: string | null
-          created_at?: string
-          failed_login_attempts?: number
-          id?: string
-          last_failed_login?: string | null
-          last_password_change?: string | null
+          breach_check?: boolean
+          fraud_detection?: boolean
+          id?: number
           lockout_duration_minutes?: number
           max_login_attempts?: number
           otp_expiry_minutes?: number
-          otp_method?: string | null
-          password_change_required?: boolean
-          two_factor_enabled?: boolean
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
-          account_locked_until?: string | null
-          created_at?: string
-          failed_login_attempts?: number
-          id?: string
-          last_failed_login?: string | null
-          last_password_change?: string | null
+          breach_check?: boolean
+          fraud_detection?: boolean
+          id?: number
           lockout_duration_minutes?: number
           max_login_attempts?: number
           otp_expiry_minutes?: number
-          otp_method?: string | null
-          password_change_required?: boolean
-          two_factor_enabled?: boolean
           updated_at?: string
-          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_settings_audit: {
+        Row: {
+          after_json: Json | null
+          before_json: Json | null
+          changed_at: string
+          changed_by: string | null
+          id: number
+        }
+        Insert: {
+          after_json?: Json | null
+          before_json?: Json | null
+          changed_at?: string
+          changed_by?: string | null
+          id?: number
+        }
+        Update: {
+          after_json?: Json | null
+          before_json?: Json | null
+          changed_at?: string
+          changed_by?: string | null
+          id?: number
         }
         Relationships: []
       }
@@ -4747,6 +4750,36 @@ export type Database = {
           details: string
           severity: string
         }[]
+      }
+      security_settings_get: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          breach_check: boolean
+          fraud_detection: boolean
+          id: number
+          lockout_duration_minutes: number
+          max_login_attempts: number
+          otp_expiry_minutes: number
+          updated_at: string
+        }
+      }
+      security_settings_save: {
+        Args: {
+          p_otp: number
+          p_max_attempts: number
+          p_lockout: number
+          p_breach: boolean
+          p_fraud: boolean
+        }
+        Returns: {
+          breach_check: boolean
+          fraud_detection: boolean
+          id: number
+          lockout_duration_minutes: number
+          max_login_attempts: number
+          otp_expiry_minutes: number
+          updated_at: string
+        }
       }
       settle_challenge_payouts: {
         Args: { challenge_id: string }
