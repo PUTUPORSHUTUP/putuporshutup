@@ -994,10 +994,43 @@ export type Database = {
             foreignKeyName: "fraud_flags_result_id_fkey"
             columns: ["result_id"]
             isOneToOne: false
-            referencedRelation: "match_results"
+            referencedRelation: "fraud_match_results"
             referencedColumns: ["id"]
           },
         ]
+      }
+      fraud_match_results: {
+        Row: {
+          created_at: string | null
+          entry_fee_cents: number
+          game: string
+          id: string
+          loser: string
+          mode: string
+          screenshot_hash: string | null
+          winner: string
+        }
+        Insert: {
+          created_at?: string | null
+          entry_fee_cents: number
+          game: string
+          id?: string
+          loser: string
+          mode: string
+          screenshot_hash?: string | null
+          winner: string
+        }
+        Update: {
+          created_at?: string | null
+          entry_fee_cents?: number
+          game?: string
+          id?: string
+          loser?: string
+          mode?: string
+          screenshot_hash?: string | null
+          winner?: string
+        }
+        Relationships: []
       }
       fraud_patterns: {
         Row: {
