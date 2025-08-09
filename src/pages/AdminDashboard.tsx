@@ -880,7 +880,7 @@ const AdminDashboard = () => {
 
           {/* Tournaments Tab */}
           <TabsContent value="tournaments" className="space-y-6">
-            <LiveEventsMonitor />
+            <LiveEventsMonitor isAdmin={true} />
           </TabsContent>
 
           {/* Disputes Tab */}

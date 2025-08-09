@@ -4285,6 +4285,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_event_force_payout: {
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
+      admin_event_force_refund: {
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
       admin_kpis_last24: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -4544,6 +4552,42 @@ export type Database = {
           p_stake_amount: number
         }
         Returns: undefined
+      }
+      live_events_list_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          title: string
+          mode_key: string
+          mode_label: string
+          entry_fee_cents: number
+          prize_pool_cents: number
+          players: number
+          max_players: number
+          status: string
+          starts_at: string
+          ends_at: string
+          public_url: string
+          payout_label: string
+        }[]
+      }
+      live_events_list_public: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          title: string
+          mode_key: string
+          mode_label: string
+          entry_fee_cents: number
+          prize_pool_cents: number
+          players: number
+          max_players: number
+          status: string
+          starts_at: string
+          ends_at: string
+          public_url: string
+          payout_label: string
+        }[]
       }
       log_event: {
         Args: { event_type: string; details: string }
