@@ -1484,6 +1484,162 @@ export type Database = {
         }
         Relationships: []
       }
+      market_match_results: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          placement: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          placement: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          placement?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      market_matches: {
+        Row: {
+          created_at: string
+          game_key: string | null
+          id: string
+          player_a: string | null
+          player_b: string | null
+          stake_cents: number
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          game_key?: string | null
+          id?: string
+          player_a?: string | null
+          player_b?: string | null
+          stake_cents?: number
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          game_key?: string | null
+          id?: string
+          player_a?: string | null
+          player_b?: string | null
+          stake_cents?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      market_payouts: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          error: string | null
+          id: string
+          match_id: string
+          status: string
+          winner_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          match_id: string
+          status?: string
+          winner_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          match_id?: string
+          status?: string
+          winner_id?: string
+        }
+        Relationships: []
+      }
+      market_queue: {
+        Row: {
+          created_at: string
+          game_key: string | null
+          id: string
+          stake_cents: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_key?: string | null
+          id?: string
+          stake_cents: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_key?: string | null
+          id?: string
+          stake_cents?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      market_wallet_transactions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          reason: string
+          ref_match: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          reason: string
+          ref_match?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          ref_match?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      market_wallets: {
+        Row: {
+          balance_cents: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_cents?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_cents?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_notifications: {
         Row: {
           created_at: string
@@ -4064,6 +4220,10 @@ export type Database = {
         Args: Record<PropertyKey, never> | { p_auto_seed?: boolean }
         Returns: Json
       }
+      db_market_run_prod: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       detect_suspicious_stats: {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
@@ -4261,6 +4421,19 @@ export type Database = {
       mark_challenge_settled: {
         Args: { p_challenge_id: string }
         Returns: boolean
+      }
+      market_payout_safe: {
+        Args: { p_match_id: string; p_total_pot_cents: number }
+        Returns: number
+      }
+      market_wallet_credit: {
+        Args: {
+          p_user_id: string
+          p_amount_cents: number
+          p_reason: string
+          p_ref_match: string
+        }
+        Returns: undefined
       }
       refund_all_challenge_players: {
         Args: { challenge_id: string; reason: string }
