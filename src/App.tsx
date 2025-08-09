@@ -21,6 +21,7 @@ import Sponsor from "./pages/Sponsor";
 import SponsorSignup from "./pages/SponsorSignup";
 import SponsorDashboard from "./pages/SponsorDashboard";
 import SundayShowdown from "./pages/SundayShowdown";
+import TournamentDetail from "./pages/TournamentDetail";
 import HowItWorks from "./pages/HowItWorks";
 import Education from "./pages/Education";
 import Promotion from "./pages/Promotion";
@@ -66,9 +67,14 @@ const App = () => {
                 </ProtectedRoute>
               } />
               <Route path="/games" element={<Games />} />
-              <Route path="/tournaments" element={
+               <Route path="/tournaments" element={
                 <ProtectedRoute>
                   <Tournaments />
+                </ProtectedRoute>
+              } />
+              <Route path="/tournaments/:tournamentId" element={
+                <ProtectedRoute>
+                  <TournamentDetail />
                 </ProtectedRoute>
               } />
               <Route path="/social" element={

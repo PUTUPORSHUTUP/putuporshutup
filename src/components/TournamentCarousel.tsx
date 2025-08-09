@@ -35,7 +35,7 @@ export default function TournamentCarousel() {
 
       <div className="flex justify-center mt-3">
         <a
-          href="/join-queue?sunday=1"
+          href="/tournaments/sunday-showdown"
           className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
         >
           ✅ Join Sunday Showdown
