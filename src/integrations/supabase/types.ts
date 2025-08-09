@@ -4501,6 +4501,22 @@ export type Database = {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
       }
+      flag_multi_account: {
+        Args: { p_res: string }
+        Returns: undefined
+      }
+      flag_rapid_rematch: {
+        Args: { p_res: string }
+        Returns: undefined
+      }
+      flag_screenshot_reused: {
+        Args: { p_res: string }
+        Returns: undefined
+      }
+      flag_win_streak: {
+        Args: { p_res: string }
+        Returns: undefined
+      }
       generate_automated_tournaments: {
         Args: Record<PropertyKey, never>
         Returns: undefined
