@@ -54,7 +54,7 @@ const Index = () => {
     }
 
     // ✅ Redirect to queue or trigger Supabase logic
-    window.location.href = '/queue';
+    navigate('/queue');
   };
 
   return (
@@ -89,7 +89,7 @@ const Index = () => {
           </button>
           <button 
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto text-center"
-            onClick={() => window.location.href = '/start-trial'}
+            onClick={() => navigate('/start-trial')}
           >
             🎟️ Start Free VIP Trial
           </button>
@@ -252,7 +252,7 @@ const Index = () => {
 
             <button 
               className="bg-orange-500 hover:bg-orange-600 w-full py-2 sm:py-3 rounded text-white font-semibold text-sm sm:text-base"
-              onClick={() => window.location.href = '/auth'}
+              onClick={() => navigate('/start-trial')}
             >
               Start Free Trial
             </button>
