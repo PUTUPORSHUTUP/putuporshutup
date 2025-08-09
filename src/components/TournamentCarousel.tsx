@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type Poster = { src: string; label: string; href?: string };
 
@@ -6,11 +7,11 @@ const posters: Poster[] = [
   {
     src: "/posters/sunday_showdown_fresh.png", // 🔥 newest / featured
     label: "🔥 Sunday Showdown — Winner Takes All",
-    href: "/tournaments/sunday-showdown"
+    href: "/tournaments"
   },
-  { src: "/posters/sunday_showdown_aug11.png", label: "Sunday Showdown – August 11", href: "/tournaments/sunday-showdown" },
-  { src: "/posters/sunday_showdown_aug4.png",  label: "Sunday Showdown – August 4",  href: "/tournaments/sunday-showdown" },
-  { src: "/posters/sunday_showdown_july28.png",label: "Sunday Showdown – July 28",   href: "/tournaments/sunday-showdown" }
+  { src: "/posters/sunday_showdown_aug11.png", label: "Sunday Showdown – August 11", href: "/tournaments" },
+  { src: "/posters/sunday_showdown_aug4.png",  label: "Sunday Showdown – August 4",  href: "/tournaments" },
+  { src: "/posters/sunday_showdown_july28.png",label: "Sunday Showdown – July 28",   href: "/tournaments" }
 ];
 
 export default function TournamentCarousel() {
@@ -27,19 +28,19 @@ export default function TournamentCarousel() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 relative">
-      <a href={cur.href || "#"} aria-label={cur.label}>
+      <Link to={cur.href || "/tournaments"} aria-label={cur.label}>
         <img src={cur.src} alt={cur.label} className="rounded-2xl shadow-lg w-full object-contain" />
-      </a>
+      </Link>
 
       <p className="text-center text-neutral-300 text-sm mt-2">{cur.label}</p>
 
       <div className="flex justify-center mt-3">
-        <a
-          href="/tournaments/sunday-showdown"
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
+        <Link
+          to="/tournaments"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold transition-colors"
         >
           ✅ Join Sunday Showdown
-        </a>
+        </Link>
       </div>
 
       <button

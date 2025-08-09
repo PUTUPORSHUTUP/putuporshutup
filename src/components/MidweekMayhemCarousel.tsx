@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type Poster = { src: string; label: string; href?: string };
 
 const posters: Poster[] = [
-  { src: "/posters/midweek_mayhem_fresh.png", label: "💥 Midweek Mayhem — Multiplayer Madness", href: "/tournaments/midweek-mayhem" },
-  { src: "/posters/midweek_mayhem_aug7.png",  label: "💥 Midweek Mayhem – August 7", href: "/tournaments/midweek-mayhem" },
-  { src: "/posters/midweek_mayhem_july31.png",label: "💥 Midweek Mayhem – July 31", href: "/tournaments/midweek-mayhem" }
+  { src: "/posters/midweek_mayhem_fresh.png", label: "💥 Midweek Mayhem — Multiplayer Madness", href: "/tournaments" },
+  { src: "/posters/midweek_mayhem_aug7.png",  label: "💥 Midweek Mayhem – August 7", href: "/tournaments" },
+  { src: "/posters/midweek_mayhem_july31.png",label: "💥 Midweek Mayhem – July 31", href: "/tournaments" }
 ];
 
 export default function MidweekMayhemCarousel() {
@@ -22,19 +23,19 @@ export default function MidweekMayhemCarousel() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 relative">
-      <a href={cur.href || "#"} aria-label={cur.label}>
+      <Link to={cur.href || "/tournaments"} aria-label={cur.label}>
         <img src={cur.src} alt={cur.label} className="rounded-2xl shadow-lg w-full object-contain" />
-      </a>
+      </Link>
 
       <p className="text-center text-neutral-300 text-sm mt-2">{cur.label}</p>
 
       <div className="flex justify-center mt-3">
-        <a
-          href="/join-queue?midweek=1"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
+        <Link
+          to="/tournaments"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition-colors"
         >
           🚀 Join Midweek Mayhem
-        </a>
+        </Link>
       </div>
 
       <button

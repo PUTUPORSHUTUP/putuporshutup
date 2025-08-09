@@ -22,24 +22,32 @@ export const FeaturedPoster = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data, error } = await supabase
-        .from("posters")
-        .select("id,title,image_url,description,event_type,featured")
-        .eq("featured", true)
-        .eq("is_active", true)
-        .eq("is_archived", false)
-        .limit(1)
-        .maybeSingle();
+    const fetchPoster = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("posters")
+          .select("id,title,image_url,description,event_type,featured")
+          .eq("featured", true)
+          .eq("is_active", true)
+          .eq("is_archived", false)
+          .limit(1)
+          .maybeSingle();
 
-      if (mounted) {
-        if (error) console.error("Load featured poster failed:", error);
-        setPoster(data || null);
+        if (error) {
+          console.error("Load featured poster failed:", error);
+          setPoster(null);
+        } else {
+          setPoster(data || null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch poster:", err);
+        setPoster(null);
+      } finally {
         setLoading(false);
       }
-    })();
-    return () => { mounted = false; };
+    };
+
+    fetchPoster();
   }, []);
 
   const onClick = () => {
