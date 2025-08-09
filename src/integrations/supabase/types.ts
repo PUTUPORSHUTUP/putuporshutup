@@ -4424,7 +4424,19 @@ export type Database = {
         Args: { p_match_id: string; p_mode_key: string }
         Returns: undefined
       }
+      ingest_results_apex: {
+        Args: { p_match_id: string; p_mode_key: string }
+        Returns: undefined
+      }
       ingest_results_cod6: {
+        Args: { p_match_id: string; p_mode_key: string }
+        Returns: undefined
+      }
+      ingest_results_fn: {
+        Args: { p_match_id: string; p_mode_key: string }
+        Returns: undefined
+      }
+      ingest_results_rl: {
         Args: { p_match_id: string; p_mode_key: string }
         Returns: undefined
       }
