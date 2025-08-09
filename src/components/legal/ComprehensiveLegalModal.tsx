@@ -125,39 +125,107 @@ export const ComprehensiveLegalModal = ({
                 onScrollCapture={handleScroll('terms')}
               >
                 <div className="space-y-4 text-sm">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <div className="flex items-start gap-2">
-                      <Shield className="w-4 h-4 text-blue-600 mt-0.5" />
-                      <div className="text-blue-800">
-                        <p className="font-medium">Terms of Use</p>
-                        <p className="text-xs mt-1">Scroll to the bottom to mark as read</p>
-                      </div>
-                    </div>
+                  <div className="text-center border-b pb-4">
+                    <h3 className="text-lg font-bold">Community Gaming Charter</h3>
+                    <p className="text-xs text-muted-foreground mt-1">Version 2.0, Founded on Community, Honesty, Integrity, and Transparency</p>
                   </div>
 
+                  <h3 className="font-semibold text-base">CORE PRINCIPLES AND CONDITIONS FOR PARTICIPATION</h3>
+
                   <div className="space-y-3">
-                    <h4 className="font-semibold">Platform Rules & Fair Play</h4>
-                    <div className="space-y-2 text-sm">
-                      <p><strong>1. Skill-Based Competition:</strong> All matches are based solely on player skill. No gambling or chance-based elements.</p>
-                      <p><strong>2. Fair Play Requirement:</strong> Use of cheats, exploits, or unauthorized software is prohibited and results in immediate disqualification.</p>
-                      <p><strong>3. Match Integrity:</strong> Players must compete honestly and submit accurate results with valid proof.</p>
-                      <p><strong>4. Platform Responsibility:</strong> PUOSU provides the platform but is not responsible for technical issues, connection problems, or gameplay outcomes.</p>
-                      <p><strong>5. Dispute Resolution:</strong> All disputes are reviewed by PUOSU moderators whose decisions are final.</p>
-                      <p><strong>6. Account Security:</strong> Players are responsible for maintaining account security and authorized access only.</p>
-                      <p><strong>7. Age Requirement:</strong> Must be 18+ or have parental consent to participate in cash competitions.</p>
-                      <p><strong>8. Compliance:</strong> Players must comply with local laws regarding skill-based competitions in their jurisdiction.</p>
+                    <div>
+                      <h4 className="font-semibold">1. Definitions</h4>
+                      <div className="pl-4 space-y-2 text-xs">
+                        <p><strong>"Community"</strong> shall mean all participants, players, and stakeholders who contribute to the collective gaming experience on our platform.</p>
+                        <p><strong>"Honesty"</strong> shall mean the commitment to truthful reporting of results, accurate representation of skills, and genuine participation in all gaming activities.</p>
+                        <p><strong>"Integrity"</strong> shall mean the adherence to moral and ethical principles, fair play, and respect for all community members regardless of skill level.</p>
+                        <p><strong>"Transparency"</strong> shall mean open communication about platform operations, clear disclosure of fees, and accessible information about all processes.</p>
+                        <p><strong>"You"</strong> (or <strong>"Your"</strong>) shall mean an individual participant exercising the privileges granted by this Charter.</p>
+                      </div>
                     </div>
 
-                    <h4 className="font-semibold mt-6">Match Procedures</h4>
-                    <div className="space-y-2 text-sm">
-                      <p><strong>Timing:</strong> Players must check in within specified time windows or forfeit their entry.</p>
-                      <p><strong>Proof Submission:</strong> Results must be submitted with valid screenshots or video proof within 10 minutes of match completion.</p>
-                      <p><strong>Communication:</strong> All match-related communication should occur through the platform's official channels.</p>
+                    <div>
+                      <h4 className="font-semibold">2. Community Commitment</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>By joining our platform, You commit to fostering a welcoming, inclusive gaming environment where:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>All skill levels are respected and encouraged</li>
+                          <li>Constructive feedback replaces toxic behavior</li>
+                          <li>Collaborative growth benefits the entire community</li>
+                          <li>New members receive support and guidance</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">3. Honesty in Competition</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>You agree to maintain absolute honesty by:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>Reporting match results accurately and promptly</li>
+                          <li>Representing Your true skill level and gaming history</li>
+                          <li>Disclosing any conflicts of interest or relationships that may affect fair play</li>
+                          <li>Providing truthful information during account registration and verification</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">4. Integrity Standards</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>Your participation must demonstrate integrity through:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>Engaging in fair play without exploits or unauthorized assistance</li>
+                          <li>Treating all community members with respect and dignity</li>
+                          <li>Taking responsibility for Your actions and their impact on others</li>
+                          <li>Supporting the community's collective success over individual gain</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">5. Transparency Obligations</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>We provide transparent operations, and You benefit from:</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>Clear visibility into all fees, charges, and payout structures</li>
+                          <li>Open access to platform policies, updates, and decision-making processes</li>
+                          <li>Transparent dispute resolution with clear timelines and procedures</li>
+                          <li>Regular community updates on platform improvements and changes</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">6. Grant of Participation Rights</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>Subject to the terms and conditions of this Charter, each community member hereby grants to You a welcoming, worldwide, non-exclusive, no-charge, skill-based, revocable license to participate in competitions, collaborate with other players, publicly display Your achievements, share Your gaming experiences, and contribute to the community growth in Source or recorded form.</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">7. Community Standards Enforcement</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>You may participate and compete with other community members in any medium, with or without modifications, provided that You meet the following conditions:</p>
+                        <div className="pl-4 space-y-1">
+                          <p>(a) You must give other participants respect and fair treatment;</p>
+                          <p>(b) You must carry yourself with integrity and honor our community values;</p>
+                          <p>(c) You must retain honesty in all interactions, accurate reporting, and transparent communication;</p>
+                          <p>(d) If conflicts arise, You must engage in good faith resolution processes.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold">8. Disclaimer of Warranty</h4>
+                      <div className="pl-4 space-y-1 text-xs">
+                        <p>Unless required by applicable law or agreed to in writing, the Platform provides services on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including any warranties of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of participating and assume any risks associated with Your exercise of permissions under this Charter.</p>
+                      </div>
                     </div>
 
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
                       <p className="text-green-800 text-sm font-medium">
-                        ✓ Terms of Use section complete
+                        ✓ Community Gaming Charter section complete
                       </p>
                     </div>
                   </div>
