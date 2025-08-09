@@ -23,7 +23,7 @@ export default function AdminSimPanel() {
   const [loadingDiag, setLoadingDiag] = useState(false);
   const timerRef = useRef<number | null>(null);
   const tickRef = useRef<number | null>(null);
-  const intervalMs = 8 * 60 * 1000; // 8 minutes
+  const intervalMs = 4 * 60 * 1000; // 4 minutes
 
   const push = (msg: any) => {
     const str =
@@ -230,7 +230,7 @@ export default function AdminSimPanel() {
 
         {!running ? (
           <button onClick={startLoop} className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded">
-            🔁 Start Auto Market (every 8 min)
+            🔁 Start Auto Market (every 4 min)
           </button>
         ) : (
           <button onClick={stopLoop} className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded">
