@@ -4689,8 +4689,8 @@ export type Database = {
         Args: {
           p_user: string
           p_amount: number
-          p_reason?: string
-          p_match?: string
+          p_reason: string
+          p_match: string
         }
         Returns: undefined
       }
