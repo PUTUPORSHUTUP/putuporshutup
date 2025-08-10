@@ -230,6 +230,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       automated_actions: {
         Row: {
           action_data: Json | null
@@ -4527,9 +4554,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      deploy_emergency_users: {
+        Args: { user_count?: number }
+        Returns: Json
+      }
       detect_suspicious_stats: {
         Args: { user_id_param: string; stats_data: Json; game_mode?: string }
         Returns: boolean
+      }
+      emergency_rollback: {
+        Args: { reason?: string }
+        Returns: Json
       }
       flag_multi_account: {
         Args: { p_res: string }
@@ -4808,6 +4843,10 @@ export type Database = {
       }
       manage_test_users: {
         Args: { action: string; username?: string; wallet_balance?: number }
+        Returns: Json
+      }
+      manual_payout: {
+        Args: { match_id: string; admin_override?: boolean }
         Returns: Json
       }
       mark_challenge_settled: {
