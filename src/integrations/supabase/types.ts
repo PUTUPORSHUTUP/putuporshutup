@@ -409,13 +409,6 @@ export type Database = {
             referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "challenge_participants_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
         ]
       }
       challenge_result_reports: {
@@ -447,13 +440,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "challenge_result_reports_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
           },
         ]
       }
@@ -516,13 +502,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "challenge_stats_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
           },
         ]
       }
@@ -599,13 +578,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "challenge_teams_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
           },
         ]
       }
@@ -800,13 +772,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "disputes_wager_id_fkey"
-            columns: ["wager_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
           },
         ]
       }
@@ -1554,13 +1519,6 @@ export type Database = {
             referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "lobby_participants_wager_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
         ]
       }
       lobby_sessions: {
@@ -1911,13 +1869,6 @@ export type Database = {
             referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "match_notifications_wager_id_fkey"
-            columns: ["wager_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
         ]
       }
       match_preferences: {
@@ -2031,13 +1982,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "challenges"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "match_queue_wager_id_fkey"
-            columns: ["wager_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
           },
         ]
       }
@@ -2444,13 +2388,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
-          {
-            foreignKeyName: "player_skill_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "test_user_status"
-            referencedColumns: ["id"]
-          },
         ]
       }
       player_stats: {
@@ -2750,25 +2687,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "proof_submissions_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
-          {
             foreignKeyName: "proof_submissions_submitted_by_fkey"
             columns: ["submitted_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "proof_submissions_submitted_by_fkey"
-            columns: ["submitted_by"]
-            isOneToOne: false
-            referencedRelation: "test_user_status"
-            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "proof_submissions_tournament_match_id_fkey"
@@ -3308,13 +3231,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "suspicious_activities_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
-          {
             foreignKeyName: "suspicious_activities_tournament_match_id_fkey"
             columns: ["tournament_match_id"]
             isOneToOne: false
@@ -3327,13 +3243,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "suspicious_activities_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "test_user_status"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -4042,13 +3951,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
-          {
-            foreignKeyName: "wallet_transactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "test_user_status"
-            referencedColumns: ["id"]
-          },
         ]
       }
       wallets: {
@@ -4321,13 +4223,6 @@ export type Database = {
             referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "xbox_match_history_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
         ]
       }
       xbox_verification_queue: {
@@ -4387,84 +4282,11 @@ export type Database = {
             referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "xbox_verification_queue_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "payout_guard"
-            referencedColumns: ["challenge_id"]
-          },
         ]
       }
     }
     Views: {
-      auth_diagnostics: {
-        Row: {
-          created_at: string | null
-          error_message: string | null
-          error_time: string | null
-          event_type: string | null
-          match_id: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          error_time?: string | null
-          event_type?: string | null
-          match_id?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          error_message?: string | null
-          error_time?: string | null
-          event_type?: string | null
-          match_id?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      payout_guard: {
-        Row: {
-          challenge_id: string | null
-          error_message: string | null
-          participant_count: number | null
-          payout_amount: number | null
-          payout_status: string | null
-          processed_at: string | null
-          settled_at: string | null
-          settlement_attempts: number | null
-          status: string | null
-          total_pot: number | null
-          winner_id: string | null
-        }
-        Relationships: []
-      }
-      test_user_status: {
-        Row: {
-          id: string | null
-          last_used: string | null
-          status: string | null
-          username: string | null
-          wallet_balance: number | null
-        }
-        Insert: {
-          id?: string | null
-          last_used?: string | null
-          status?: never
-          username?: string | null
-          wallet_balance?: number | null
-        }
-        Update: {
-          id?: string | null
-          last_used?: string | null
-          status?: never
-          username?: string | null
-          wallet_balance?: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       admin_event_force_payout: {
@@ -4629,6 +4451,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_auth_diagnostics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          match_id: string
+          created_at: string
+          event_type: string
+          status: string
+          error_message: string
+          error_time: string
+        }[]
+      }
       get_available_test_users: {
         Args: { min_balance?: number; max_users?: number }
         Returns: {
@@ -4636,9 +4469,35 @@ export type Database = {
           wallet_balance: number
         }[]
       }
+      get_payout_guard: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          challenge_id: string
+          status: string
+          winner_id: string
+          settled_at: string
+          settlement_attempts: number
+          payout_status: string
+          error_message: string
+          processed_at: string
+          payout_amount: number
+          participant_count: number
+          total_pot: number
+        }[]
+      }
       get_platform_health: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_test_user_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          username: string
+          wallet_balance: number
+          last_used: string
+          status: string
+        }[]
       }
       get_user_role: {
         Args: { user_uuid?: string }
