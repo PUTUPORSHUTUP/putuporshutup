@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Users, DollarSign, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FeaturedPoster } from '@/components/ui/featured-poster';
-const sundayShowdownImage = '/lovable-uploads/45d7073b-0f70-4555-95ab-c80162886810.png';
+const sundayShowdownImage = '/lovable-uploads/26ea1408-24d7-4d09-ba97-0d7d6e2946fd.png';
 
 interface UpcomingTournament {
   id: string;
@@ -112,9 +112,20 @@ export const UpcomingTournaments = ({ showAll = false, maxItems = 3 }: UpcomingT
 
   return (
     <div className="space-y-6">
-      {/* Featured Poster Section */}
+      {/* Featured Sunday Showdown Poster */}
       <div className="mb-8">
-        <FeaturedPoster />
+        <Link to="/tournaments?id=featured-sunday-showdown" className="block">
+          <div className="relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <img 
+              src={sundayShowdownImage}
+              alt="Sunday Showdown – Free-for-All, Winner-Takes-All, $5 Entry – PUOSU"
+              className="w-full h-auto object-cover"
+            />
+            <div className="absolute top-4 left-4">
+              <Badge className="bg-yellow-500 text-black font-bold">⭐ Featured</Badge>
+            </div>
+          </div>
+        </Link>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
