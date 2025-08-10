@@ -4816,6 +4816,14 @@ export type Database = {
           payout_label: string
         }[]
       }
+      log_admin_action: {
+        Args: {
+          p_action_type: string
+          p_target_user_id?: string
+          p_details?: Json
+        }
+        Returns: undefined
+      }
       log_event: {
         Args: { event_type: string; details: string }
         Returns: undefined
