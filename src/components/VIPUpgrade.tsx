@@ -193,13 +193,13 @@ export const VIPUpgrade = () => {
           {loading ? "Processing..." : "Submit Deposit Request"}
         </Button>
 
-        <div className="bg-gray-800 p-4 rounded-lg text-sm text-gray-300">
-          <p><strong>How it works:</strong></p>
-          <p>1. Enter the amount you want to deposit</p>
-          <p>2. Choose your preferred payment method</p>
-          <p>3. Complete the payment and include your account info</p>
-          <p>4. Funds will be added to your wallet within 24 hours</p>
-        </div>
+          <div className="bg-gray-800 p-4 rounded-lg text-sm text-gray-300">
+            <p><strong>How it works:</strong></p>
+            <p>1. Enter the amount you want to deposit</p>
+            <p>2. Choose your preferred payment method</p>
+            <p>3. Complete the payment and include your account info</p>
+            <p>4. Funds will be added to your wallet after verification</p>
+          </div>
       </CardContent>
     </Card>
   );

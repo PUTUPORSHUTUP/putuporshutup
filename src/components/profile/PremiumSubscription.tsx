@@ -51,7 +51,7 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
   const handleManualPayment = (method: string) => {
     toast({
       title: "Payment Instructions",
-      description: `Send $9.99 via ${method} using the QR code. You'll get VIP access within 24 hours after payment verification.`,
+      description: `Send $9.99 via ${method} using the QR code. You'll get VIP access after payment verification.`,
     });
   };
 
@@ -244,7 +244,7 @@ export const PremiumSubscription = ({ onSubscriptionUpdate, currentSubscription 
 
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  After payment, your VIP access will be activated within 24 hours
+                  After payment, your VIP access will be activated
                 </p>
                 <Button 
                   onClick={() => setShowPaymentOptions(false)} 
