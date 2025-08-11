@@ -156,15 +156,15 @@ export const MobileNavigation = ({ profile }: MobileNavigationProps) => {
                       <span className="font-medium">Admin Dashboard</span>
                     </Button>
                   </Link>
-                  <Link to="/admin?tab=simulation" onClick={handleNavClick}>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start h-12 text-left hover:bg-muted/50"
-                    >
-                      🧪
-                      <span className="font-medium ml-3">Simulation</span>
-                    </Button>
-                  </Link>
+                   <Link to="/admin/simulation" onClick={handleNavClick}>
+                     <Button 
+                       variant="ghost" 
+                       className="w-full justify-start h-12 text-left hover:bg-muted/50"
+                     >
+                       🧪
+                       <span className="font-medium ml-3">Simulation</span>
+                     </Button>
+                   </Link>
                 </>
               )}
 

@@ -7,6 +7,7 @@ import { Clock, Gamepad2, QrCode } from "lucide-react";
 import { FeaturedPoster } from "@/components/ui/featured-poster";
 import TournamentCarousel from "@/components/TournamentCarousel";
 import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
+import FreeDemoCountdown from "@/components/FreeDemoCountdown";
 import { supabase } from "@/integrations/supabase/client";
 
 type BannerType = {
@@ -392,6 +393,9 @@ const Index = () => {
       <footer className="bg-zinc-900 py-4 px-4 text-center text-gray-500 text-xs">
         © 2025 Put Up or Shut Up™ – All Rights Reserved
       </footer>
+
+      {/* Free Demo Countdown Widget */}
+      <FreeDemoCountdown />
     </div>
   );
 };
