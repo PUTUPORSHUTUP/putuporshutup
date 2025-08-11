@@ -8,6 +8,7 @@ import { FeaturedPoster } from "@/components/ui/featured-poster";
 import TournamentCarousel from "@/components/TournamentCarousel";
 import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
 import FreeDemoCountdown from "@/components/FreeDemoCountdown";
+import SmartBanner from "@/components/SmartBanner";
 import { supabase } from "@/integrations/supabase/client";
 
 type BannerType = {
@@ -112,7 +113,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      {/* Smart Banner */}
+      <SmartBanner />
 
       {/* Enhanced Mobile-Optimized Hero Section */}
       <section className="w-full bg-black text-white py-8 px-4 md:px-10 rounded-lg shadow-lg">

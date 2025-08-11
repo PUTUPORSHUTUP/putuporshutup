@@ -1,94 +1,124 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import JoinConfirmationModal from '@/components/JoinConfirmationModal';
+import { Button } from '@/components/ui/button';
+
+type DemoMatch = {
+  id: string;
+  game: string;
+  mode: string;
+  platform: string;
+  starts_at: string;
+  ends_at: string | null;
+  state: "active" | "closed" | "canceled";
+};
 
 export default function QueuePage() {
-  const [showModal, setShowModal] = useState(false);
-  const [isJoining, setIsJoining] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [match, setMatch] = useState<DemoMatch | null>(null);
+  const [joinBusy, setJoinBusy] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const [alreadyIn, setAlreadyIn] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("demo_matches")
+        .select("*")
+        .eq("state", "active")
+        .gte("starts_at", new Date(Date.now() - 30*60*1000).toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error) setMatch(data as DemoMatch | null);
+
+      if (data && user) {
+        const { data: p } = await supabase
+          .from("demo_participants")
+          .select("id")
+          .eq("match_id", data.id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (p) setAlreadyIn(true);
+      }
+    };
+    load();
+  }, [user]);
 
   const handleJoin = async () => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to join the queue.",
-        variant: "destructive",
-      });
+      navigate("/auth?next=/queue");
       return;
     }
-
-    setIsJoining(true);
-
+    if (!match) return;
+    setJoinBusy(true);
     try {
-      // Insert into match_queue table with required fields
-      const { data, error } = await supabase
-        .from('match_queue')
-        .insert([{
-          user_id: user.id,
-          stake_amount: 10.00, // Default stake amount
-          game_id: '00000000-0000-0000-0000-000000000000', // You'll need to get this from a game selector
-          platform: 'Xbox', // Default platform
-          expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
-        }]);
-
-      if (!error) {
-        setShowModal(true);
-        toast({
-          title: "Success!",
-          description: "You've joined the match queue.",
-        });
-      } else {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error joining queue:', error);
-      toast({
-        title: "Error",
-        description: "Failed to join the queue. Please try again.",
-        variant: "destructive",
+      const { error } = await supabase.from("demo_participants").insert({
+        match_id: match.id,
+        user_id: user.id,
       });
+      if (error && !error.message.includes("duplicate key")) throw error;
+      setJoined(true);
+      setAlreadyIn(true);
+    } catch (e) {
+      alert("Could not join. Please try again.");
     } finally {
-      setIsJoining(false);
+      setJoinBusy(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-md">
+    <div className="container mx-auto p-6 max-w-3xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Quick Match</CardTitle>
+          <CardTitle className="text-2xl font-extrabold">🎮 Free Match Queue</CardTitle>
+          <p className="text-muted-foreground">
+            Join our free "Multiplayer" demo matches running on Xbox Series X. No wallet needed.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-center text-muted-foreground">
-            Join the match queue to find opponents and start competing!
-          </p>
-          
-          <Button
-            onClick={handleJoin}
-            disabled={isJoining || !user}
-            className="w-full"
-            size="lg"
-          >
-            {isJoining ? "Joining..." : "Join Match Queue"}
-          </Button>
+          {!match && (
+            <div className="bg-muted rounded p-4">
+              <p>No active free match right now. New ones start automatically every 30 minutes.</p>
+            </div>
+          )}
 
-          {!user && (
-            <p className="text-center text-sm text-muted-foreground">
-              Please log in to join matches
-            </p>
+          {match && (
+            <div className="bg-card rounded p-4 border space-y-3">
+              <div className="text-lg font-semibold">
+                {match.game} — {match.mode} • {match.platform}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Starts: {new Date(match.starts_at).toLocaleTimeString()}
+              </div>
+              <div className="flex gap-2">
+                {alreadyIn ? (
+                  <Button variant="outline" disabled>
+                    ✅ You're in!
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleJoin}
+                    disabled={joinBusy}
+                  >
+                    {joinBusy ? "Joining…" : "Join Match"}
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate("/")}
+                >
+                  Back Home
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
-
-      <JoinConfirmationModal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
-      />
     </div>
   );
 }

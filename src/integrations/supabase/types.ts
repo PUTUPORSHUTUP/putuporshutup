@@ -706,6 +706,68 @@ export type Database = {
           },
         ]
       }
+      demo_matches: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          game: string
+          id: string
+          mode: string
+          platform: string
+          starts_at: string
+          state: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          game?: string
+          id?: string
+          mode?: string
+          platform?: string
+          starts_at: string
+          state?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          game?: string
+          id?: string
+          mode?: string
+          platform?: string
+          starts_at?: string
+          state?: string
+        }
+        Relationships: []
+      }
+      demo_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "demo_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disputes: {
         Row: {
           admin_response: string | null
