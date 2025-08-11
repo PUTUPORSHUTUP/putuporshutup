@@ -29,6 +29,7 @@ import Promotion from "./pages/Promotion";
 import VIP from "./pages/VIP";
 import VIPRequired from "./pages/VIPRequired";
 import Wallet from "./pages/Wallet";
+import QueuePage from "./pages/QueuePage";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -125,10 +126,15 @@ const App = () => {
                   <StartTrial />
                 </ProtectedRoute>
               } />
-              <Route path="/wallet" element={
-                <ProtectedRoute>
-                  <Wallet />
-                </ProtectedRoute>
+               <Route path="/wallet" element={
+                 <ProtectedRoute>
+                   <Wallet />
+                 </ProtectedRoute>
+               } />
+               <Route path="/queue" element={
+                 <ProtectedRoute>
+                   <QueuePage />
+                 </ProtectedRoute>
                } />
                 <Route path="/vip-success" element={<VIPSuccess />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
