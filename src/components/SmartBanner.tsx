@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getActiveDemoMatch } from '@/lib/demo';
 
 export default function SmartBanner() {
   const { user } = useAuth();
@@ -12,6 +13,9 @@ export default function SmartBanner() {
   useEffect(() => {
     const checkProfile = async () => {
       if (!user) return;
+
+      // Check if there's an active demo match first
+      const demoMatch = await getActiveDemoMatch();
 
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -33,7 +37,8 @@ export default function SmartBanner() {
             </AlertDescription>
           </Alert>
         );
-      } else if ((profile.wallet_balance ?? 0) < 5) {
+      } else if ((profile.wallet_balance ?? 0) < 5 && !demoMatch) {
+        // Only show wallet warning if no demo match is available
         setBanner(
           <Alert className="border-yellow-500/50 text-yellow-700 dark:text-yellow-300">
             <Wallet className="h-4 w-4" />

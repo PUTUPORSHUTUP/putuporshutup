@@ -9,6 +9,7 @@ import TournamentCarousel from "@/components/TournamentCarousel";
 import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
 import FreeDemoCountdown from "@/components/FreeDemoCountdown";
 import SmartBanner from "@/components/SmartBanner";
+import DemoJoinButton from "@/components/DemoJoinButton";
 import { supabase } from "@/integrations/supabase/client";
 
 type BannerType = {
@@ -150,6 +151,11 @@ const Index = () => {
           >
             🎟️ Start Free VIP Trial
           </button>
+        </div>
+
+        {/* Free Demo Match Section */}
+        <div className="mt-6 max-w-md mx-auto">
+          <DemoJoinButton />
         </div>
 
         {/* Join Validation Banner */}

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DemoJoinButton from '@/components/DemoJoinButton';
 
 type DemoMatch = {
   id: string;
@@ -79,6 +80,9 @@ export default function QueuePage() {
           <p className="text-muted-foreground">
             Join our free "Multiplayer" demo matches running on Xbox Series X. No wallet needed.
           </p>
+          <div className="mt-4">
+            <DemoJoinButton />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {!match && (
