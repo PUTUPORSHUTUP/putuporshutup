@@ -1882,6 +1882,24 @@ export type Database = {
         }
         Relationships: []
       }
+      match_cycle_state: {
+        Row: {
+          id: number
+          idx: number
+          last_created: string | null
+        }
+        Insert: {
+          id?: number
+          idx?: number
+          last_created?: string | null
+        }
+        Update: {
+          id?: number
+          idx?: number
+          last_created?: string | null
+        }
+        Relationships: []
+      }
       match_notifications: {
         Row: {
           created_at: string
@@ -1922,6 +1940,13 @@ export type Database = {
             columns: ["match_queue_id"]
             isOneToOne: false
             referencedRelation: "match_queue"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_notifications_match_queue_id_fkey"
+            columns: ["match_queue_id"]
+            isOneToOne: false
+            referencedRelation: "v_joinable_matches"
             referencedColumns: ["id"]
           },
           {
@@ -1989,45 +2014,57 @@ export type Database = {
       }
       match_queue: {
         Row: {
+          automated: boolean | null
+          entry_fee: number | null
           expires_at: string
           game_id: string
           game_mode_key: string | null
           id: string
           matched_at: string | null
           matched_with_user_id: string | null
+          payout_type: string | null
           platform: string
           queue_status: string
           queued_at: string
           stake_amount: number
           user_id: string
+          vip_required: boolean | null
           wager_id: string | null
         }
         Insert: {
+          automated?: boolean | null
+          entry_fee?: number | null
           expires_at: string
           game_id: string
           game_mode_key?: string | null
           id?: string
           matched_at?: string | null
           matched_with_user_id?: string | null
+          payout_type?: string | null
           platform: string
           queue_status?: string
           queued_at?: string
           stake_amount: number
           user_id: string
+          vip_required?: boolean | null
           wager_id?: string | null
         }
         Update: {
+          automated?: boolean | null
+          entry_fee?: number | null
           expires_at?: string
           game_id?: string
           game_mode_key?: string | null
           id?: string
           matched_at?: string | null
           matched_with_user_id?: string | null
+          payout_type?: string | null
           platform?: string
           queue_status?: string
           queued_at?: string
           stake_amount?: number
           user_id?: string
+          vip_required?: boolean | null
           wager_id?: string | null
         }
         Relationships: [
@@ -4348,7 +4385,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_joinable_matches: {
+        Row: {
+          automated: boolean | null
+          entry_fee: number | null
+          expires_at: string | null
+          game_id: string | null
+          game_mode_key: string | null
+          id: string | null
+          matched_at: string | null
+          matched_with_user_id: string | null
+          payout_type: string | null
+          platform: string | null
+          queue_status: string | null
+          queued_at: string | null
+          stake_amount: number | null
+          user_id: string | null
+          vip_required: boolean | null
+          wager_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_queue_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_queue_wager_id_fkey"
+            columns: ["wager_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       admin_event_force_payout: {
@@ -4423,6 +4495,10 @@ export type Database = {
         Returns: undefined
       }
       cleanup_expired_queue_entries: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      close_stale_matches: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
