@@ -11,9 +11,9 @@ serve(async (req) => {
     // Close open automated matches past expires_at
     const { error } = await supabase
       .from('match_queue')
-      .update({ queue_status: 'closed' })
+      .update({ queue_status: 'expired' })
       .eq('automated', true)
-      .eq('queue_status', 'open')
+      .eq('queue_status', 'searching')
       .lt('expires_at', new Date().toISOString());
 
     if (error) throw error;

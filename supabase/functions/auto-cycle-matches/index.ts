@@ -35,7 +35,7 @@ serve(async (req) => {
     const expiresAt = new Date(now.getTime() + 40 * 60 * 1000); // 40 minutes from now
 
     const payload = {
-      queue_status: "open",
+      queue_status: "searching",
       stake_amount: tier.entry,
       platform: "Xbox",
       payout_type: "winner_take_all",
@@ -44,9 +44,9 @@ serve(async (req) => {
       automated: true,
       queued_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
-      // Need a user_id and game_id for the table schema
-      user_id: '00000000-0000-0000-0000-000000000000', // system user
-      game_id: (await supabase.from('games').select('id').limit(1).single()).data?.id || '00000000-0000-0000-0000-000000000000'
+      // Use known working user_id and game_id
+      user_id: '12da340a-464a-4987-bac9-c69b546312ed',
+      game_id: 'a39ff069-f19e-4d56-b522-81601ad60cee'
     };
 
     const { error: insertError } = await supabase
