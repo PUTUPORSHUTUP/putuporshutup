@@ -26,12 +26,16 @@ export function JoinQueueButton() {
     if (!user) return navigate("/auth?next=/queue");
     const { data } = await supabase
       .from("profiles")
-      .select("xbox_gamertag, wallet_balance")
+      .select("xbox_gamertag, wallet_balance, is_vip")
       .eq("user_id", user.id)
       .maybeSingle();
     if (!data?.xbox_gamertag) return navigate("/profile?verify=gamertag&next=/queue");
-    if ((data?.wallet_balance ?? 0) <= 0) return navigate("/wallet?topup=1&next=/queue");
-    navigate("/queue"); // ✅ relative, stays on current domain
+    
+    // Check if they can join any match (including $1 matches)
+    if ((data?.wallet_balance ?? 0) < 1) {
+      return navigate("/wallet?topup=1&next=/queue");
+    }
+    navigate("/queue");
   };
 
   return (

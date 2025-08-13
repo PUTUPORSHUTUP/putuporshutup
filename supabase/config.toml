@@ -9,6 +9,12 @@ verify_jwt = false
 [functions.xbl_verify_profile]
 verify_jwt = false
 
+[functions.auto-cycle-matches]
+verify_jwt = false
+
+[functions.close-old-opens]
+verify_jwt = false
+
 # Add JWT verification to critical financial functions
 [functions.instant-challenge-creator]
 verify_jwt = true
