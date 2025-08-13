@@ -35,16 +35,18 @@ serve(async (req) => {
     const expiresAt = new Date(now.getTime() + 40 * 60 * 1000); // 40 minutes from now
 
     const payload = {
-      status: "open",
-      game: "Call of Duty",
-      mode: "Multiplayer", 
+      queue_status: "open",
+      stake_amount: tier.entry,
+      platform: "Xbox",
       payout_type: "winner_take_all",
-      entry_fee: tier.entry,
+      entry_fee: tier.entry,  
       vip_required: tier.vip,
       automated: true,
-      starts_at: startsAt.toISOString(),
+      queued_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
-      capacity: 100,
+      // Need a user_id and game_id for the table schema
+      user_id: '00000000-0000-0000-0000-000000000000', // system user
+      game_id: (await supabase.from('games').select('id').limit(1).single()).data?.id || '00000000-0000-0000-0000-000000000000'
     };
 
     const { error: insertError } = await supabase

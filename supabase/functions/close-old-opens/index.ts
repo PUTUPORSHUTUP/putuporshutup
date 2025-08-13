@@ -9,7 +9,12 @@ serve(async (req) => {
     );
 
     // Close open automated matches past expires_at
-    const { error } = await supabase.rpc('close_stale_matches');
+    const { error } = await supabase
+      .from('match_queue')
+      .update({ queue_status: 'closed' })
+      .eq('automated', true)
+      .eq('queue_status', 'open')
+      .lt('expires_at', new Date().toISOString());
 
     if (error) throw error;
 
