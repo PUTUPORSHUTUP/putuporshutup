@@ -49,11 +49,19 @@ serve(async (req) => {
       game_id: 'a39ff069-f19e-4d56-b522-81601ad60cee'
     };
 
-    const { error: insertError } = await supabase
-      .from('match_queue')
-      .insert(payload);
+    try {
+      const { error: insertError } = await supabase
+        .from('match_queue')
+        .insert(payload);
 
-    if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Match creation error:', insertError);
+        throw insertError;
+      }
+    } catch (err) {
+      console.error('Match creation error:', err);
+      throw err;
+    }
 
     // 4) Advance pointer
     const nextIdx = (idx + 1) % TIERS.length;
