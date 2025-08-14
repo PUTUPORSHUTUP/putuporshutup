@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -4480,14 +4480,14 @@ export type Database = {
         Returns: string
       }
       api_key_put: {
-        Args: { p_provider: string; p_plain: string }
+        Args: { p_plain: string; p_provider: string }
         Returns: string
       }
       atomic_market_cycle: {
         Args: {
-          min_players?: number
           crash_rate?: number
           force_no_crash?: boolean
+          min_players?: number
         }
         Returns: Json
       }
@@ -4502,28 +4502,28 @@ export type Database = {
       check_function_diagnostics: {
         Args: Record<PropertyKey, never>
         Returns: {
-          function_name: string
-          recent_errors: number
-          last_error_time: string
           error_types: string[]
+          function_name: string
+          last_error_time: string
+          recent_errors: number
         }[]
       }
       check_rate_limit: {
         Args: {
-          p_user_id: string
           p_action_type: string
           p_max_attempts?: number
           p_time_window_minutes?: number
+          p_user_id: string
         }
         Returns: boolean
       }
       check_rls_policy_coverage: {
         Args: Record<PropertyKey, never>
         Returns: {
-          table_name: string
-          rls_enabled: boolean
-          policy_count: number
           needs_attention: boolean
+          policy_count: number
+          rls_enabled: boolean
+          table_name: string
         }[]
       }
       cleanup_expired_otp: {
@@ -4555,7 +4555,7 @@ export type Database = {
         Returns: Json
       }
       detect_suspicious_stats: {
-        Args: { user_id_param: string; stats_data: Json; game_mode?: string }
+        Args: { game_mode?: string; stats_data: Json; user_id_param: string }
         Returns: boolean
       }
       emergency_rollback: {
@@ -4588,37 +4588,37 @@ export type Database = {
       }
       generate_secure_otp: {
         Args: {
-          p_user_id: string
-          p_purpose: string
           p_email?: string
           p_phone?: string
+          p_purpose: string
+          p_user_id: string
         }
         Returns: {
-          otp_code: string
           expires_at: string
+          otp_code: string
         }[]
       }
       generate_system_alert: {
         Args: {
           p_alert_type: string
-          p_severity: string
           p_message: string
           p_metadata?: Json
+          p_severity: string
         }
         Returns: string
       }
       get_admin_analytics: {
         Args: { hide_test_data?: boolean }
         Returns: {
-          total_deposits: number
-          total_withdrawals: number
           active_premium_users: number
-          total_users: number
-          total_tournaments: number
-          total_challenges: number
-          transactions_today: number
-          tournaments_this_week: number
           new_users_this_week: number
+          total_challenges: number
+          total_deposits: number
+          total_tournaments: number
+          total_users: number
+          total_withdrawals: number
+          tournaments_this_week: number
+          transactions_today: number
         }[]
       }
       get_auth_context: {
@@ -4628,16 +4628,16 @@ export type Database = {
       get_auth_diagnostics: {
         Args: Record<PropertyKey, never>
         Returns: {
-          match_id: string
           created_at: string
-          event_type: string
-          status: string
           error_message: string
           error_time: string
+          event_type: string
+          match_id: string
+          status: string
         }[]
       }
       get_available_test_users: {
-        Args: { min_balance?: number; max_users?: number }
+        Args: { max_users?: number; min_balance?: number }
         Returns: {
           user_id: string
           wallet_balance: number
@@ -4647,16 +4647,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           challenge_id: string
-          status: string
-          winner_id: string
+          error_message: string
+          participant_count: number
+          payout_amount: number
+          payout_status: string
+          processed_at: string
           settled_at: string
           settlement_attempts: number
-          payout_status: string
-          error_message: string
-          processed_at: string
-          payout_amount: number
-          participant_count: number
+          status: string
           total_pot: number
+          winner_id: string
         }[]
       }
       get_platform_health: {
@@ -4667,10 +4667,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           id: string
-          username: string
-          wallet_balance: number
           last_used: string
           status: string
+          username: string
+          wallet_balance: number
         }[]
       }
       get_user_role: {
@@ -4682,16 +4682,16 @@ export type Database = {
         Returns: {
           total_visits: number
           unique_visitors: number
-          visits_today: number
           visits_this_week: number
+          visits_today: number
         }[]
       }
       get_xbox_profile: {
         Args: { gamertag: string }
         Returns: {
-          xuid: string
           gamer_score: number
           last_played: string
+          xuid: string
         }[]
       }
       has_vip_access: {
@@ -4708,12 +4708,12 @@ export type Database = {
       }
       http_delete: {
         Args:
+          | { content: string; content_type: string; uri: string }
           | { uri: string }
-          | { uri: string; content: string; content_type: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_get: {
-        Args: { uri: string } | { uri: string; data: Json }
+        Args: { data: Json; uri: string } | { uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_head: {
@@ -4732,17 +4732,17 @@ export type Database = {
         }[]
       }
       http_patch: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_post: {
         Args:
-          | { uri: string; content: string; content_type: string }
-          | { uri: string; data: Json }
+          | { content: string; content_type: string; uri: string }
+          | { data: Json; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_put: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_reset_curlopt: {
@@ -4755,14 +4755,14 @@ export type Database = {
       }
       increment_wallet_balance: {
         Args:
-          | { user_id_param: string; amount_param: number }
           | {
-              user_id_param: string
               amount_param: number
-              reason_param?: string
-              match_id_param?: string
               challenge_id_param?: string
+              match_id_param?: string
+              reason_param?: string
+              user_id_param: string
             }
+          | { amount_param: number; user_id_param: string }
         Returns: undefined
       }
       ingest_results: {
@@ -4808,78 +4808,78 @@ export type Database = {
       join_challenge_atomic: {
         Args: {
           p_challenge_id: string
-          p_user_id: string
           p_stake_amount: number
+          p_user_id: string
         }
         Returns: undefined
       }
       live_events_list_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
+          ends_at: string
+          entry_fee_cents: number
           id: string
-          title: string
+          max_players: number
           mode_key: string
           mode_label: string
-          entry_fee_cents: number
-          prize_pool_cents: number
-          players: number
-          max_players: number
-          status: string
-          starts_at: string
-          ends_at: string
-          public_url: string
           payout_label: string
+          players: number
+          prize_pool_cents: number
+          public_url: string
+          starts_at: string
+          status: string
+          title: string
         }[]
       }
       live_events_list_public: {
         Args: Record<PropertyKey, never>
         Returns: {
+          ends_at: string
+          entry_fee_cents: number
           id: string
-          title: string
+          max_players: number
           mode_key: string
           mode_label: string
-          entry_fee_cents: number
-          prize_pool_cents: number
-          players: number
-          max_players: number
-          status: string
-          starts_at: string
-          ends_at: string
-          public_url: string
           payout_label: string
+          players: number
+          prize_pool_cents: number
+          public_url: string
+          starts_at: string
+          status: string
+          title: string
         }[]
       }
       log_admin_action: {
         Args: {
           p_action_type: string
-          p_target_user_id?: string
           p_details?: Json
+          p_target_user_id?: string
         }
         Returns: undefined
       }
       log_event: {
-        Args: { event_type: string; details: string }
+        Args: { details: string; event_type: string }
         Returns: undefined
       }
       log_function_error: {
         Args: {
-          function_name: string
           error_code?: number
           error_message?: string
+          function_name: string
           request_headers?: Json
         }
         Returns: undefined
       }
       log_market_event: {
-        Args: { match_id: string; event_type: string; details?: Json }
+        Args: { details?: Json; event_type: string; match_id: string }
         Returns: undefined
       }
       log_security_event: {
-        Args: { p_event_type: string; p_user_id?: string; p_details?: Json }
+        Args: { p_details?: Json; p_event_type: string; p_user_id?: string }
         Returns: undefined
       }
       log_security_violation: {
-        Args: { p_violation_type: string; p_user_id?: string; p_details?: Json }
+        Args: { p_details?: Json; p_user_id?: string; p_violation_type: string }
         Returns: undefined
       }
       manage_test_users: {
@@ -4887,7 +4887,7 @@ export type Database = {
         Returns: Json
       }
       manual_payout: {
-        Args: { match_id: string; admin_override?: boolean }
+        Args: { admin_override?: boolean; match_id: string }
         Returns: Json
       }
       mark_challenge_settled: {
@@ -4900,22 +4900,22 @@ export type Database = {
       }
       market_wallet_credit: {
         Args: {
-          p_user_id: string
           p_amount_cents: number
           p_reason: string
           p_ref_match: string
+          p_user_id: string
         }
         Returns: undefined
       }
       queue_test_players: {
-        Args: { p_mode_key?: string; p_count?: number }
+        Args: { p_count?: number; p_mode_key?: string }
         Returns: Json
       }
       refund_all_challenge_players: {
         Args: { challenge_id: string; reason: string }
         Returns: {
-          user_id: string
           refund_amount: number
+          user_id: string
         }[]
       }
       safe_nextval: {
@@ -4928,19 +4928,19 @@ export type Database = {
       }
       secure_increment_wallet_balance: {
         Args: {
-          p_user_id: string
           p_amount: number
-          p_reason?: string
           p_challenge_id?: string
+          p_reason?: string
           p_requires_admin?: boolean
+          p_user_id: string
         }
         Returns: Json
       }
       secure_join_challenge_atomic: {
         Args: {
           p_challenge_id: string
-          p_user_id: string
           p_stake_amount: number
+          p_user_id: string
         }
         Returns: Json
       }
@@ -4949,16 +4949,16 @@ export type Database = {
         Returns: boolean
       }
       secure_update_transaction_status: {
-        Args: { p_transaction_id: string; p_new_status: string }
+        Args: { p_new_status: string; p_transaction_id: string }
         Returns: undefined
       }
       security_health_check: {
         Args: Record<PropertyKey, never>
         Returns: {
           check_name: string
-          status: string
           details: string
           severity: string
+          status: string
         }[]
       }
       security_settings_get: {
@@ -4975,11 +4975,11 @@ export type Database = {
       }
       security_settings_save: {
         Args: {
-          p_otp: number
-          p_max_attempts: number
-          p_lockout: number
           p_breach: boolean
           p_fraud: boolean
+          p_lockout: number
+          p_max_attempts: number
+          p_otp: number
         }
         Returns: {
           breach_check: boolean
@@ -5013,13 +5013,13 @@ export type Database = {
       }
       update_xbox_leaderboard_stats: {
         Args: {
-          p_xuid: string
-          p_kills: number
-          p_deaths: number
           p_assists: number
+          p_deaths: number
+          p_kills: number
           p_score: number
-          p_won_challenge?: boolean
           p_winnings?: number
+          p_won_challenge?: boolean
+          p_xuid: string
         }
         Returns: undefined
       }
@@ -5028,15 +5028,15 @@ export type Database = {
         Returns: string
       }
       verify_otp: {
-        Args: { p_user_id: string; p_otp_code: string; p_purpose: string }
+        Args: { p_otp_code: string; p_purpose: string; p_user_id: string }
         Returns: boolean
       }
       wallet_debit_safe: {
         Args: {
-          p_user: string
           p_amount: number
-          p_reason: string
           p_match: string
+          p_reason: string
+          p_user: string
         }
         Returns: undefined
       }
@@ -5045,7 +5045,7 @@ export type Database = {
         Returns: undefined
       }
       xbox_configure: {
-        Args: { p_console_ip: string; p_api_key: string }
+        Args: { p_api_key: string; p_console_ip: string }
         Returns: Json
       }
     }
