@@ -4391,10 +4391,12 @@ export type Database = {
       v_joinable_matches: {
         Row: {
           automated: boolean | null
+          creator_username: string | null
           entry_fee: number | null
           expires_at: string | null
           game_id: string | null
           game_mode_key: string | null
+          game_name: string | null
           id: string | null
           matched_at: string | null
           matched_with_user_id: string | null
@@ -4406,42 +4408,6 @@ export type Database = {
           user_id: string | null
           vip_required: boolean | null
           wager_id: string | null
-        }
-        Insert: {
-          automated?: boolean | null
-          entry_fee?: number | null
-          expires_at?: string | null
-          game_id?: string | null
-          game_mode_key?: string | null
-          id?: string | null
-          matched_at?: string | null
-          matched_with_user_id?: string | null
-          payout_type?: string | null
-          platform?: string | null
-          queue_status?: string | null
-          queued_at?: string | null
-          stake_amount?: number | null
-          user_id?: string | null
-          vip_required?: boolean | null
-          wager_id?: string | null
-        }
-        Update: {
-          automated?: boolean | null
-          entry_fee?: number | null
-          expires_at?: string | null
-          game_id?: string | null
-          game_mode_key?: string | null
-          id?: string | null
-          matched_at?: string | null
-          matched_with_user_id?: string | null
-          payout_type?: string | null
-          platform?: string | null
-          queue_status?: string | null
-          queued_at?: string | null
-          stake_amount?: number | null
-          user_id?: string | null
-          vip_required?: boolean | null
-          wager_id?: string | null
         }
         Relationships: [
           {
