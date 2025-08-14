@@ -3057,6 +3057,7 @@ export type Database = {
         Row: {
           clicks_to_site: number | null
           hashtag_uses: number | null
+          id: string
           logo_impressions: number | null
           mentions_in_match: number | null
           report_link: string | null
@@ -3070,6 +3071,7 @@ export type Database = {
         Insert: {
           clicks_to_site?: number | null
           hashtag_uses?: number | null
+          id?: string
           logo_impressions?: number | null
           mentions_in_match?: number | null
           report_link?: string | null
@@ -3083,6 +3085,7 @@ export type Database = {
         Update: {
           clicks_to_site?: number | null
           hashtag_uses?: number | null
+          id?: string
           logo_impressions?: number | null
           mentions_in_match?: number | null
           report_link?: string | null
