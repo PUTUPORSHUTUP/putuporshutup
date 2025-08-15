@@ -10,6 +10,7 @@ import MidweekMayhemCarousel from "@/components/MidweekMayhemCarousel";
 import FreeDemoCountdown from "@/components/FreeDemoCountdown";
 import SmartBanner from "@/components/SmartBanner";
 import DemoJoinButton from "@/components/DemoJoinButton";
+import NextMatchCard from "@/components/NextMatchCard";
 import { supabase } from "@/integrations/supabase/client";
 
 type BannerType = {
@@ -213,25 +214,8 @@ const Index = () => {
         <MidweekMayhemCarousel />
       </section>
 
-      {/* Live Match Preview */}
-      <section className="bg-zinc-950 py-6 px-4">
-        <div className="max-w-3xl mx-auto text-center text-white">
-          <h2 className="text-xl font-semibold">
-            🎮 Next Match: <span className="text-green-400">Call of Duty – Team Deathmatch</span>
-          </h2>
-          <p className="text-sm text-gray-400 mt-2">
-            ⏰ Starts in: <span className="font-mono text-green-400">00:30:00</span>
-          </p>
-          <div className="text-center mt-4">
-            <button 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-colors"
-              onClick={joinMatch}
-            >
-              Join Match Queue
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Live Match Preview - Now Dynamic */}
+      <NextMatchCard onJoinMatch={joinMatch} />
 
       {/* Enhanced Game & Mode Filter Section - TEMPORARILY HIDDEN */}
       {SHOW_MATCH_FILTERS && (
