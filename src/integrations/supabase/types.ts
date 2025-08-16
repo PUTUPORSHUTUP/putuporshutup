@@ -2487,6 +2487,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "player_skill_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       player_stats: {
@@ -2790,6 +2797,13 @@ export type Database = {
             columns: ["submitted_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "proof_submissions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["user_id"]
           },
           {
@@ -3344,6 +3358,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "suspicious_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -4053,6 +4074,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "wallet_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       wallets: {
@@ -4388,6 +4416,51 @@ export type Database = {
       }
     }
     Views: {
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          is_vip: boolean | null
+          total_losses: number | null
+          total_wagered: number | null
+          total_wins: number | null
+          user_id: string | null
+          username: string | null
+          vip_access: boolean | null
+          xbox_gamertag: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          is_vip?: boolean | null
+          total_losses?: number | null
+          total_wagered?: number | null
+          total_wins?: number | null
+          user_id?: string | null
+          username?: string | null
+          vip_access?: boolean | null
+          xbox_gamertag?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          is_vip?: boolean | null
+          total_losses?: number | null
+          total_wagered?: number | null
+          total_wins?: number | null
+          user_id?: string | null
+          username?: string | null
+          vip_access?: boolean | null
+          xbox_gamertag?: string | null
+        }
+        Relationships: []
+      }
       v_joinable_matches: {
         Row: {
           automated: boolean | null
