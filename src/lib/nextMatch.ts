@@ -3,11 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type NextMatch = {
   id: string;
-  game: string | null;
-  mode: string | null;
+  game_mode_key: string | null;
   entry_fee: number;
   vip_required: boolean;
-  starts_at: string;        // ISO string
+  queued_at: string;        // ISO string - using queued_at from match_queue
   payout_type: string | null;
 };
 
@@ -31,11 +30,10 @@ export async function fetchNextOpenMatch(): Promise<NextMatch | null> {
   // Transform the data to match our NextMatch type
   return {
     id: data.id,
-    game: "Call of Duty",  // Default game for now
-    mode: data.game_mode_key || "Multiplayer",
+    game_mode_key: data.game_mode_key || "competitive",
     entry_fee: data.entry_fee,
     vip_required: data.vip_required,
-    starts_at: data.queued_at, // Use queued_at as start time for now
+    queued_at: data.queued_at,
     payout_type: data.payout_type
   };
 }

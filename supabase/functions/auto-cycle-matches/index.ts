@@ -1,70 +1,114 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-type Tier = { label: string; entry: number; vip: boolean };
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-const TIERS: Tier[] = [
-  { label: "$1 Open",  entry: 1,  vip: false },
-  { label: "$5 Open",  entry: 5,  vip: false },
-  { label: "$10 VIP",  entry: 10, vip: true  },
+interface MatchTier {
+  entry_fee: number;
+  vip_required: boolean;
+  payout_type: string;
+}
+
+const MATCH_TIERS: MatchTier[] = [
+  { entry_fee: 1.00, vip_required: false, payout_type: 'winner_take_all' },
+  { entry_fee: 5.00, vip_required: false, payout_type: 'winner_take_all' },
+  { entry_fee: 10.00, vip_required: true, payout_type: 'winner_take_all' }
 ];
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
+    console.log('🎯 AUTO-CYCLE-MATCHES: Starting match rotation');
+    
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // 1) Get rotation index
-    let idx = 0;
-    const { data: stateData } = await supabase
+    const { manual } = await req.json();
+    console.log('Manual trigger:', manual);
+
+    // Get or create rotation state
+    let { data: rotationState, error: rotationError } = await supabase
       .from('match_cycle_state')
-      .select('idx')
+      .select('*')
       .eq('id', 1)
       .single();
-    
-    idx = stateData?.idx ?? 0;
 
-    // 2) Pick tier
-    const tier = TIERS[idx % TIERS.length];
-
-    // 3) Create the next match
-    const now = new Date();
-    const startsAt = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes from now
-    const expiresAt = new Date(now.getTime() + 40 * 60 * 1000); // 40 minutes from now
-
-    const payload = {
-      queue_status: "searching",
-      stake_amount: tier.entry,
-      platform: "Xbox",
-      payout_type: "winner_take_all",
-      entry_fee: tier.entry,  
-      vip_required: tier.vip,
-      automated: true,
-      queued_at: now.toISOString(),
-      expires_at: expiresAt.toISOString(),
-      // Use known working user_id and game_id
-      user_id: '12da340a-464a-4987-bac9-c69b546312ed',
-      game_id: 'a39ff069-f19e-4d56-b522-81601ad60cee'
-    };
-
-    try {
-      const { error: insertError } = await supabase
-        .from('match_queue')
-        .insert(payload);
-
-      if (insertError) {
-        console.error('Match creation error:', insertError);
-        throw insertError;
+    if (rotationError || !rotationState) {
+      console.log('Creating rotation state...');
+      const { data: newState, error: createError } = await supabase
+        .from('match_cycle_state')
+        .insert({ id: 1, idx: 0, last_created: new Date().toISOString() })
+        .select()
+        .single();
+      
+      if (createError) {
+        console.error('Failed to create rotation state:', createError);
+        throw createError;
       }
-    } catch (err) {
-      console.error('Match creation error:', err);
-      throw err;
+      rotationState = newState;
     }
 
-    // 4) Advance pointer
-    const nextIdx = (idx + 1) % TIERS.length;
+    // Get current tier
+    const currentTier = MATCH_TIERS[rotationState.idx % MATCH_TIERS.length];
+    console.log(`Current tier: $${currentTier.entry_fee} (VIP: ${currentTier.vip_required})`);
+
+    // Calculate match start time (1 minute from now for demo purposes)
+    const startsAt = new Date(Date.now() + 60 * 1000);
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    // Get a default user and game for the automated match
+    const { data: defaultUser } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .limit(1)
+      .single();
+
+    const { data: defaultGame } = await supabase
+      .from('games')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (!defaultUser || !defaultGame) {
+      throw new Error('No default user or game found for automated match');
+    }
+
+    // Create the match
+    const { data: match, error: matchError } = await supabase
+      .from('match_queue')
+      .insert({
+        user_id: defaultUser.user_id,
+        stake_amount: currentTier.entry_fee,
+        game_id: defaultGame.id,
+        platform: 'Xbox',
+        queue_status: 'searching',
+        queued_at: new Date().toISOString(),
+        expires_at: expiresAt.toISOString(),
+        entry_fee: currentTier.entry_fee,
+        payout_type: currentTier.payout_type,
+        vip_required: currentTier.vip_required,
+        automated: true,
+        game_mode_key: 'competitive'
+      })
+      .select()
+      .single();
+
+    if (matchError) {
+      console.error('Failed to create match:', matchError);
+      throw matchError;
+    }
+
+    console.log('✅ Created automated match:', match.id);
+
+    // Update rotation state to next tier
+    const nextIdx = (rotationState.idx + 1) % MATCH_TIERS.length;
     const { error: updateError } = await supabase
       .from('match_cycle_state')
       .update({ 
@@ -73,30 +117,30 @@ serve(async (req) => {
       })
       .eq('id', 1);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Failed to update rotation state:', updateError);
+    }
 
-    console.log(`Created ${tier.label} match, next: ${TIERS[nextIdx].label}`);
+    console.log(`🔄 Rotated to next tier index: ${nextIdx}`);
 
-    return new Response(
-      JSON.stringify({ 
-        ok: true, 
-        created: payload, 
-        nextIdx,
-        nextTier: TIERS[nextIdx].label 
-      }), 
-      { 
-        headers: { "Content-Type": "application/json" }
-      }
-    );
+    return new Response(JSON.stringify({
+      success: true,
+      match_id: match.id,
+      tier: currentTier,
+      next_tier_index: nextIdx,
+      message: `Created $${currentTier.entry_fee} match (VIP: ${currentTier.vip_required})`
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
-  } catch (e) {
-    console.error('Auto cycle matches error:', e);
-    return new Response(
-      JSON.stringify({ ok: false, error: String(e) }), 
-      { 
-        status: 500, 
-        headers: { "Content-Type": "application/json" }
-      }
-    );
+  } catch (error) {
+    console.error('❌ Auto-cycle-matches error:', error);
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: error.message 
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 });

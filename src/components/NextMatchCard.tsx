@@ -42,8 +42,8 @@ export default function NextMatchCard({ onJoinMatch }: NextMatchCardProps) {
   }, []);
 
   const startsAtMs = useMemo(
-    () => (match?.starts_at ? new Date(match.starts_at).getTime() + 30 * 60 * 1000 : 0), // Add 30 minutes to start time
-    [match?.starts_at]
+    () => (match?.queued_at ? new Date(match.queued_at).getTime() + 60 * 1000 : 0), // Add 1 minute for match start
+    [match?.queued_at]
   );
   const msLeft = Math.max(0, startsAtMs - now);
 
@@ -83,7 +83,7 @@ export default function NextMatchCard({ onJoinMatch }: NextMatchCardProps) {
       <div className="max-w-3xl mx-auto text-center text-white">
         <div className="flex items-center justify-center gap-3 mb-2">
           <h2 className="text-xl font-semibold">
-            🎮 Next Match: <span className="text-green-400">{match.game} – {match.mode}</span>
+            🎮 Next Match: <span className="text-green-400">{match.game_mode_key?.toUpperCase() || "COMPETITIVE"}</span>
           </h2>
           {match.vip_required ? (
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/40">
