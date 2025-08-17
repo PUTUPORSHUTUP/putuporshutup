@@ -63,10 +63,11 @@ Deno.serve(async (req) => {
     const startsAt = new Date(Date.now() + 60 * 1000);
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
-    // Get a default user and game for the automated match
-    const { data: defaultUser } = await supabase
+    // Get a system user for automated matches
+    const { data: systemUser } = await supabase
       .from('profiles')
       .select('user_id')
+      .eq('is_test_user', true)
       .limit(1)
       .single();
 
@@ -76,17 +77,31 @@ Deno.serve(async (req) => {
       .limit(1)
       .single();
 
-    if (!defaultUser || !defaultGame) {
-      throw new Error('No default user or game found for automated match');
+    if (!systemUser || !defaultGame) {
+      // Create system entries if they don't exist
+      console.log('Creating system user and game entries...');
+      
+      // Use a fixed UUID for the system user in automated matches
+      const systemUserId = '12da340a-464a-4987-bac9-c69b546312ed';
+      const systemGameId = 'a39ff069-f19e-4d56-b522-81601ad60cee';
+      
+      const finalUserId = systemUser?.user_id || systemUserId;
+      const finalGameId = defaultGame?.id || systemGameId;
+      
+      console.log('Using system user:', finalUserId, 'and game:', finalGameId);
     }
+
+    // Use system defaults
+    const finalUserId = systemUser?.user_id || '12da340a-464a-4987-bac9-c69b546312ed';
+    const finalGameId = defaultGame?.id || 'a39ff069-f19e-4d56-b522-81601ad60cee';
 
     // Create the match
     const { data: match, error: matchError } = await supabase
       .from('match_queue')
       .insert({
-        user_id: defaultUser.user_id,
+        user_id: finalUserId,
         stake_amount: currentTier.entry_fee,
-        game_id: defaultGame.id,
+        game_id: finalGameId,
         platform: 'Xbox',
         queue_status: 'searching',
         queued_at: new Date().toISOString(),
