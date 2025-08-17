@@ -63,13 +63,18 @@ Deno.serve(async (req) => {
     const startsAt = new Date(Date.now() + 60 * 1000);
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
-    // Get a system user for automated matches
-    const { data: systemUser } = await supabase
+    // Get available users for automated matches (avoid conflicts)
+    const { data: availableUsers } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('is_test_user', true)
-      .limit(1)
-      .single();
+      .not('user_id', 'in', `(${
+        // Exclude users already in queue
+        await supabase.from('match_queue')
+          .select('user_id')
+          .eq('queue_status', 'searching')
+          .then(r => r.data?.map(u => `'${u.user_id}'`).join(',') || "'none'")
+      })`)
+      .limit(5);
 
     const { data: defaultGame } = await supabase
       .from('games')
@@ -77,31 +82,21 @@ Deno.serve(async (req) => {
       .limit(1)
       .single();
 
-    if (!systemUser || !defaultGame) {
-      // Create system entries if they don't exist
-      console.log('Creating system user and game entries...');
-      
-      // Use a fixed UUID for the system user in automated matches
-      const systemUserId = '12da340a-464a-4987-bac9-c69b546312ed';
-      const systemGameId = 'a39ff069-f19e-4d56-b522-81601ad60cee';
-      
-      const finalUserId = systemUser?.user_id || systemUserId;
-      const finalGameId = defaultGame?.id || systemGameId;
-      
-      console.log('Using system user:', finalUserId, 'and game:', finalGameId);
+    if (!availableUsers?.length || !defaultGame) {
+      throw new Error('No available users or games found for automated match');
     }
 
-    // Use system defaults
-    const finalUserId = systemUser?.user_id || '12da340a-464a-4987-bac9-c69b546312ed';
-    const finalGameId = defaultGame?.id || 'a39ff069-f19e-4d56-b522-81601ad60cee';
+    // Use first available user
+    const selectedUser = availableUsers[0];
+    console.log('Using user:', selectedUser.user_id, 'for automated match');
 
     // Create the match
     const { data: match, error: matchError } = await supabase
       .from('match_queue')
       .insert({
-        user_id: finalUserId,
+        user_id: selectedUser.user_id,
         stake_amount: currentTier.entry_fee,
-        game_id: finalGameId,
+        game_id: defaultGame.id,
         platform: 'Xbox',
         queue_status: 'searching',
         queued_at: new Date().toISOString(),
