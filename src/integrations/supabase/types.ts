@@ -4604,6 +4604,16 @@ export type Database = {
         Args: { reason?: string }
         Returns: Json
       }
+      find_stuck_matches: {
+        Args: { p_minutes?: number }
+        Returns: {
+          created_at: string
+          game_id: string
+          id: string
+          stake_amount: number
+          user_id: string
+        }[]
+      }
       flag_multi_account: {
         Args: { p_res: string }
         Returns: undefined

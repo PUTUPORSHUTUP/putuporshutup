@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { VIPUpgrade } from '@/components/VIPUpgrade';
 import { Wallet as WalletIcon, DollarSign, TrendingUp, Activity } from 'lucide-react';
 
@@ -76,13 +77,29 @@ const Wallet = () => {
                   <div className="p-3 bg-primary/10 rounded-full">
                     <DollarSign className="w-6 h-6 text-primary" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="text-3xl font-bold">
                       ${balance?.toFixed(2) ?? '0.00'}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Available balance for matches and tournaments
                     </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.location.reload()}
+                    >
+                      Refresh
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={() => document.getElementById('add-funds-section')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      Add Funds
+                    </Button>
                   </div>
                 </div>
                 
@@ -114,7 +131,9 @@ const Wallet = () => {
           </CardContent>
         </Card>
         
-        <VIPUpgrade />
+        <div id="add-funds-section">
+          <VIPUpgrade />
+        </div>
       </div>
     </div>
   );

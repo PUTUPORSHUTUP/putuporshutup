@@ -22,6 +22,7 @@ export const FeaturedPoster = () => {
   const nav = useNavigate();
 
   const onClick = () => {
+    // Always go to tournament signup/registration, never admin
     nav('/tournaments?id=featured-sunday-showdown');
   };
 
