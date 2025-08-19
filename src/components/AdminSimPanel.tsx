@@ -21,6 +21,7 @@ export default function AdminSimPanel() {
   const [countdown, setCountdown] = useState(0);
   const [diagnostics, setDiagnostics] = useState<PayoutDiagnostic[]>([]);
   const [loadingDiag, setLoadingDiag] = useState(false);
+  const [nextTier, setNextTier] = useState<string>("?");
   const timerRef = useRef<number | null>(null);
   const tickRef = useRef<number | null>(null);
   const intervalMs = 4 * 60 * 1000; // 4 minutes
@@ -36,13 +37,15 @@ export default function AdminSimPanel() {
     setLogs((l) => [{ ts: new Date().toLocaleTimeString(), msg: str }, ...(l || [])].slice(0, 300));
   };
 
-  // Use the new Database Market Engine RPC function
+  // Call auto-cycle-matches function to advance rotation
   const invokeInstantMarket = async (payload: any) => {
-    const { data, error } = await rpcSafe(supabase, 'db_market_run', { p_auto_seed: true });
+    const { data, error } = await supabase.functions.invoke("auto-cycle-matches", { 
+      body: { manual: true } 
+    });
     
     if (error) {
-      console.error("Database Market Engine error:", error);
-      return { ok: false, message: error, status: 'error' };
+      console.error("Auto-cycle-matches error:", error);
+      return { ok: false, message: error.message, status: 'error' };
     }
     
     return data as any || { ok: true };
@@ -51,39 +54,33 @@ export default function AdminSimPanel() {
   const runOnce = async () => {
     if (busy) return;
     setBusy(true);
-    push("🚀 Starting Database Market Engine…");
+    push("🚀 Advancing rotation…");
 
     try {
-      const data = await invokeInstantMarket({ manual: true, min_players: 4 });
-      if (data?.status === 'success' || data?.ok || data?.success) {
-        // Safe parsing with fallbacks
-        const cid = data.challenge_id || '';
-        const id = shortId(cid);
-        
-        const players = n(data.players_paired);
-        const potCents = n(data.pot_cents);
-        const pot = (potCents / 100).toFixed(2);
-        
-        const durMs = n(data.duration_ms);
-        const secs = Math.max(0, Math.round(durMs / 1000));
-        
-        const paidRows = n(data.paid_rows);
-
-        if (players === 0) {
-          push("❌ No eligible players found - try seeding test users with balance");
-        } else {
-          push(
-            `✅ DATABASE MARKET SUCCESS: Challenge ${id}... · ${players}p · $${pot} · ${paidRows} payouts · ${secs}s`
-          );
-        }
+      const data = await invokeInstantMarket({ manual: true });
+      if (data?.success || data?.ok) {
+        push(`✅ Rotation advanced OK: ${JSON.stringify(data)}`);
       } else {
-        push(`❌ Database Market Failed: ${data.reason || data.error || 'Unknown error'}`);
+        push(`❌ Rotation Failed: ${data?.message || data?.error || 'Unknown error'}`);
       }
     } catch (e: any) {
       push(`❌ Connection Error: ${e?.message || String(e)}`);
     } finally {
       setBusy(false);
     }
+  };
+
+  const readNextTier = async () => {
+    const { data, error } = await supabase
+      .from("match_cycle_state")
+      .select("idx, last_created")
+      .eq("id", 1)
+      .single();
+    if (error) return push(`❌ Read error: ${error.message}`);
+    const tiers = ["$1 Open", "$5 Open", "$10 VIP"];
+    const idx = Number(data?.idx ?? 0);
+    setNextTier(tiers[idx] ?? "?");
+    push(`ℹ️ Next in rotation: ${tiers[idx]} (last_created: ${data?.last_created ?? "n/a"})`);
   };
 
   const startLoop = () => {
@@ -217,11 +214,19 @@ export default function AdminSimPanel() {
 
       <div className="flex flex-wrap gap-2">
         <button
+          onClick={readNextTier}
+          className="bg-neutral-700 hover:bg-neutral-600 px-4 py-2 rounded"
+        >
+          🔍 Check Next Tier
+        </button>
+        <span className="text-sm text-neutral-300 self-center">Next: {nextTier}</span>
+        
+        <button
           onClick={runOnce}
           disabled={busy}
           className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
         >
-          {busy ? "🎯 Processing…" : "🎯 Run Database Market"}
+          {busy ? "🚀 Processing…" : "🚀 Run One Simulation Now"}
         </button>
 
         {!running ? (

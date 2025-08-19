@@ -85,12 +85,17 @@ const App = () => {
                 </ProtectedRoute>
               } />
               <Route path="/leaderboards" element={<Leaderboards />} />
-              <Route path="/admin/*" element={<AdminRoutes />} />
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
+               <Route path="/admin/sim" element={
+                 <ProtectedRoute>
+                   <AdminSimPanel />
+                 </ProtectedRoute>
+               } />
+               <Route path="/admin/*" element={<AdminRoutes />} />
+               <Route path="/admin" element={
+                 <ProtectedRoute>
+                   <AdminDashboard />
+                 </ProtectedRoute>
+               } />
               <Route path="/moderator" element={
                 <ProtectedRoute>
                   <Moderator />
