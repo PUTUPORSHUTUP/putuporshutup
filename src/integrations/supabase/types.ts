@@ -4607,9 +4607,9 @@ export type Database = {
       find_stuck_matches: {
         Args: { p_minutes?: number }
         Returns: {
-          created_at: string
           game_id: string
           id: string
+          queued_at: string
           stake_amount: number
           user_id: string
         }[]
