@@ -63,18 +63,13 @@ Deno.serve(async (req) => {
     const startsAt = new Date(Date.now() + 60 * 1000);
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
-    // Get available users for automated matches (avoid conflicts)
+    // Get available test users for automated matches
     const { data: availableUsers } = await supabase
       .from('profiles')
       .select('user_id')
-      .not('user_id', 'in', `(${
-        // Exclude users already in queue
-        await supabase.from('match_queue')
-          .select('user_id')
-          .eq('queue_status', 'searching')
-          .then(r => r.data?.map(u => `'${u.user_id}'`).join(',') || "'none'")
-      })`)
-      .limit(5);
+      .eq('is_test_user', true)
+      .gte('wallet_balance', currentTier.entry_fee)
+      .limit(10);
 
     const { data: defaultGame } = await supabase
       .from('games')
