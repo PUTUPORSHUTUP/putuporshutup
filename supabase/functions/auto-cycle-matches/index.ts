@@ -63,13 +63,12 @@ Deno.serve(async (req) => {
     const startsAt = new Date(Date.now() + 60 * 1000);
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
-    // Get available test users who are NOT already in the match queue
+    // Get available test users for automated matches
     const { data: availableUsers } = await supabase
       .from('profiles')
       .select('user_id')
       .eq('is_test_user', true)
       .gte('wallet_balance', currentTier.entry_fee)
-      .not('user_id', 'in', `(SELECT user_id FROM match_queue WHERE queue_status IN ('searching', 'matched'))`)
       .limit(10);
 
     const { data: defaultGame } = await supabase
@@ -79,32 +78,19 @@ Deno.serve(async (req) => {
       .single();
 
     if (!availableUsers?.length || !defaultGame) {
-      // If no users available, clear old entries and retry
-      console.log('No available users found, cleaning up old entries...');
-      await supabase
-        .from('match_queue')
-        .delete()
-        .eq('automated', true)
-        .lt('queued_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // 5 minutes old
-      
-      // Retry getting users
-      const { data: retryUsers } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('is_test_user', true)
-        .gte('wallet_balance', currentTier.entry_fee)
-        .limit(1);
-      
-      if (!retryUsers?.length) {
-        throw new Error('No available users found even after cleanup');
-      }
-      
-      availableUsers.push(...retryUsers);
+      throw new Error('No available users or games found for automated match');
     }
 
     // Use first available user
     const selectedUser = availableUsers[0];
     console.log('Using user:', selectedUser.user_id, 'for automated match');
+
+    // Clean up any existing entries for this user to avoid unique constraint violation
+    console.log('Cleaning up existing entries for user...');
+    await supabase
+      .from('match_queue')
+      .delete()
+      .eq('user_id', selectedUser.user_id);
 
     // Create the match
     const { data: match, error: matchError } = await supabase
