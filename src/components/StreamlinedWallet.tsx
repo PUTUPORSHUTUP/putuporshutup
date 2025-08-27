@@ -13,22 +13,67 @@ import {
   ArrowDownRight, 
   DollarSign, 
   CreditCard,
-  Loader2
+  Loader2,
+  Clock,
+  CheckCircle,
+  XCircle,
+  RefreshCw
 } from 'lucide-react';
+
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  description: string;
+  created_at: string;
+  payment_intent_id?: string;
+}
 
 export const StreamlinedWallet = () => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
 
   useEffect(() => {
     if (profile?.wallet_balance) {
       setBalance(profile.wallet_balance);
     }
   }, [profile]);
+
+  // Load transaction history
+  useEffect(() => {
+    if (user) {
+      loadTransactions();
+    }
+  }, [user]);
+
+  const loadTransactions = async () => {
+    if (!user) return;
+    
+    setLoadingTransactions(true);
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setTransactions(data || []);
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
 
   const quickAmounts = [10, 25, 50, 100];
 
@@ -43,29 +88,37 @@ export const StreamlinedWallet = () => {
       return;
     }
 
+    if (depositValue > 10000) {
+      toast({
+        title: "Amount Too Large",
+        description: "Maximum deposit amount is $10,000",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-payment-session', {
+      const { data, error } = await supabase.functions.invoke('wallet-deposit', {
         body: {
           amount: depositValue,
-          totalCharge: depositValue + (depositValue * 0.029) + 0.30, // Include fees
-          platformFee: (depositValue * 0.029) + 0.30
+          description: `Gaming wallet deposit - $${depositValue}`
         },
       });
 
       if (error) throw error;
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
         toast({
           title: "Redirecting to Payment",
-          description: "Complete your deposit in the new tab",
+          description: `Processing $${depositValue} deposit...`,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Deposit Failed",
-        description: "Please try again or contact support",
+        description: error.message || "Please try again or contact support",
         variant: "destructive",
       });
     } finally {
@@ -94,28 +147,56 @@ export const StreamlinedWallet = () => {
       return;
     }
 
-    setLoading(true);
+    setWithdrawLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('create-withdrawal', {
-        body: { amount: withdrawValue },
+      const { data, error } = await supabase.functions.invoke('wallet-withdrawal', {
+        body: { 
+          amount: withdrawValue,
+          method: 'instant',
+          account_details: { type: 'gaming_wallet' }
+        },
       });
 
       if (error) throw error;
 
       toast({
-        title: "Withdrawal Submitted",
-        description: "Your withdrawal will be processed within 1-3 business days",
+        title: "Withdrawal Successful",    
+        description: `$${withdrawValue} has been processed`,
       });
+      
+      // Update local balance and reload transactions
+      setBalance(data.new_balance);
       setWithdrawAmount('');
-    } catch (error) {
+      loadTransactions();
+
+    } catch (error: any) {
       toast({
         title: "Withdrawal Failed",
-        description: "Please try again or contact support",
+        description: error.message || "Please try again or contact support",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setWithdrawLoading(false);
     }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      case 'failed':
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return <Clock className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const getTransactionColor = (type: string, amount: number) => {
+    if (type === 'deposit' || type === 'prize') return 'text-green-600';
+    if (type === 'withdrawal' || type === 'entry_fee') return 'text-red-600';
+    return amount > 0 ? 'text-green-600' : 'text-red-600';
   };
 
   return (
@@ -123,20 +204,30 @@ export const StreamlinedWallet = () => {
       {/* Balance Overview */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
-                <Wallet className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
+                  <Wallet className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Available Balance</p>
+                  <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Available Balance</p>
-                <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  Ready to Play
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={loadTransactions}
+                  disabled={loadingTransactions}
+                >
+                  <RefreshCw className={`h-4 w-4 ${loadingTransactions ? 'animate-spin' : ''}`} />
+                </Button>
               </div>
             </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              Ready to Play
-            </Badge>
-          </div>
         </CardContent>
       </Card>
 
@@ -227,10 +318,10 @@ export const StreamlinedWallet = () => {
                 </div>
                 <Button 
                   onClick={handleWithdraw}
-                  disabled={loading || !withdrawAmount || parseFloat(withdrawAmount) < 10}
+                  disabled={withdrawLoading || !withdrawAmount || parseFloat(withdrawAmount) < 10}
                   variant="outline"
                 >
-                  {loading ? (
+                  {withdrawLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     "Withdraw"
@@ -251,6 +342,70 @@ export const StreamlinedWallet = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Transaction History */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            Recent Transactions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingTransactions ? (
+            <div className="flex items-center justify-center p-4">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="ml-2">Loading transactions...</span>
+            </div>
+          ) : transactions.length === 0 ? (
+            <div className="text-center text-muted-foreground p-4">
+              No transactions yet. Make your first deposit to get started!
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {transactions.map((transaction) => (
+                <div 
+                  key={transaction.id} 
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {getStatusIcon(transaction.status)}
+                    <div>
+                      <div className="font-medium capitalize">
+                        {transaction.type.replace('_', ' ')}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {transaction.description}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(transaction.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`font-bold ${getTransactionColor(transaction.type, transaction.amount)}`}>
+                      {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
+                    </div>
+                    <Badge 
+                      variant={transaction.status === 'completed' ? 'default' : 
+                              transaction.status === 'pending' ? 'secondary' : 'destructive'}
+                      className="text-xs"
+                    >
+                      {transaction.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
