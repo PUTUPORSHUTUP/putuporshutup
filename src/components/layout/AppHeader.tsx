@@ -15,11 +15,7 @@ export const AppHeader = () => {
   if (isAuthPage) return null;
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
+    navigate(-1);
   };
 
   const currentHour = new Date().getHours();
