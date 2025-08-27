@@ -1943,13 +1943,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "match_notifications_match_queue_id_fkey"
-            columns: ["match_queue_id"]
-            isOneToOne: false
-            referencedRelation: "v_joinable_matches"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "match_notifications_wager_id_fkey"
             columns: ["wager_id"]
             isOneToOne: false
@@ -2491,7 +2484,7 @@ export type Database = {
             foreignKeyName: "player_skill_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "public_profiles"
+            referencedRelation: "public_user_profiles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -2803,7 +2796,7 @@ export type Database = {
             foreignKeyName: "proof_submissions_submitted_by_fkey"
             columns: ["submitted_by"]
             isOneToOne: false
-            referencedRelation: "public_profiles"
+            referencedRelation: "public_user_profiles"
             referencedColumns: ["user_id"]
           },
           {
@@ -3364,7 +3357,7 @@ export type Database = {
             foreignKeyName: "suspicious_activities_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "public_profiles"
+            referencedRelation: "public_user_profiles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -4078,7 +4071,7 @@ export type Database = {
             foreignKeyName: "wallet_transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "public_profiles"
+            referencedRelation: "public_user_profiles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -4416,88 +4409,32 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
+      public_user_profiles: {
         Row: {
           avatar_url: string | null
-          bio: string | null
           created_at: string | null
           display_name: string | null
           is_vip: boolean | null
-          total_losses: number | null
-          total_wagered: number | null
-          total_wins: number | null
           user_id: string | null
           username: string | null
-          vip_access: boolean | null
-          xbox_gamertag: string | null
         }
         Insert: {
           avatar_url?: string | null
-          bio?: string | null
           created_at?: string | null
           display_name?: string | null
           is_vip?: boolean | null
-          total_losses?: number | null
-          total_wagered?: number | null
-          total_wins?: number | null
           user_id?: string | null
           username?: string | null
-          vip_access?: boolean | null
-          xbox_gamertag?: string | null
         }
         Update: {
           avatar_url?: string | null
-          bio?: string | null
           created_at?: string | null
           display_name?: string | null
           is_vip?: boolean | null
-          total_losses?: number | null
-          total_wagered?: number | null
-          total_wins?: number | null
           user_id?: string | null
           username?: string | null
-          vip_access?: boolean | null
-          xbox_gamertag?: string | null
         }
         Relationships: []
-      }
-      v_joinable_matches: {
-        Row: {
-          automated: boolean | null
-          creator_username: string | null
-          entry_fee: number | null
-          expires_at: string | null
-          game_id: string | null
-          game_mode_key: string | null
-          game_name: string | null
-          id: string | null
-          matched_at: string | null
-          matched_with_user_id: string | null
-          payout_type: string | null
-          platform: string | null
-          queue_status: string | null
-          queued_at: string | null
-          stake_amount: number | null
-          user_id: string | null
-          vip_required: boolean | null
-          wager_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "match_queue_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "match_queue_wager_id_fkey"
-            columns: ["wager_id"]
-            isOneToOne: false
-            referencedRelation: "challenges"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Functions: {
