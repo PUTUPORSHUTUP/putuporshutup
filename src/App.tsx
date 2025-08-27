@@ -60,6 +60,11 @@ const App = () => {
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
+              <Route path="/queue" element={
+                <ProtectedRoute>
+                  <QueuePage />
+                </ProtectedRoute>
+              } />
               <Route path="/wallet" element={
                 <ProtectedRoute>
                   <Wallet />
