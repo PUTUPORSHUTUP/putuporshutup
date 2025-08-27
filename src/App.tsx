@@ -63,88 +63,24 @@ const App = () => {
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
+              <Route path="/wallet" element={
+                <ProtectedRoute>
+                  <Wallet />
+                </ProtectedRoute>
+              } />
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />
                 </ProtectedRoute>
               } />
-              <Route path="/games" element={<Games />} />
-               <Route path="/tournaments" element={
+              <Route path="/admin" element={
                 <ProtectedRoute>
-                  <Tournaments />
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/tournaments/:tournamentId" element={
-                <ProtectedRoute>
-                  <TournamentDetail />
-                </ProtectedRoute>
-              } />
-              <Route path="/social" element={
-                <ProtectedRoute>
-                  <Social />
-                </ProtectedRoute>
-              } />
-              <Route path="/leaderboards" element={<Leaderboards />} />
-               <Route path="/admin/sim" element={
-                 <ProtectedRoute>
-                   <AdminSimPanel />
-                 </ProtectedRoute>
-               } />
-               <Route path="/admin/*" element={<AdminRoutes />} />
-               <Route path="/admin" element={
-                 <ProtectedRoute>
-                   <AdminDashboard />
-                 </ProtectedRoute>
-               } />
-              <Route path="/moderator" element={
-                <ProtectedRoute>
-                  <Moderator />
-                </ProtectedRoute>
-              } />
-              <Route path="/sponsor" element={<Sponsor />} />
-              <Route path="/sponsor-signup" element={<SponsorSignup />} />
-              <Route path="/sponsor-dashboard" element={
-                <ProtectedRoute>
-                  <SponsorDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/how-it-works" element={<HowItWorks />} />
-              <Route path="/education" element={<Education />} />
-              <Route path="/sunday-showdown" element={<SundayShowdown />} />
-              <Route path="/promotion" element={
-                <ProtectedRoute>
-                  <Promotion />
-                </ProtectedRoute>
-              } />
-              <Route path="/vip" element={
-                <ProtectedRoute>
-                  <VIP />
-                </ProtectedRoute>
-              } />
-              <Route path="/vip-required" element={
-                <ProtectedRoute>
-                  <VIPRequired />
-                </ProtectedRoute>
-              } />
-              <Route path="/start-trial" element={
-                <ProtectedRoute>
-                  <StartTrial />
-                </ProtectedRoute>
-              } />
-               <Route path="/wallet" element={
-                 <ProtectedRoute>
-                   <Wallet />
-                 </ProtectedRoute>
-               } />
-               <Route path="/queue" element={
-                 <ProtectedRoute>
-                   <QueuePage />
-                 </ProtectedRoute>
-               } />
-                <Route path="/vip-success" element={<VIPSuccess />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="/health" element={<Health />} />
-                <Route path="*" element={<NotFound />} />
+              <Route path="/admin/*" element={<AdminRoutes />} />
+              <Route path="/health" element={<Health />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
             </BrowserRouter>

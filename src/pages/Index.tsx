@@ -1,138 +1,193 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-
-type MatchRow = {
-  id: string;
-  game_mode_key: string | null;
-  entry_fee: number | null;
-  vip_required: boolean | null;
-  payout_type: string | null;
-  queued_at: string | null;
-};
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Wallet, User, Play, Zap } from "lucide-react";
 
 export default function IndexPage() {
-  const navigate = useNavigate();
   const { user, profile } = useAuth();
-
-  // status strip
-  const [dbOk, setDbOk] = useState<boolean | null>(null);
-  const [nextMatches, setNextMatches] = useState<MatchRow[]>([]);
+  const [systemStatus, setSystemStatus] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // user mini
   const balance = profile?.wallet_balance || 0;
-  const gamertag = profile?.xbox_gamertag;
-  const isAdmin = profile?.is_admin || false;
+  const isSetup = profile?.xbox_gamertag && balance >= 5;
 
-  // ---- load system status + next matches
   useEffect(() => {
-    (async () => {
-      // ping DB by reading one row; if it works, DB is reachable
-      const { error: pingErr } = await supabase
-        .from("match_queue")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
-      setDbOk(!pingErr);
-
-      const { data } = await supabase
-        .from("match_queue")
-        .select("id, game_mode_key, entry_fee, vip_required, payout_type, queued_at")
-        .eq("automated", true)
-        .eq("queue_status", "searching")
-        .order("queued_at", { ascending: true })
-        .limit(3);
-
-      setNextMatches(data || []);
+    const checkSystem = async () => {
+      const { error } = await supabase.from("profiles").select("id").limit(1).maybeSingle();
+      setSystemStatus(!error);
       setLoading(false);
-    })();
+    };
+    checkSystem();
   }, []);
 
-  const needsFunds = (balance || 0) < 1; // lowest tier is $1
-  const needsGamertag = !gamertag || gamertag.trim() === "";
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* System Ready strip */}
-      <div className="w-full px-4 py-2 text-sm flex items-center gap-3">
-        <span className={`inline-flex items-center gap-2 px-2 py-1 rounded ${dbOk ? "bg-emerald-900/50 text-emerald-300" : "bg-red-900/50 text-red-300"}`}>
-          <span className={`w-2 h-2 rounded-full ${dbOk ? "bg-emerald-400" : "bg-red-400"}`} />
-          {dbOk ? "DB Connected" : "DB Error"}
-        </span>
-        <span className="text-neutral-400">Automated rotation active (shows upcoming matches below)</span>
+    <div className="min-h-screen bg-background">
+      {/* System Status */}
+      <div className="w-full bg-primary/5 border-b px-4 py-2">
+        <div className="max-w-4xl mx-auto flex items-center gap-2 text-sm">
+          <div className={`w-2 h-2 rounded-full ${systemStatus ? "bg-green-500" : "bg-red-500"}`} />
+          <span className="text-muted-foreground">
+            {systemStatus ? "System Online • 24/7 Automation Active" : "System Offline"}
+          </span>
+        </div>
       </div>
 
-      {/* SmartBanner */}
-      {(needsFunds || needsGamertag) && (
-        <div className="bg-amber-900/60 border border-amber-700 text-amber-100 px-4 py-3 text-sm flex items-center justify-between">
-          <div className="space-x-3">
-            {needsGamertag && <span>⚠️ Link your Xbox gamertag</span>}
-            {needsFunds && <span>💳 Add funds to wallet</span>}
-          </div>
-          <div className="space-x-2">
-            {needsGamertag && <Link to="/profile" className="underline">Profile</Link>}
-            {needsFunds && <Link to="/wallet" className="underline">Wallet</Link>}
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="px-4 py-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">PUOSU</h1>
-        <div className="text-sm text-neutral-300">
-          {user ? (
-            <span>Balance: ${Number(balance ?? 0).toFixed(2)} · {gamertag ? `GT: ${gamertag}` : "Gamertag not linked"}</span>
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        {/* Hero Section */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight">PUOSU Gaming</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Automated 24/7 gaming platform with instant payouts and seamless wallet management
+          </p>
+          
+          {!user ? (
+            <div className="flex gap-4 justify-center">
+              <Button asChild size="lg">
+                <Link to="/auth">Join Now</Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            </div>
           ) : (
-            <Link to="/auth" className="underline">Sign in</Link>
+            <div className="flex items-center justify-center gap-4">
+              <Badge variant={isSetup ? "default" : "secondary"} className="text-sm px-3 py-1">
+                {isSetup ? "✅ Ready to Play" : "⚠️ Setup Required"}
+              </Badge>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Next Matches */}
-      <section className="px-4">
-        <h2 className="text-xl font-semibold mb-3">Next Matches</h2>
-        {loading ? (
-          <div className="text-neutral-400">Loading…</div>
-        ) : nextMatches.length === 0 ? (
-          <div className="text-neutral-400">No scheduled matches yet.</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {nextMatches.map((m) => {
-              const when = m.queued_at ? new Date(m.queued_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "TBD";
-              return (
-                <div key={m.id} className="bg-neutral-900/60 border border-neutral-800 rounded-lg p-4">
-                  <div className="text-sm text-neutral-400 mb-1">{when}</div>
-                  <div className="text-lg font-medium">
-                    ${m.entry_fee ?? 0} {m.vip_required ? "VIP" : "Open"}
-                  </div>
-                  <div className="text-neutral-300">{m.game_mode_key || "competitive"}</div>
-                  <div className="text-xs text-neutral-400 mt-1">
-                    Payout: {m.payout_type?.replace(/_/g, " ") || "winner take all"}
-                  </div>
+        {/* Main Actions */}
+        {user && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="relative overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Wallet</CardTitle>
                 </div>
-              );
-            })}
+                <CardDescription>Manage funds & withdrawals</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
+                  <Button asChild className="w-full">
+                    <Link to="/wallet">
+                      <Wallet className="w-4 h-4 mr-2" />
+                      Manage Wallet
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Profile</CardTitle>
+                </div>
+                <CardDescription>Setup gamertag & preferences</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">
+                    {profile?.xbox_gamertag ? `GT: ${profile.xbox_gamertag}` : "No gamertag linked"}
+                  </div>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/profile">
+                      <User className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-primary/20 bg-primary/5">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Live Matches</CardTitle>
+                </div>
+                <CardDescription>24/7 automated gaming</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">
+                    {isSetup ? "Ready to join matches" : "Complete setup first"}
+                  </div>
+                  <Button 
+                    disabled={!isSetup} 
+                    className="w-full"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {isSetup ? "Join Match" : "Setup Required"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
-      </section>
 
-      {/* Admin Shortcut */}
-      {isAdmin && (
-        <div className="px-4 mt-6">
-          <Link to="/admin/sim" className="inline-block bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded">
-            🧪 Open Simulation Panel
-          </Link>
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+              <Zap className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold">24/7 Automation</h3>
+            <p className="text-sm text-muted-foreground">
+              Continuous match rotation with instant results
+            </p>
+          </div>
+          
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+              <Wallet className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold">Instant Payouts</h3>
+            <p className="text-sm text-muted-foreground">
+              Automatic wallet credits and fast withdrawals
+            </p>
+          </div>
+          
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+              <Play className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold">Simple Setup</h3>
+            <p className="text-sm text-muted-foreground">
+              Link gamertag, add funds, and start playing
+            </p>
+          </div>
         </div>
-      )}
 
-      {/* Footer Notice (Stripe/Tilled info or ops notes) */}
-      <div className="px-4 py-6">
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-lg p-4 text-sm text-neutral-300">
-          <p className="font-semibold mb-1">Operations Notice</p>
-          <p>PUOSU is fully automated for match rotation, wallet accounting, and payouts/refunds. Payment processing is migrating to Tilled. VIP-only $10 matches appear every third slot.</p>
-        </div>
+        {profile?.is_admin && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <span className="text-amber-800 font-medium">Admin Access</span>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/admin">Admin Dashboard</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
