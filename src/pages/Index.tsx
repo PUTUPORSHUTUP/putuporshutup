@@ -12,11 +12,6 @@ export default function IndexPage() {
   const [systemStatus, setSystemStatus] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Debug logging
-  console.log('IndexPage - User:', user?.email);
-  console.log('IndexPage - Profile:', profile);
-  console.log('IndexPage - Admin status:', profile?.is_admin);
-
   const balance = profile?.wallet_balance || 0;
   const isSetup = profile?.xbox_gamertag && balance >= 5;
 
