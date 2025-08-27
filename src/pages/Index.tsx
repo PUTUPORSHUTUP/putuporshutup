@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Wallet, User, Play, Zap } from "lucide-react";
 
 export default function IndexPage() {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [systemStatus, setSystemStatus] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -133,6 +134,11 @@ export default function IndexPage() {
                   <Button 
                     disabled={!isSetup} 
                     className="w-full"
+                    onClick={() => {
+                      if (isSetup) {
+                        navigate("/queue");
+                      }
+                    }}
                   >
                     <Play className="w-4 h-4 mr-2" />
                     {isSetup ? "Join Match" : "Setup Required"}
