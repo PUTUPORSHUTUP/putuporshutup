@@ -33,156 +33,122 @@ export default function IndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* System Status */}
-      <div className="w-full bg-primary/5 border-b px-4 py-2">
-        <div className="max-w-4xl mx-auto flex items-center gap-2 text-sm">
-          <div className={`w-2 h-2 rounded-full ${systemStatus ? "bg-green-500" : "bg-red-500"}`} />
-          <span className="text-muted-foreground">
-            {systemStatus ? "System Online • 24/7 Automation Active" : "System Offline"}
-          </span>
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-emerald-900">
+      {/* Tournament Engine Status Banner */}
+      <div className="w-full bg-sky-400 rounded-full mx-4 mt-4 px-6 py-3 max-w-2xl">
+        <div className="flex items-center justify-center gap-2 text-sm font-semibold text-slate-900">
+          <Zap className="w-4 h-4 text-red-500 animate-pulse" />
+          TOURNAMENT ENGINE LIVE - New matches every 20 minutes
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">PUOSU Gaming</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Automated 24/7 gaming platform with instant payouts and seamless wallet management
+      <div className="max-w-4xl mx-auto px-6 py-12 text-center space-y-8">
+        {/* Hero Title */}
+        <div className="space-y-6">
+          <h1 className="text-6xl md:text-7xl font-black tracking-tight text-emerald-400">
+            ENDLESS
+          </h1>
+          <h2 className="text-6xl md:text-7xl font-black tracking-tight text-emerald-400">
+            TOURNAMENTS
+          </h2>
+          
+          <p className="text-2xl text-amber-300 font-semibold max-w-2xl mx-auto">
+            No Subscriptions. No Waiting.<br />
+            Just Skill + Cash.
           </p>
           
+          <p className="text-lg text-amber-200 max-w-3xl mx-auto leading-relaxed">
+            Join automated tournaments every 20 minutes. Entry fees only. 
+            Winners get paid instantly. The platform that runs itself.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-4">
           {!user ? (
-            <div className="flex gap-4 justify-center">
-              <Button asChild size="lg">
-                <Link to="/auth">Join Now</Link>
+            <>
+              <Button 
+                asChild 
+                size="lg" 
+                className="w-full max-w-md bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-lg py-6 rounded-full"
+              >
+                <Link to="/auth">
+                  <Play className="w-5 h-5 mr-2" />
+                  JOIN NEXT TOURNAMENT
+                </Link>
               </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link to="/auth">Sign In</Link>
+              
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full max-w-md border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold text-lg py-6 rounded-full"
+                asChild
+              >
+                <Link to="/how-it-works">
+                  <Zap className="w-5 h-5 mr-2" />
+                  HOW IT WORKS
+                </Link>
               </Button>
-            </div>
+            </>
           ) : (
-            <div className="flex items-center justify-center gap-4">
-              <Badge variant={isSetup ? "default" : "secondary"} className="text-sm px-3 py-1">
-                {isSetup ? "✅ Ready to Play" : "⚠️ Setup Required"}
-              </Badge>
-            </div>
+            <>
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <Badge variant={isSetup ? "default" : "secondary"} className="text-lg px-4 py-2 bg-emerald-500 text-slate-900">
+                  {isSetup ? "✅ Ready to Compete" : "⚠️ Setup Required"}
+                </Badge>
+              </div>
+              
+              <Button 
+                disabled={!isSetup}
+                size="lg" 
+                className="w-full max-w-md bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-lg py-6 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                {isSetup ? "JOIN NEXT TOURNAMENT" : "COMPLETE SETUP FIRST"}
+              </Button>
+              
+              {/* Quick Stats for logged in users */}
+              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mt-8">
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <div className="text-emerald-400 text-2xl font-bold">${balance.toFixed(2)}</div>
+                  <div className="text-amber-200 text-sm">Balance</div>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <div className="text-emerald-400 text-2xl font-bold">
+                    {profile?.xbox_gamertag ? "✓" : "×"}
+                  </div>
+                  <div className="text-amber-200 text-sm">Gamertag</div>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Main Actions */}
+        {/* Quick Access for Authenticated Users */}
         {user && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="relative overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Wallet</CardTitle>
-                </div>
-                <CardDescription>Manage funds & withdrawals</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
-                  <Button asChild className="w-full">
-                    <Link to="/wallet">
-                      <Wallet className="w-4 h-4 mr-2" />
-                      Manage Wallet
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Profile</CardTitle>
-                </div>
-                <CardDescription>Setup gamertag & preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="text-sm text-muted-foreground">
-                    {profile?.xbox_gamertag ? `GT: ${profile.xbox_gamertag}` : "No gamertag linked"}
-                  </div>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to="/profile">
-                      <User className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-primary/20 bg-primary/5">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Live Matches</CardTitle>
-                </div>
-                <CardDescription>24/7 automated gaming</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="text-sm text-muted-foreground">
-                    {isSetup ? "Ready to join matches" : "Complete setup first"}
-                  </div>
-                  <Button 
-                    disabled={!isSetup} 
-                    className="w-full"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    {isSetup ? "Join Match" : "Setup Required"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="flex gap-4 justify-center pt-8">
+            <Button asChild variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900">
+              <Link to="/wallet">
+                <Wallet className="w-4 h-4 mr-2" />
+                Wallet
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900">
+              <Link to="/profile">
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </Link>
+            </Button>
           </div>
         )}
 
-        {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Zap className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold">24/7 Automation</h3>
-            <p className="text-sm text-muted-foreground">
-              Continuous match rotation with instant results
-            </p>
-          </div>
-          
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Wallet className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold">Instant Payouts</h3>
-            <p className="text-sm text-muted-foreground">
-              Automatic wallet credits and fast withdrawals
-            </p>
-          </div>
-          
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Play className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold">Simple Setup</h3>
-            <p className="text-sm text-muted-foreground">
-              Link gamertag, add funds, and start playing
-            </p>
-          </div>
-        </div>
-
         {profile?.is_admin && (
-          <Card className="border-amber-200 bg-amber-50">
+          <Card className="border-amber-400 bg-amber-400/10 max-w-md mx-auto">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <span className="text-amber-800 font-medium">Admin Access</span>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/admin">Admin Dashboard</Link>
+                <span className="text-amber-400 font-medium">Admin Access</span>
+                <Button asChild variant="outline" size="sm" className="border-amber-400 text-amber-400">
+                  <Link to="/admin">Dashboard</Link>
                 </Button>
               </div>
             </CardContent>
