@@ -4748,6 +4748,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      join_tournament: {
+        Args: { tournament_uuid: string; user_uuid: string }
+        Returns: Json
+      }
       live_events_list_admin: {
         Args: Record<PropertyKey, never>
         Returns: {

@@ -14,24 +14,20 @@ import {
   Loader2,
   Calendar,
   Target,
-  Zap
+  Zap,
+  Plus
 } from 'lucide-react';
 
 interface Tournament {
   id: string;
-  name: string;
+  title: string;
   description: string;
   entry_fee: number;
   max_participants: number;
   current_participants: number;
   prize_pool: number;
   status: string;
-  registration_start: string;
-  registration_end: string;
-  tournament_start: string;
-  game_mode: string;
   platform: string;
-  automation_enabled: boolean;
   created_at: string;
 }
 
@@ -40,7 +36,6 @@ export const TournamentEngine = () => {
   const { toast } = useToast();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(false);
-  const [joinLoading, setJoinLoading] = useState<string | null>(null);
 
   useEffect(() => {
     loadTournaments();
@@ -71,13 +66,17 @@ export const TournamentEngine = () => {
     try {
       const { data, error } = await supabase
         .from('tournaments')
-        .select('*')
+        .select(`
+          id, title, description, entry_fee, max_participants, 
+          current_participants, prize_pool, status, 
+          platform, created_at
+        `)
         .in('status', ['upcoming', 'registration_open', 'ongoing'])
         .order('created_at', { ascending: false })
         .limit(6);
 
       if (error) throw error;
-      setTournaments(data || []);
+      setTournaments((data || []) as Tournament[]);
     } catch (error) {
       console.error('Error loading tournaments:', error);
       toast({
@@ -90,53 +89,62 @@ export const TournamentEngine = () => {
     }
   };
 
-  const joinTournament = async (tournamentId: string, entryFee: number) => {
-    if (!user || !profile) {
+  const createNewTournament = async () => {
+    if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to join tournaments",
+        description: "Please sign in to create tournaments",
         variant: "destructive"
       });
       return;
     }
 
-    if (profile.wallet_balance < entryFee) {
-      toast({
-        title: "Insufficient Funds",
-        description: `You need $${entryFee.toFixed(2)} to join this tournament`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setJoinLoading(tournamentId);
+    setLoading(true);
     try {
-      // Use the database function to join tournament
-      const { data, error } = await supabase
-        .rpc('join_tournament', {
-          tournament_uuid: tournamentId,
-          user_uuid: user.id
+      const now = new Date();
+      const tournamentName = `PUOSU Tournament ${now.toISOString().slice(0, 16).replace('T', ' ')}`;
+      
+      // First get a game_id from the games table
+      const { data: games, error: gamesError } = await supabase
+        .from('games')
+        .select('id')
+        .limit(1);
+
+      if (gamesError || !games?.length) {
+        throw new Error('No games available. Please contact administrator.');
+      }
+      
+      const { error } = await supabase
+        .from('tournaments')
+        .insert({
+          title: tournamentName,
+          description: 'Elite gaming tournament with automated prize distribution',
+          entry_fee: 25,
+          max_participants: 16,
+          current_participants: 0,
+          prize_pool: 0,
+          status: 'registration_open',
+          platform: 'Xbox Series X',
+          creator_id: user.id,
+          game_id: games[0].id // Use the first available game
         });
 
       if (error) throw error;
 
-      if (data.success) {
-        toast({
-          title: "Tournament Joined!",
-          description: `Entry fee of $${entryFee} deducted. Good luck!`,
-        });
-        loadTournaments(); // Refresh the list
-      } else {
-        throw new Error(data.error || 'Failed to join tournament');
-      }
+      toast({
+        title: "Tournament Created!",
+        description: "Your tournament is now live and accepting registrations",
+      });
+
+      loadTournaments();
     } catch (error: any) {
       toast({
-        title: "Join Failed",
-        description: error.message || "Unable to join tournament",
+        title: "Creation Failed",
+        description: error.message || "Unable to create tournament",
         variant: "destructive"
       });
     } finally {
-      setJoinLoading(null);
+      setLoading(false);
     }
   };
 
@@ -153,24 +161,6 @@ export const TournamentEngine = () => {
     }
   };
 
-  const formatTimeRemaining = (dateString: string) => {
-    const now = new Date();
-    const target = new Date(dateString);
-    const diff = target.getTime() - now.getTime();
-    
-    if (diff <= 0) return 'Started';
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    if (hours > 24) {
-      const days = Math.floor(hours / 24);
-      return `${days}d ${hours % 24}h`;
-    }
-    
-    return `${hours}h ${minutes}m`;
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -183,6 +173,17 @@ export const TournamentEngine = () => {
         <p className="text-muted-foreground">
           Automated tournaments running 24/7. Join now and compete for prizes!
         </p>
+        
+        {user && (
+          <Button onClick={createNewTournament} disabled={loading} className="mt-4">
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <Plus className="w-4 h-4 mr-2" />
+            )}
+            Create Tournament
+          </Button>
+        )}
       </div>
 
       {/* Tournament Grid */}
@@ -209,10 +210,10 @@ export const TournamentEngine = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-lg line-clamp-1">
-                      {tournament.name}
+                      {tournament.title}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                      {tournament.description || tournament.game_mode}
+                      {tournament.description || 'Elite gaming tournament'}
                     </p>
                   </div>
                   {getStatusBadge(tournament.status)}
@@ -242,18 +243,18 @@ export const TournamentEngine = () => {
                   </div>
                 </div>
 
-                {/* Timing Info */}
+                {/* Status Info */}
                 {tournament.status === 'upcoming' && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
-                    <span>Starts: {formatTimeRemaining(tournament.registration_start)}</span>
+                    <span>Starting soon...</span>
                   </div>
                 )}
                 
                 {tournament.status === 'registration_open' && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-green-600">
                     <Clock className="w-4 h-4" />
-                    <span>Registration closes: {formatTimeRemaining(tournament.registration_end)}</span>
+                    <span className="font-medium">Registration open now!</span>
                   </div>
                 )}
 
@@ -264,20 +265,25 @@ export const TournamentEngine = () => {
                   </div>
                 )}
 
-                {/* Action Button */}
+                {/* Action Buttons */}
                 {tournament.status === 'registration_open' && (
-                  <Button 
-                    className="w-full" 
-                    onClick={() => joinTournament(tournament.id, tournament.entry_fee)}
-                    disabled={joinLoading === tournament.id || !user}
-                  >
-                    {joinLoading === tournament.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
+                  <div className="space-y-2">
+                    <Button 
+                      className="w-full" 
+                      disabled={!user || !profile || profile.wallet_balance < tournament.entry_fee}
+                    >
                       <Trophy className="w-4 h-4 mr-2" />
+                      {!user ? 'Sign In to Join' : 
+                       !profile || profile.wallet_balance < tournament.entry_fee ? 
+                       'Insufficient Funds' : 
+                       `Join for $${tournament.entry_fee}`}
+                    </Button>
+                    {profile && profile.wallet_balance < tournament.entry_fee && (
+                      <p className="text-xs text-center text-muted-foreground">
+                        Need $${(tournament.entry_fee - profile.wallet_balance).toFixed(2)} more
+                      </p>
                     )}
-                    {!user ? 'Sign In to Join' : `Join for $${tournament.entry_fee}`}
-                  </Button>
+                  </div>
                 )}
 
                 {tournament.status === 'upcoming' && (

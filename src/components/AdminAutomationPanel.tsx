@@ -7,9 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Settings, 
-  Play, 
-  Pause,
-  RotateCcw,
+  Play,
   Activity,
   Loader2,
   CheckCircle,
@@ -47,16 +45,15 @@ export const AdminAutomationPanel = () => {
       // Get active tournaments count
       const { count: activeTournaments } = await supabase
         .from('tournaments')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .in('status', ['upcoming', 'registration_open', 'ongoing']);
 
       // Get today's processed tournaments
       const today = new Date().toISOString().split('T')[0];
       const { count: processedToday } = await supabase
         .from('tournaments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', today)
-        .eq('automation_enabled', true);
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', today);
 
       // Get total prize pool
       const { data: prizeData } = await supabase
@@ -121,7 +118,7 @@ export const AdminAutomationPanel = () => {
 
       toast({
         title: "Automation Cycle Complete",
-        description: `Processed ${data.processed_tournaments} tournaments`,
+        description: `Processed tournaments successfully`,
       });
 
       // Reload stats and logs

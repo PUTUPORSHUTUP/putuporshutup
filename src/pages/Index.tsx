@@ -5,7 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, User, Play, Zap } from "lucide-react";
+import { Wallet, User, Play, Zap, Bot } from "lucide-react";
+import { TournamentEngine } from '@/components/TournamentEngine';
 
 export default function IndexPage() {
   const { user, profile } = useAuth();
@@ -149,6 +150,9 @@ export default function IndexPage() {
           </div>
         )}
 
+        {/* Tournament Engine */}
+        <TournamentEngine />
+
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center space-y-2">
@@ -173,11 +177,11 @@ export default function IndexPage() {
           
           <div className="text-center space-y-2">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Play className="w-6 h-6 text-primary" />
+              <Bot className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold">Simple Setup</h3>
+            <h3 className="font-semibold">Smart Automation</h3>
             <p className="text-sm text-muted-foreground">
-              Link gamertag, add funds, and start playing
+              AI-powered tournament management and prize distribution
             </p>
           </div>
         </div>
