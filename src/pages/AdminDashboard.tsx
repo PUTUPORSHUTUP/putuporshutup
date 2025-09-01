@@ -78,6 +78,7 @@ import { ManualDepositProcessor } from '@/components/admin/ManualDepositProcesso
 import PosterSelector from '@/components/PosterSelector';
 import { SecuritySettings } from '@/components/admin/SecuritySettings';
 import { SystemMonitoring } from '@/components/admin/SystemMonitoring';
+import SystemTestSuite from '@/components/admin/SystemTestSuite';
 
 
 interface AdminAnalytics {
@@ -641,6 +642,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="monitoring" className="text-xs sm:text-sm">Monitor</TabsTrigger>
             <TabsTrigger value="diagnostics" className="text-xs sm:text-sm">Diagnostics</TabsTrigger>
             <TabsTrigger value="xbox-test" className="text-xs sm:text-sm">Xbox Test</TabsTrigger>
+            <TabsTrigger value="prod-test" className="text-xs sm:text-sm">Production Test</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -1053,6 +1055,11 @@ const AdminDashboard = () => {
           {/* API Diagnostics Tab */}
           <TabsContent value="diagnostics" className="space-y-6">
             <ApiDiagnosticsPanel />
+          </TabsContent>
+
+          {/* Production Testing Tab */}
+          <TabsContent value="prod-test" className="space-y-6">
+            <SystemTestSuite />
           </TabsContent>
 
         </Tabs>
