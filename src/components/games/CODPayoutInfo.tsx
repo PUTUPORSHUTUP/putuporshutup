@@ -78,13 +78,13 @@ export const CODPayoutInfo = () => {
               
               <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium">Kill Race</span>
+                  <span className="font-medium">Gun Game</span>
                   <Badge variant="outline" className="border-amber-500/50">Top 3 Split</Badge>
                 </div>
                 <div className="text-sm space-y-1">
-                  <p>🥇 Most Kills: 60% of pot</p>
-                  <p>🥈 2nd Most: 30% of pot</p>
-                  <p>🥉 3rd Most: 10% of pot</p>
+                  <p>🥇 1st Place: 60% of pot</p>
+                  <p>🥈 2nd Place: 30% of pot</p>
+                  <p>🥉 3rd Place: 10% of pot</p>
                 </div>
               </div>
             </div>

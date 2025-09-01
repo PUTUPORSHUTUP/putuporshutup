@@ -65,12 +65,12 @@ export const CODRevenueLobbies = () => {
       // COD Maps and Modes for variety with payout structures
       const codMaps = ['Nuketown', 'Hijacked', 'Raid', 'Express', 'Slums', 'Plaza', 'Standoff'];
       const codModes = [
-        { name: 'Kill Race', type: 'ffa', payout: '1st/2nd/3rd (60%/30%/10%)' },
+        { name: 'Free for All', type: 'ffa', payout: '1st/2nd/3rd (50%/30%/20%)' },
+        { name: 'Gun Game', type: 'ffa', payout: '1st/2nd/3rd (60%/30%/10%)' },
         { name: 'Domination', type: 'team', payout: 'Winner Take All (90%)' },
         { name: 'Search & Destroy', type: 'team', payout: 'Winner Take All (90%)' },
         { name: 'Hardpoint', type: 'team', payout: 'Winner Take All (90%)' },
-        { name: 'Team Deathmatch', type: 'team', payout: 'Winner Take All (90%)' },
-        { name: 'Free for All', type: 'ffa', payout: '1st/2nd/3rd (50%/30%/20%)' }
+        { name: 'Team Deathmatch', type: 'team', payout: 'Winner Take All (90%)' }
       ];
       const vipTiers = [
         { name: 'Bronze VIP', fee: 1, color: 'amber' },
@@ -141,7 +141,7 @@ export const CODRevenueLobbies = () => {
           action: 'create_lobby',
           config: {
             gameId: 'cod_bo6',
-            lobbyType: tier === 'gold' ? 'search_destroy' : tier === 'silver' ? 'domination' : 'kill_race',
+            lobbyType: tier === 'gold' ? 'search_destroy' : tier === 'silver' ? 'domination' : 'free_for_all',
             maxPlayers: 8,
             entryFee: config.fee,
             gameMode: `COD6:${tier.toUpperCase()}_VIP`,
@@ -176,7 +176,7 @@ export const CODRevenueLobbies = () => {
       const { data, error } = await supabase.functions.invoke('database-market-engine', {
         body: {
           auto_seed: true,
-          mode_key: 'COD6:KILL_RACE'
+          mode_key: 'COD6:FREE_FOR_ALL'
         }
       });
 
@@ -391,7 +391,7 @@ export const CODRevenueLobbies = () => {
                     <div className="text-xl font-bold text-green-600 mb-1">
                       ${lobby.estimated_revenue.toFixed(2)}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">Revenue (15%)</p>
+                    <p className="text-xs text-muted-foreground mb-2">Revenue (10%)</p>
                     <Badge 
                       variant={lobby.status === 'active' ? 'default' : 'secondary'}
                       className={lobby.status === 'active' ? 'bg-green-500' : ''}
