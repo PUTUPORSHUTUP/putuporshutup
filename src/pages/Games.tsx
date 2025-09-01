@@ -18,6 +18,7 @@ import { GamesHeader } from '@/components/games/GamesHeader';
 import { WalletBalanceCard } from '@/components/games/WalletBalanceCard';
 import { GamesStatsCards } from '@/components/games/GamesStatsCards';
 import { GamesVisitorView } from '@/components/games/GamesVisitorView';
+import { CODRevenueLobbies } from '@/components/games/CODRevenueLobbies';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useGamesData } from '@/hooks/useGamesData';
@@ -27,7 +28,7 @@ import { Plus, Trophy } from 'lucide-react';
 const Games = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState('browse');
+  const [activeTab, setActiveTab] = useState('cod-revenue');
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [showLegalModal, setShowLegalModal] = useState(false);
   
@@ -117,7 +118,8 @@ const Games = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7 max-w-4xl text-xs">
+          <TabsList className="grid w-full grid-cols-8 max-w-4xl text-xs">
+            <TabsTrigger value="cod-revenue">🎯 COD Revenue</TabsTrigger>
             <TabsTrigger value="browse">Browse</TabsTrigger>
             <TabsTrigger value="quick-match">Quick Match</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -126,6 +128,10 @@ const Games = () => {
             <TabsTrigger value="automation">Automation</TabsTrigger>
             <TabsTrigger value="rules">Rules</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="cod-revenue" className="space-y-6">
+            <CODRevenueLobbies />
+          </TabsContent>
 
           <TabsContent value="browse" className="space-y-6">
             {/* Wager Type Filter */}
