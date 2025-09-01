@@ -40,6 +40,7 @@ import { ProjectExportModal } from '@/components/admin/ProjectExportModal';
 import { ApiDiagnosticsPanel } from '@/components/admin/ApiDiagnosticsPanel';
 import XboxIntegrationTest from '@/components/admin/XboxIntegrationTest';
 import XboxLiveDashboard from '@/components/admin/XboxLiveDashboard';
+import { XboxSeriesXAutomation } from '@/components/admin/XboxSeriesXAutomation';
 import ComprehensiveSystemTest from '@/components/admin/ComprehensiveSystemTest';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -998,6 +999,7 @@ const AdminDashboard = () => {
 
           {/* Xbox Live Integration Tab */}
           <TabsContent value="xbox-live" className="space-y-6">
+            <XboxSeriesXAutomation />
             <div className="grid gap-6 md:grid-cols-2">
               <XboxAPIKeyManagement />
               <XboxLiveDashboard />

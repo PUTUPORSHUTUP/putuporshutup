@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { XboxLobbyMonitor } from './XboxLobbyMonitor';
 import { 
   Gamepad2, 
   Wifi, 
@@ -445,52 +446,7 @@ export const XboxSeriesXAutomation = () => {
         </TabsContent>
 
         <TabsContent value="monitoring" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Real-time Monitoring</CardTitle>
-              <CardDescription>
-                Monitor your Xbox automation performance
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>System Load</span>
-                    <span>{Math.round((status.activeLobbies / config.maxConcurrentLobbies) * 100)}%</span>
-                  </div>
-                  <Progress value={(status.activeLobbies / config.maxConcurrentLobbies) * 100} />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Console Status:</span>
-                    <p className="font-medium">{status.isConnected ? "Online" : "Offline"}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Automation:</span>
-                    <p className="font-medium">{status.isRunning ? "Running" : "Stopped"}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Revenue/Hour:</span>
-                    <p className="font-medium">${(status.totalRevenue / Math.max(status.uptime / 60, 1)).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Active Players:</span>
-                    <p className="font-medium">{status.activeLobbies * 8}</p>
-                  </div>
-                </div>
-
-                {status.lastError && (
-                  <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
-                    <p className="text-red-800 text-sm">
-                      <strong>Last Error:</strong> {status.lastError}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <XboxLobbyMonitor />
         </TabsContent>
       </Tabs>
     </div>
