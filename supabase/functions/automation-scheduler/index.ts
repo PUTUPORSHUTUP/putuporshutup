@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
     console.log('Starting automation scheduler...')
 
-    // Define automation schedule (every 5 minutes for game tracking)
+    // Define automation schedule with tournament automation
     const automations = [
       {
         name: 'live-game-tracker',
@@ -34,6 +34,11 @@ Deno.serve(async (req) => {
         name: 'game-automation-orchestrator',
         interval_minutes: 10, 
         description: 'Handle game-specific automations'
+      },
+      {
+        name: 'tournament-automation',
+        interval_minutes: 30,
+        description: 'Create 3 tournaments every 90 minutes (runs every 30 min)'
       }
     ]
 

@@ -3475,6 +3475,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_engine_status: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_running: boolean | null
+          last_tournament_created_at: string | null
+          next_tournament_scheduled_at: string | null
+          tournaments_created_today: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_running?: boolean | null
+          last_tournament_created_at?: string | null
+          next_tournament_scheduled_at?: string | null
+          tournaments_created_today?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_running?: boolean | null
+          last_tournament_created_at?: string | null
+          next_tournament_scheduled_at?: string | null
+          tournaments_created_today?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       tournament_entries: {
         Row: {
           created_at: string
@@ -4597,6 +4627,25 @@ export type Database = {
       get_platform_health: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_random_tournament_template: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          collectible_series: string | null
+          cover_art_url: string | null
+          created_at: string | null
+          entry_fee: number | null
+          game_id: string | null
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          poster_title_template: string | null
+          prize_distribution: Json | null
+          schedule_cron: string
+          template_name: string
+          title_variations: Json | null
+          tournament_settings: Json | null
+        }
       }
       get_test_user_status: {
         Args: Record<PropertyKey, never>
