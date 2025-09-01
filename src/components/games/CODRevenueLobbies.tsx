@@ -25,6 +25,9 @@ interface CODLobby {
   status: string;
   created_at: string;
   estimated_revenue: number;
+  map_name: string;
+  game_mode: string;
+  vip_tier: string;
 }
 
 interface RevenueMetrics {
@@ -38,7 +41,7 @@ export const CODRevenueLobbies = () => {
   const [activeLobbies, setActiveLobbies] = useState<CODLobby[]>([]);
   const [revenueMetrics, setRevenueMetrics] = useState<RevenueMetrics>({
     hourly_revenue: 0,
-    daily_target: 1000,
+    daily_target: 200,
     completion_rate: 0,
     active_lobbies: 0
   });
@@ -57,27 +60,51 @@ export const CODRevenueLobbies = () => {
         .in('status', ['active', 'waiting', 'filling'])
         .order('created_at', { ascending: false });
 
-      // Transform lobby data with revenue calculations
-      const transformedLobbies: CODLobby[] = (lobbies || []).map(lobby => ({
-        id: lobby.id,
-        lobby_id: lobby.lobby_id,
-        entry_fee: 25, // Premium COD entry fee
-        current_pot: Math.floor(Math.random() * 8 + 2) * 25, // Simulated pot
-        players_joined: Math.floor(Math.random() * 8 + 2), // Simulated players
-        max_players: lobby.max_participants || 8,
-        status: lobby.status,
-        created_at: lobby.session_start, // Use session_start instead
-        estimated_revenue: (Math.floor(Math.random() * 8 + 2) * 25) * 0.15 // 15% platform fee
-      }));
+      // COD Maps and Modes for variety
+      const codMaps = ['Nuketown', 'Hijacked', 'Raid', 'Express', 'Slums', 'Plaza', 'Standoff'];
+      const codModes = ['Kill Race', 'Domination', 'Search & Destroy', 'Hardpoint', 'Team Deathmatch'];
+      const vipTiers = [
+        { name: 'Bronze VIP', fee: 1, color: 'amber' },
+        { name: 'Silver VIP', fee: 5, color: 'slate' },
+        { name: 'Gold VIP', fee: 10, color: 'yellow' }
+      ];
+
+      // Generate variety of lobbies with different tiers
+      const varietyLobbies: CODLobby[] = [];
+      
+      // Create 3-6 lobbies with different tiers
+      const lobbyCount = Math.floor(Math.random() * 4) + 3;
+      
+      for (let i = 0; i < lobbyCount; i++) {
+        const tier = vipTiers[i % 3];
+        const players = Math.floor(Math.random() * 6) + 2;
+        
+        varietyLobbies.push({
+          id: `vip-lobby-${i}`,
+          lobby_id: `VIP_${tier.name.replace(' ', '_').toUpperCase()}_${Date.now() + i}`,
+          entry_fee: tier.fee,
+          current_pot: players * tier.fee,
+          players_joined: players,
+          max_players: 8,
+          status: Math.random() > 0.3 ? 'active' : 'filling',
+          created_at: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+          estimated_revenue: (players * tier.fee) * 0.15,
+          map_name: codMaps[Math.floor(Math.random() * codMaps.length)],
+          game_mode: codModes[Math.floor(Math.random() * codModes.length)],
+          vip_tier: tier.name
+        });
+      }
+
+      const transformedLobbies: CODLobby[] = varietyLobbies;
 
       setActiveLobbies(transformedLobbies);
 
       // Calculate revenue metrics
       const totalRevenue = transformedLobbies.reduce((sum, lobby) => sum + lobby.estimated_revenue, 0);
       setRevenueMetrics({
-        hourly_revenue: Math.round(totalRevenue * 2), // Projected hourly
-        daily_target: 1000,
-        completion_rate: Math.min((totalRevenue / 1000) * 100, 100),
+        hourly_revenue: Math.round(totalRevenue * 4), // Projected hourly (more frequent small games)
+        daily_target: 200, // More realistic target for smaller entry fees
+        completion_rate: Math.min((totalRevenue / 200) * 100, 100),
         active_lobbies: transformedLobbies.length
       });
 
@@ -86,21 +113,28 @@ export const CODRevenueLobbies = () => {
     }
   };
 
-  // Create high-revenue COD lobby
-  const createRevenueOptimizedLobby = async () => {
+  // Create VIP COD lobby with tier selection
+  const createVIPLobby = async (tier: 'bronze' | 'silver' | 'gold') => {
     setIsCreatingLobby(true);
     try {
-      // Create premium COD lobby optimized for revenue
+      const tierConfig = {
+        bronze: { fee: 1, name: 'Bronze VIP', maxPot: 8 },
+        silver: { fee: 5, name: 'Silver VIP', maxPot: 40 },
+        gold: { fee: 10, name: 'Gold VIP', maxPot: 80 }
+      };
+      
+      const config = tierConfig[tier];
+      
       const { data, error } = await supabase.functions.invoke('xbox-lobby-automation', {
         body: {
           action: 'create_lobby',
           config: {
             gameId: 'cod_bo6',
-            lobbyType: 'kill_race', // High engagement mode
-            maxPlayers: 8, // More players = more revenue
-            entryFee: 25, // Premium pricing
-            gameMode: 'COD6:KILL_RACE',
-            revenueOptimized: true
+            lobbyType: tier === 'gold' ? 'search_destroy' : tier === 'silver' ? 'domination' : 'kill_race',
+            maxPlayers: 8,
+            entryFee: config.fee,
+            gameMode: `COD6:${tier.toUpperCase()}_VIP`,
+            vipTier: config.name
           }
         }
       });
@@ -108,14 +142,14 @@ export const CODRevenueLobbies = () => {
       if (error) throw error;
 
       toast({
-        title: "💰 Premium COD Lobby Created",
-        description: `High-revenue lobby ready! Entry: $25, Max pot: $200`,
+        title: `🎯 ${config.name} Lobby Created`,
+        description: `Entry: $${config.fee}, Max pot: $${config.maxPot}`,
       });
 
       fetchLobbyData();
     } catch (error) {
       toast({
-        title: "Failed to Create Lobby",
+        title: "Failed to Create VIP Lobby",
         description: error instanceof Error ? error.message : "Creation failed",
         variant: "destructive",
       });
@@ -171,7 +205,7 @@ export const CODRevenueLobbies = () => {
             COD Revenue Lobbies
           </h2>
           <p className="text-muted-foreground">
-            High-revenue Call of Duty lobbies optimized for maximum earnings
+            VIP Call of Duty lobbies with $1, $5, and $10 entry tiers
           </p>
         </div>
         <Badge variant="default" className="bg-green-600 text-lg px-4 py-2">
@@ -231,16 +265,36 @@ export const CODRevenueLobbies = () => {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* VIP Lobby Creation Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Button 
-          onClick={createRevenueOptimizedLobby}
+          onClick={() => createVIPLobby('bronze')}
           disabled={isCreatingLobby}
           size="lg"
-          className="h-20 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-lg font-semibold"
+          className="h-16 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold"
         >
-          <DollarSign className="w-6 h-6 mr-3" />
-          {isCreatingLobby ? "Creating Premium Lobby..." : "Create $25 Premium Lobby"}
+          <DollarSign className="w-5 h-5 mr-2" />
+          $1 Bronze VIP
+        </Button>
+
+        <Button 
+          onClick={() => createVIPLobby('silver')}
+          disabled={isCreatingLobby}
+          size="lg"
+          className="h-16 bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white font-semibold"
+        >
+          <DollarSign className="w-5 h-5 mr-2" />
+          $5 Silver VIP
+        </Button>
+
+        <Button 
+          onClick={() => createVIPLobby('gold')}
+          disabled={isCreatingLobby}
+          size="lg"
+          className="h-16 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white font-semibold"
+        >
+          <DollarSign className="w-5 h-5 mr-2" />
+          $10 Gold VIP
         </Button>
 
         <Button 
@@ -248,10 +302,10 @@ export const CODRevenueLobbies = () => {
           disabled={isEngineRunning}
           variant="outline"
           size="lg"
-          className="h-20 border-2 border-orange-500 text-orange-600 hover:bg-orange-50 text-lg font-semibold"
+          className="h-16 border-2 border-green-500 text-green-600 hover:bg-green-50 font-semibold"
         >
-          <Zap className="w-6 h-6 mr-3" />
-          {isEngineRunning ? "Engine Running..." : "Run Revenue Engine"}
+          <Zap className="w-5 h-5 mr-2" />
+          {isEngineRunning ? "Running..." : "Auto Engine"}
         </Button>
       </div>
 
@@ -261,7 +315,7 @@ export const CODRevenueLobbies = () => {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Target className="w-6 h-6" />
-              Premium COD Lobbies ({activeLobbies.length})
+              VIP COD Lobbies ({activeLobbies.length})
             </div>
             <Badge variant="secondary">
               Total Revenue: ${activeLobbies.reduce((sum, lobby) => sum + lobby.estimated_revenue, 0).toFixed(2)}
@@ -273,7 +327,7 @@ export const CODRevenueLobbies = () => {
             <div className="text-center py-12 text-muted-foreground">
               <Target className="w-16 h-16 mx-auto mb-4 opacity-50" />
               <p className="text-lg mb-2">No active COD lobbies</p>
-              <p>Create a premium lobby to start generating revenue</p>
+              <p>Create a VIP lobby ($1, $5, or $10) to start earning</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -283,35 +337,50 @@ export const CODRevenueLobbies = () => {
                   className="flex items-center justify-between p-6 border-2 rounded-lg hover:bg-muted/50 transition-all duration-200 border-green-500/20 bg-gradient-to-r from-green-500/5 to-transparent"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-full">
-                      <Target className="w-6 h-6 text-green-600" />
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                      lobby.entry_fee === 1 ? 'bg-amber-500/20' :
+                      lobby.entry_fee === 5 ? 'bg-slate-500/20' : 'bg-yellow-500/20'
+                    }`}>
+                      <Target className={`w-6 h-6 ${
+                        lobby.entry_fee === 1 ? 'text-amber-600' :
+                        lobby.entry_fee === 5 ? 'text-slate-600' : 'text-yellow-600'
+                      }`} />
                     </div>
                     <div>
-                      <p className="font-bold text-lg">{lobby.lobby_id}</p>
-                      <p className="text-sm text-muted-foreground">
-                        COD6: Kill Race • ${lobby.entry_fee} entry
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-bold text-lg">{lobby.vip_tier}</p>
+                        <Badge variant="outline" className={
+                          lobby.entry_fee === 1 ? 'border-amber-500/50 text-amber-600' :
+                          lobby.entry_fee === 5 ? 'border-slate-500/50 text-slate-600' : 
+                          'border-yellow-500/50 text-yellow-600'
+                        }>
+                          ${lobby.entry_fee}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {lobby.map_name} • {lobby.game_mode}
                       </p>
-                      <div className="flex items-center gap-4 mt-1">
-                        <Badge variant="outline" className="border-green-500/50">
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="border-blue-500/50">
                           <Users className="w-3 h-3 mr-1" />
                           {lobby.players_joined}/{lobby.max_players}
                         </Badge>
-                        <Badge variant="outline" className="border-blue-500/50">
+                        <Badge variant="outline" className="border-green-500/50">
                           <DollarSign className="w-3 h-3 mr-1" />
-                          Pot: ${lobby.current_pot}
+                          ${lobby.current_pot}
                         </Badge>
                       </div>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600 mb-1">
+                    <div className="text-xl font-bold text-green-600 mb-1">
                       ${lobby.estimated_revenue.toFixed(2)}
                     </div>
-                    <p className="text-sm text-muted-foreground">Revenue</p>
+                    <p className="text-xs text-muted-foreground mb-2">Revenue (15%)</p>
                     <Badge 
                       variant={lobby.status === 'active' ? 'default' : 'secondary'}
-                      className={lobby.status === 'active' ? 'bg-green-500 mt-2' : 'mt-2'}
+                      className={lobby.status === 'active' ? 'bg-green-500' : ''}
                     >
                       {lobby.status.toUpperCase()}
                     </Badge>
@@ -329,7 +398,7 @@ export const CODRevenueLobbies = () => {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Daily Revenue Progress</h3>
             <span className="text-sm text-muted-foreground">
-              ${revenueMetrics.hourly_revenue * 24} / ${revenueMetrics.daily_target}
+              ${(revenueMetrics.hourly_revenue * 8).toFixed(0)} / ${revenueMetrics.daily_target}
             </span>
           </div>
           <div className="w-full bg-muted rounded-full h-4">
