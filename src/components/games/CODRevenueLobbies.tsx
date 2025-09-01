@@ -14,6 +14,7 @@ import {
   Clock,
   Trophy
 } from 'lucide-react';
+import { CODPayoutInfo } from './CODPayoutInfo';
 
 interface CODLobby {
   id: string;
@@ -28,6 +29,7 @@ interface CODLobby {
   map_name: string;
   game_mode: string;
   vip_tier: string;
+  payout_structure?: string;
 }
 
 interface RevenueMetrics {
@@ -60,9 +62,16 @@ export const CODRevenueLobbies = () => {
         .in('status', ['active', 'waiting', 'filling'])
         .order('created_at', { ascending: false });
 
-      // COD Maps and Modes for variety
+      // COD Maps and Modes for variety with payout structures
       const codMaps = ['Nuketown', 'Hijacked', 'Raid', 'Express', 'Slums', 'Plaza', 'Standoff'];
-      const codModes = ['Kill Race', 'Domination', 'Search & Destroy', 'Hardpoint', 'Team Deathmatch'];
+      const codModes = [
+        { name: 'Kill Race', type: 'ffa', payout: '1st/2nd/3rd (60%/30%/10%)' },
+        { name: 'Domination', type: 'team', payout: 'Winner Take All (90%)' },
+        { name: 'Search & Destroy', type: 'team', payout: 'Winner Take All (90%)' },
+        { name: 'Hardpoint', type: 'team', payout: 'Winner Take All (90%)' },
+        { name: 'Team Deathmatch', type: 'team', payout: 'Winner Take All (90%)' },
+        { name: 'Free for All', type: 'ffa', payout: '1st/2nd/3rd (50%/30%/20%)' }
+      ];
       const vipTiers = [
         { name: 'Bronze VIP', fee: 1, color: 'amber' },
         { name: 'Silver VIP', fee: 5, color: 'slate' },
@@ -78,6 +87,7 @@ export const CODRevenueLobbies = () => {
       for (let i = 0; i < lobbyCount; i++) {
         const tier = vipTiers[i % 3];
         const players = Math.floor(Math.random() * 6) + 2;
+        const selectedMode = codModes[Math.floor(Math.random() * codModes.length)];
         
         varietyLobbies.push({
           id: `vip-lobby-${i}`,
@@ -85,13 +95,14 @@ export const CODRevenueLobbies = () => {
           entry_fee: tier.fee,
           current_pot: players * tier.fee,
           players_joined: players,
-          max_players: 8,
+          max_players: selectedMode.type === 'team' ? 8 : 6, // Team modes 4v4, FFA modes 6 players
           status: Math.random() > 0.3 ? 'active' : 'filling',
           created_at: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-          estimated_revenue: (players * tier.fee) * 0.15,
+          estimated_revenue: (players * tier.fee) * 0.10, // 10% platform fee
           map_name: codMaps[Math.floor(Math.random() * codMaps.length)],
-          game_mode: codModes[Math.floor(Math.random() * codModes.length)],
-          vip_tier: tier.name
+          game_mode: selectedMode.name,
+          vip_tier: tier.name,
+          payout_structure: selectedMode.payout
         });
       }
 
@@ -360,6 +371,9 @@ export const CODRevenueLobbies = () => {
                       <p className="text-sm text-muted-foreground mb-2">
                         {lobby.map_name} • {lobby.game_mode}
                       </p>
+                      <p className="text-xs text-muted-foreground mb-2 font-medium">
+                        💰 {lobby.payout_structure || 'Standard Payout'}
+                      </p>
                       <div className="flex items-center gap-3">
                         <Badge variant="outline" className="border-blue-500/50">
                           <Users className="w-3 h-3 mr-1" />
@@ -412,6 +426,9 @@ export const CODRevenueLobbies = () => {
           </p>
         </CardContent>
       </Card>
+
+      {/* Payout Information */}
+      <CODPayoutInfo />
     </div>
   );
 };
