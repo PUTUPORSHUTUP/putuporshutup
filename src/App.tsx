@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import Health from "./pages/Health";
 import Wallet from "./pages/Wallet";
 import QueuePage from "./pages/QueuePage";
+import { ChallengeLanding } from "./pages/ChallengeLanding";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
@@ -42,6 +43,7 @@ const App = () => {
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Index />} />
+              <Route path="/challenge" element={<ChallengeLanding />} />
               <Route path="/queue" element={
                 <ProtectedRoute>
                   <QueuePage />
