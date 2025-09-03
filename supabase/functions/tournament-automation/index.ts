@@ -233,7 +233,6 @@ serve(async (req) => {
           errors++;
         }
       }
-    }
 
     const summary = {
       success: true,
