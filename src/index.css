@@ -10,95 +10,94 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cyberpunk Readable Theme - Dark with Better Contrast */
-    --background: 222 84% 5%;
-    --foreground: 210 40% 85%;
+    /* Cyberpunk Neon Theme - Pure Black with Cyan and Magenta */
+    --background: 0 0% 0%;
+    --foreground: 180 100% 80%;
 
-    --card: 222 84% 8%;
-    --card-foreground: 210 40% 85%;
+    --card: 0 0% 7%;
+    --card-foreground: 180 100% 80%;
 
-    --popover: 222 84% 5%;
-    --popover-foreground: 210 40% 85%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 180 100% 80%;
 
-    /* Electric Cyan Primary */
-    --primary: 189 100% 60%;
-    --primary-foreground: 222 84% 5%;
+    /* Neon Cyan Primary */
+    --primary: 180 100% 80%;
+    --primary-foreground: 0 0% 0%;
 
-    /* Hot Pink Secondary */
-    --secondary: 320 100% 60%;
-    --secondary-foreground: 210 40% 98%;
+    /* Electric Magenta Secondary */
+    --secondary: 320 100% 50%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 215 28% 15%;
-    --muted-foreground: 217 10% 55%;
+    --muted: 0 0% 7%;
+    --muted-foreground: 0 0% 40%;
 
-    /* Neon Green Accent */
-    --accent: 141 76% 55%;
-    --accent-foreground: 222 84% 5%;
+    /* Neon Cyan Accent */
+    --accent: 180 100% 80%;
+    --accent-foreground: 0 0% 0%;
 
-    /* Danger Red */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    /* Hot Pink Destructive */
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 180 100% 80%;
 
-    --border: 217 32% 17%;
-    --input: 215 28% 15%;
-    --ring: 189 100% 60%;
+    --border: 180 100% 80% / 0.2;
+    --input: 0 0% 7%;
+    --ring: 180 100% 80%;
 
     --radius: 0.5rem;
 
-    /* Enhanced neon effects with better contrast */
-    --neon-cyan: 189 100% 60%;
-    --neon-magenta: 320 100% 60%;
-    --neon-green: 141 76% 55%;
+    /* Neon effects */
+    --neon-cyan: 180 100% 80%;
+    --neon-magenta: 320 100% 50%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(189 100% 60%), hsl(320 100% 60%));
-    --gradient-secondary: linear-gradient(135deg, hsl(320 100% 60%), hsl(189 100% 60%));
-    --gradient-gaming: linear-gradient(135deg, hsl(222 84% 5%), hsl(222 84% 8%));
+    --gradient-primary: linear-gradient(135deg, hsl(180 100% 80%), hsl(320 100% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(320 100% 50%), hsl(180 100% 80%));
+    --gradient-gaming: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 7%));
     
-    /* Glows with better visibility */
-    --glow-primary: 0 0 20px hsl(189 100% 60% / 0.4);
-    --glow-secondary: 0 0 20px hsl(320 100% 60% / 0.4);
-    --glow-accent: 0 0 20px hsl(141 76% 55% / 0.4);
+    /* Glows */
+    --glow-primary: 0 0 20px hsl(180 100% 80% / 0.5);
+    --glow-secondary: 0 0 20px hsl(320 100% 50% / 0.5);
+    --glow-accent: 0 0 20px hsl(180 100% 80% / 0.5);
 
-    --sidebar-background: 222 84% 8%;
-    --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 189 100% 60%;
-    --sidebar-primary-foreground: 222 84% 5%;
-    --sidebar-accent: 215 28% 15%;
-    --sidebar-accent-foreground: 210 40% 85%;
-    --sidebar-border: 217 32% 17%;
-    --sidebar-ring: 189 100% 60%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 180 100% 80%;
+    --sidebar-primary: 180 100% 80%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 7%;
+    --sidebar-accent-foreground: 180 100% 80%;
+    --sidebar-border: 180 100% 80% / 0.2;
+    --sidebar-ring: 180 100% 80%;
   }
 
   .dark {
-    /* Matching dark theme with better readability */
-    --background: 222 84% 5%;
-    --foreground: 210 40% 85%;
-    --card: 222 84% 8%;
-    --card-foreground: 210 40% 85%;
-    --popover: 222 84% 5%;
-    --popover-foreground: 210 40% 85%;
-    --primary: 189 100% 60%;
-    --primary-foreground: 222 84% 5%;
-    --secondary: 320 100% 60%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 215 28% 15%;
-    --muted-foreground: 217 10% 55%;
-    --accent: 141 76% 55%;
-    --accent-foreground: 222 84% 5%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 215 28% 15%;
-    --ring: 189 100% 60%;
-    --sidebar-background: 222 84% 8%;
-    --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 189 100% 60%;
-    --sidebar-primary-foreground: 222 84% 5%;
-    --sidebar-accent: 215 28% 15%;
-    --sidebar-accent-foreground: 210 40% 85%;
-    --sidebar-border: 217 32% 17%;
-    --sidebar-ring: 189 100% 60%;
+    /* Same cyberpunk theme for dark mode */
+    --background: 0 0% 0%;
+    --foreground: 180 100% 80%;
+    --card: 0 0% 7%;
+    --card-foreground: 180 100% 80%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 180 100% 80%;
+    --primary: 180 100% 80%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 320 100% 50%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 7%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 180 100% 80%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 180 100% 80%;
+    --border: 180 100% 80% / 0.2;
+    --input: 0 0% 7%;
+    --ring: 180 100% 80%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 180 100% 80%;
+    --sidebar-primary: 180 100% 80%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 7%;
+    --sidebar-accent-foreground: 180 100% 80%;
+    --sidebar-border: 180 100% 80% / 0.2;
+    --sidebar-ring: 180 100% 80%;
   }
 
   * {
