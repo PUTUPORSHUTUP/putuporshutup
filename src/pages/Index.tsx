@@ -54,28 +54,22 @@ export default function IndexPage() {
             Automated 24/7 gaming platform with instant payouts and seamless wallet management
           </p>
           
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button asChild size="lg" variant="secondary">
-              <Link to="/challenge">🎮 Challenge Me</Link>
-            </Button>
-            
-            {!user ? (
-              <>
-                <Button asChild size="lg">
-                  <Link to="/auth">Join Now</Link>
-                </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-              </>
-            ) : (
-              <div className="flex items-center justify-center gap-4">
-                <Badge variant={isSetup ? "default" : "secondary"} className="text-sm px-3 py-1">
-                  {isSetup ? "✅ Ready to Play" : "⚠️ Setup Required"}
-                </Badge>
-              </div>
-            )}
-          </div>
+          {!user ? (
+            <div className="flex gap-4 justify-center">
+              <Button asChild size="lg">
+                <Link to="/auth">Join Now</Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-4">
+              <Badge variant={isSetup ? "default" : "secondary"} className="text-sm px-3 py-1">
+                {isSetup ? "✅ Ready to Play" : "⚠️ Setup Required"}
+              </Badge>
+            </div>
+          )}
         </div>
 
         {/* Main Actions */}
