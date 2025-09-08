@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play, Target, Link, UserCheck } from 'lucide-react';
+import { Trophy, Users, Clock, DollarSign, Gamepad2, Loader2, LogOut, CheckCircle, Play, Target, Link, UserCheck, Wallet } from 'lucide-react';
 import { EnhancedResultModal } from './EnhancedResultModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createWalletValidator } from '@/lib/walletValidation';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Game {
   id: string;
@@ -62,12 +64,36 @@ interface WagerCardProps {
 
 export const ChallengeCard = ({ wager, onJoin, onLeave, onResultReported, currentUserId, isJoining, isLeaving }: WagerCardProps) => {
   const [isStarting, setIsStarting] = useState(false);
+  const [walletSufficient, setWalletSufficient] = useState(true);
+  const [currentBalance, setCurrentBalance] = useState(0);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const validateWallet = createWalletValidator(toast, user);
   
   const isCreator = currentUserId === wager.creator_id;
   const isFull = wager.participant_count >= wager.max_participants;
   const isParticipant = wager.user_participated || isCreator; // Creator can always cancel
   const creatorName = 'Player'; // We'll fetch this later if needed
+
+  // Check wallet balance when component mounts or user changes
+  useEffect(() => {
+    const checkWalletBalance = async () => {
+      if (!user || isParticipant) return;
+      
+      const validation = await validateWallet(wager.stake_amount);
+      setWalletSufficient(validation.isValid);
+      setCurrentBalance(validation.currentBalance);
+    };
+
+    checkWalletBalance();
+  }, [user, wager.stake_amount, isParticipant, validateWallet]);
+
+  const handleJoinWithValidation = async () => {
+    const validation = await validateWallet(wager.stake_amount);
+    if (validation.isValid) {
+      onJoin(wager.id, wager.stake_amount);
+    }
+  };
 
   const handleStartWager = async () => {
     setIsStarting(true);
@@ -348,9 +374,23 @@ export const ChallengeCard = ({ wager, onJoin, onLeave, onResultReported, curren
                 <Users className="w-4 h-4 mr-2" />
                 Wager Full
               </Button>
+            ) : !walletSufficient ? (
+              <div className="space-y-2">
+                <Button 
+                  disabled
+                  className="w-full bg-muted text-muted-foreground"
+                  variant="outline"
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Insufficient Funds
+                </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  Balance: ${currentBalance.toFixed(2)} | Need: ${wager.stake_amount.toFixed(2)}
+                </p>
+              </div>
             ) : (
               <Button 
-                onClick={() => onJoin(wager.id, wager.stake_amount)}
+                onClick={handleJoinWithValidation}
                 className="w-full bg-primary hover:bg-primary/90"
                 disabled={isJoining}
               >
