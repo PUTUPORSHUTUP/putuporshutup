@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { calculateMatchEligibility } from '@/lib/walletValidation';
 import { getActiveDemoMatch } from '@/lib/demo';
 
 export default function SmartBanner() {
@@ -37,20 +39,32 @@ export default function SmartBanner() {
             </AlertDescription>
           </Alert>
         );
-      } else if ((profile.wallet_balance ?? 0) < 5 && !demoMatch) {
-        // Only show wallet warning if no demo match is available
-        setBanner(
-          <Alert className="border-yellow-500/50 text-yellow-700 dark:text-yellow-300">
-            <Wallet className="h-4 w-4" />
-            <AlertDescription>
-              💸 Your wallet balance is low (${(profile.wallet_balance ?? 0).toFixed(2)}).{' '}
-              <Link to="/wallet" className="underline hover:no-underline font-semibold">
-                Add funds
-              </Link>{' '}
-              to stay in automated matches.
-            </AlertDescription>
-          </Alert>
-        );
+      } else if (!demoMatch) {
+        // PUOSU Wallet System - Smart Banner Logic
+        const balance = profile.wallet_balance ?? 0;
+        const eligibility = calculateMatchEligibility(balance);
+        
+        if (eligibility.bannerMessage) {
+          const isError = eligibility.bannerType === 'error';
+          setBanner(
+            <Alert className={isError ? "border-destructive/50 text-destructive" : "border-yellow-500/50 text-yellow-700 dark:text-yellow-300"}>
+              {isError ? <AlertTriangle className="h-4 w-4" /> : <Wallet className="h-4 w-4" />}
+              <AlertDescription className="flex items-center justify-between">
+                <span>
+                  {eligibility.bannerMessage}
+                  {eligibility.availableMatches.length > 0 && (
+                    <span className="ml-2 text-sm opacity-80">
+                      Available: ${eligibility.availableMatches.join(', $')} matches
+                    </span>
+                  )}
+                </span>
+                <Button asChild size="sm" variant={isError ? "destructive" : "outline"}>
+                  <Link to="/wallet">Top Up Wallet</Link>
+                </Button>
+              </AlertDescription>
+            </Alert>
+          );
+        }
       }
     };
 
