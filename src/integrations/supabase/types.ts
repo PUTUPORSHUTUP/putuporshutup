@@ -4505,6 +4505,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      deduct_entry_fee_safe: {
+        Args: { p_entry_fee: number; p_user_id: string }
+        Returns: Json
+      }
       deploy_emergency_users: {
         Args: { user_count?: number }
         Returns: Json
@@ -4607,6 +4611,10 @@ export type Database = {
           user_id: string
           wallet_balance: number
         }[]
+      }
+      get_match_eligibility: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       get_payout_guard: {
         Args: Record<PropertyKey, never>
@@ -4905,6 +4913,10 @@ export type Database = {
           refund_amount: number
           user_id: string
         }[]
+      }
+      refund_entry_fee: {
+        Args: { p_entry_fee: number; p_reason?: string; p_user_id: string }
+        Returns: Json
       }
       safe_nextval: {
         Args: { sequence_name: string }
