@@ -2341,6 +2341,41 @@ export type Database = {
         }
         Relationships: []
       }
+      payouts: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          status: string | null
+          transaction_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payouts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_revenue: {
         Row: {
           amount: number
@@ -4509,6 +4544,10 @@ export type Database = {
         Args: { p_entry_fee: number; p_user_id: string }
         Returns: Json
       }
+      demote_user_from_admin: {
+        Args: { target_email: string }
+        Returns: undefined
+      }
       deploy_emergency_users: {
         Args: { user_count?: number }
         Returns: Json
@@ -4882,6 +4921,10 @@ export type Database = {
         Args: { action: string; username?: string; wallet_balance?: number }
         Returns: Json
       }
+      manage_user_role: {
+        Args: { action: string; target_email: string }
+        Returns: undefined
+      }
       manual_payout: {
         Args: { admin_override?: boolean; match_id: string }
         Returns: Json
@@ -4901,6 +4944,10 @@ export type Database = {
           p_ref_match: string
           p_user_id: string
         }
+        Returns: undefined
+      }
+      promote_user_to_admin: {
+        Args: { target_email: string }
         Returns: undefined
       }
       queue_test_players: {
