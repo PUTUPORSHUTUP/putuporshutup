@@ -153,17 +153,6 @@ export default function IndexPage() {
         {/* Tournament Engine */}
         <TournamentEngine />
 
-        {/* Platform Showcase */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            <img 
-              src="/lovable-uploads/microsoft-platform-showcase.png" 
-              alt="PUOSU Gaming Platform Showcase - Features include 24/7 automation, instant payouts, user profiles, and gaming wallet"
-              className="w-full h-auto"
-            />
-          </CardContent>
-        </Card>
-
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center space-y-2">
